@@ -14,12 +14,61 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          id: number
+          sendpulse_chat_id: string | null
+          site_name: string
+          site_url: string | null
+          smtp_from_email: string | null
+          smtp_from_name: string | null
+          smtp_host: string | null
+          smtp_password: string | null
+          smtp_port: number | null
+          smtp_secure: boolean | null
+          smtp_user: string | null
+          tidio_public_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          sendpulse_chat_id?: string | null
+          site_name?: string
+          site_url?: string | null
+          smtp_from_email?: string | null
+          smtp_from_name?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_user?: string | null
+          tidio_public_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          sendpulse_chat_id?: string | null
+          site_name?: string
+          site_url?: string | null
+          smtp_from_email?: string | null
+          smtp_from_name?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_user?: string | null
+          tidio_public_key?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           admin_note: string | null
           amount: number
           created_at: string
           id: string
+          payer_phone: string | null
           payment_method_id: string | null
           proof_url: string | null
           reference: string | null
@@ -32,6 +81,7 @@ export type Database = {
           amount: number
           created_at?: string
           id?: string
+          payer_phone?: string | null
           payment_method_id?: string | null
           proof_url?: string | null
           reference?: string | null
@@ -44,6 +94,7 @@ export type Database = {
           amount?: number
           created_at?: string
           id?: string
+          payer_phone?: string | null
           payment_method_id?: string | null
           proof_url?: string | null
           reference?: string | null
@@ -60,6 +111,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          recipient: string
+          status: string
+          subject: string | null
+          template_key: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          recipient: string
+          status: string
+          subject?: string | null
+          template_key?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          recipient?: string
+          status?: string
+          subject?: string | null
+          template_key?: string | null
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          enabled: boolean
+          html_body: string
+          key: string
+          name: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          html_body: string
+          key: string
+          name: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          html_body?: string
+          key?: string
+          name?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       investments: {
         Row: {
@@ -151,10 +259,13 @@ export type Database = {
           daily_roi_percent: number
           description: string | null
           duration_days: number
+          fixed_daily_profit: number
           id: string
           max_amount: number
           min_amount: number
           name: string
+          payout_frequency: string
+          profit_type: string
         }
         Insert: {
           active?: boolean
@@ -162,10 +273,13 @@ export type Database = {
           daily_roi_percent: number
           description?: string | null
           duration_days: number
+          fixed_daily_profit?: number
           id?: string
           max_amount: number
           min_amount: number
           name: string
+          payout_frequency?: string
+          profit_type?: string
         }
         Update: {
           active?: boolean
@@ -173,10 +287,13 @@ export type Database = {
           daily_roi_percent?: number
           description?: string | null
           duration_days?: number
+          fixed_daily_profit?: number
           id?: string
           max_amount?: number
           min_amount?: number
           name?: string
+          payout_frequency?: string
+          profit_type?: string
         }
         Relationships: []
       }
@@ -186,7 +303,9 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          kyc_status: string
           phone: string | null
+          referral_code: string | null
           total_earned: number
           total_invested: number
           updated_at: string
@@ -196,7 +315,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          kyc_status?: string
           phone?: string | null
+          referral_code?: string | null
           total_earned?: number
           total_invested?: number
           updated_at?: string
@@ -206,7 +327,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          kyc_status?: string
           phone?: string | null
+          referral_code?: string | null
           total_earned?: number
           total_invested?: number
           updated_at?: string
@@ -305,7 +428,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_settings: {
+        Row: {
+          id: number | null
+          site_name: string | null
+          site_url: string | null
+          tidio_public_key: string | null
+        }
+        Insert: {
+          id?: number | null
+          site_name?: string | null
+          site_url?: string | null
+          tidio_public_key?: string | null
+        }
+        Update: {
+          id?: number | null
+          site_name?: string | null
+          site_url?: string | null
+          tidio_public_key?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
