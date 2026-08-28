@@ -470,6 +470,9 @@ export type Database = {
         | "roi"
         | "withdrawal"
         | "adjustment"
+        | "profit"
+        | "referral"
+        | "investment_return"
       withdrawal_status: "pending" | "approved" | "rejected" | "paid"
     }
     CompositeTypes: {
@@ -608,6 +611,9 @@ export const Constants = {
         "roi",
         "withdrawal",
         "adjustment",
+        "profit",
+        "referral",
+        "investment_return",
       ],
       withdrawal_status: ["pending", "approved", "rejected", "paid"],
     },
