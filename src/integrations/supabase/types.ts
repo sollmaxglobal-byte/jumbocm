@@ -458,6 +458,42 @@ export type Database = {
       }
     }
     Views: {
+      public_app_settings: {
+        Row: {
+          id: number | null
+          referral_percent: number | null
+          sendpulse_chat_id: string | null
+          sendpulse_embed_html: string | null
+          site_name: string | null
+          site_url: string | null
+          tawk_property_id: string | null
+          tawk_widget_id: string | null
+          tidio_public_key: string | null
+        }
+        Insert: {
+          id?: number | null
+          referral_percent?: number | null
+          sendpulse_chat_id?: string | null
+          sendpulse_embed_html?: string | null
+          site_name?: string | null
+          site_url?: string | null
+          tawk_property_id?: string | null
+          tawk_widget_id?: string | null
+          tidio_public_key?: string | null
+        }
+        Update: {
+          id?: number | null
+          referral_percent?: number | null
+          sendpulse_chat_id?: string | null
+          sendpulse_embed_html?: string | null
+          site_name?: string | null
+          site_url?: string | null
+          tawk_property_id?: string | null
+          tawk_widget_id?: string | null
+          tidio_public_key?: string | null
+        }
+        Relationships: []
+      }
       public_settings: {
         Row: {
           id: number | null
@@ -481,13 +517,54 @@ export type Database = {
       }
     }
     Functions: {
+      activate_investment: {
+        Args: { _amount: number; _plan_id: string }
+        Returns: string
+      }
       distribute_profits: { Args: never; Returns: undefined }
+      get_app_settings_admin: {
+        Args: never
+        Returns: {
+          id: number
+          referral_percent: number
+          sendpulse_chat_id: string | null
+          sendpulse_embed_html: string | null
+          site_name: string
+          site_url: string | null
+          smtp_from_email: string | null
+          smtp_from_name: string | null
+          smtp_host: string | null
+          smtp_password: string | null
+          smtp_port: number | null
+          smtp_secure: boolean | null
+          smtp_user: string | null
+          tawk_property_id: string | null
+          tawk_widget_id: string | null
+          tidio_public_key: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "app_settings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      recent_activity: {
+        Args: { _limit?: number }
+        Returns: {
+          amount: number
+          created_at: string
+          first_name: string
+          kind: string
+        }[]
       }
     }
     Enums: {
