@@ -17,7 +17,9 @@ export type Database = {
       app_settings: {
         Row: {
           id: number
+          referral_percent: number
           sendpulse_chat_id: string | null
+          sendpulse_embed_html: string | null
           site_name: string
           site_url: string | null
           smtp_from_email: string | null
@@ -27,12 +29,16 @@ export type Database = {
           smtp_port: number | null
           smtp_secure: boolean | null
           smtp_user: string | null
+          tawk_property_id: string | null
+          tawk_widget_id: string | null
           tidio_public_key: string | null
           updated_at: string
         }
         Insert: {
           id?: number
+          referral_percent?: number
           sendpulse_chat_id?: string | null
+          sendpulse_embed_html?: string | null
           site_name?: string
           site_url?: string | null
           smtp_from_email?: string | null
@@ -42,12 +48,16 @@ export type Database = {
           smtp_port?: number | null
           smtp_secure?: boolean | null
           smtp_user?: string | null
+          tawk_property_id?: string | null
+          tawk_widget_id?: string | null
           tidio_public_key?: string | null
           updated_at?: string
         }
         Update: {
           id?: number
+          referral_percent?: number
           sendpulse_chat_id?: string | null
+          sendpulse_embed_html?: string | null
           site_name?: string
           site_url?: string | null
           smtp_from_email?: string | null
@@ -57,6 +67,8 @@ export type Database = {
           smtp_port?: number | null
           smtp_secure?: boolean | null
           smtp_user?: string | null
+          tawk_property_id?: string | null
+          tawk_widget_id?: string | null
           tidio_public_key?: string | null
           updated_at?: string
         }
@@ -176,6 +188,7 @@ export type Database = {
           duration_days: number
           end_date: string
           id: string
+          is_paused: boolean
           last_payout_at: string | null
           plan_id: string
           start_date: string
@@ -189,6 +202,7 @@ export type Database = {
           duration_days: number
           end_date: string
           id?: string
+          is_paused?: boolean
           last_payout_at?: string | null
           plan_id: string
           start_date?: string
@@ -202,6 +216,7 @@ export type Database = {
           duration_days?: number
           end_date?: string
           id?: string
+          is_paused?: boolean
           last_payout_at?: string | null
           plan_id?: string
           start_date?: string
@@ -255,10 +270,12 @@ export type Database = {
       plans: {
         Row: {
           active: boolean
+          amount_type: string
           created_at: string
           daily_roi_percent: number
           description: string | null
           duration_days: number
+          fixed_amount: number
           fixed_daily_profit: number
           id: string
           max_amount: number
@@ -269,10 +286,12 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          amount_type?: string
           created_at?: string
           daily_roi_percent: number
           description?: string | null
           duration_days: number
+          fixed_amount?: number
           fixed_daily_profit?: number
           id?: string
           max_amount: number
@@ -283,10 +302,12 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          amount_type?: string
           created_at?: string
           daily_roi_percent?: number
           description?: string | null
           duration_days?: number
+          fixed_amount?: number
           fixed_daily_profit?: number
           id?: string
           max_amount?: number
@@ -303,9 +324,12 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_suspended: boolean
           kyc_status: string
           phone: string | null
           referral_code: string | null
+          referral_earnings: number
+          referred_by: string | null
           total_earned: number
           total_invested: number
           updated_at: string
@@ -315,9 +339,12 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          is_suspended?: boolean
           kyc_status?: string
           phone?: string | null
           referral_code?: string | null
+          referral_earnings?: number
+          referred_by?: string | null
           total_earned?: number
           total_invested?: number
           updated_at?: string
@@ -327,9 +354,12 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_suspended?: boolean
           kyc_status?: string
           phone?: string | null
           referral_code?: string | null
+          referral_earnings?: number
+          referred_by?: string | null
           total_earned?: number
           total_invested?: number
           updated_at?: string
@@ -451,6 +481,7 @@ export type Database = {
       }
     }
     Functions: {
+      distribute_profits: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
