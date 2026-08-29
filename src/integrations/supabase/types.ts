@@ -690,6 +690,8 @@ export type Database = {
         | "profit"
         | "referral"
         | "investment_return"
+        | "withdrawal_hold"
+        | "withdrawal_refund"
       withdrawal_status: "pending" | "approved" | "rejected" | "paid"
     }
     CompositeTypes: {
@@ -831,6 +833,8 @@ export const Constants = {
         "profit",
         "referral",
         "investment_return",
+        "withdrawal_hold",
+        "withdrawal_refund",
       ],
       withdrawal_status: ["pending", "approved", "rejected", "paid"],
     },
