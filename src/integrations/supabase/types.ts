@@ -22,7 +22,19 @@ export type Database = {
           announcement_message: string | null
           announcement_title: string | null
           announcement_version: number
+          auto_approve_enabled: boolean
+          auto_approve_max_amount: number | null
+          auto_withdraw_enabled: boolean
+          auto_withdraw_max_amount: number | null
+          auto_withdraw_ussd_template: string
+          deposit_max_amount: number
+          deposit_min_amount: number
           id: number
+          mm_webhook_secret: string | null
+          mtn_enabled: boolean
+          mtn_number: string | null
+          orange_enabled: boolean
+          orange_number: string | null
           referral_percent: number
           sendpulse_chat_id: string | null
           sendpulse_embed_html: string | null
@@ -47,7 +59,19 @@ export type Database = {
           announcement_message?: string | null
           announcement_title?: string | null
           announcement_version?: number
+          auto_approve_enabled?: boolean
+          auto_approve_max_amount?: number | null
+          auto_withdraw_enabled?: boolean
+          auto_withdraw_max_amount?: number | null
+          auto_withdraw_ussd_template?: string
+          deposit_max_amount?: number
+          deposit_min_amount?: number
           id?: number
+          mm_webhook_secret?: string | null
+          mtn_enabled?: boolean
+          mtn_number?: string | null
+          orange_enabled?: boolean
+          orange_number?: string | null
           referral_percent?: number
           sendpulse_chat_id?: string | null
           sendpulse_embed_html?: string | null
@@ -72,7 +96,19 @@ export type Database = {
           announcement_message?: string | null
           announcement_title?: string | null
           announcement_version?: number
+          auto_approve_enabled?: boolean
+          auto_approve_max_amount?: number | null
+          auto_withdraw_enabled?: boolean
+          auto_withdraw_max_amount?: number | null
+          auto_withdraw_ussd_template?: string
+          deposit_max_amount?: number
+          deposit_min_amount?: number
           id?: number
+          mm_webhook_secret?: string | null
+          mtn_enabled?: boolean
+          mtn_number?: string | null
+          orange_enabled?: boolean
+          orange_number?: string | null
           referral_percent?: number
           sendpulse_chat_id?: string | null
           sendpulse_embed_html?: string | null
@@ -96,8 +132,16 @@ export type Database = {
         Row: {
           admin_note: string | null
           amount: number
+          auto_approved_at: string | null
+          auto_note: string | null
           created_at: string
           id: string
+          matched_message_id: string | null
+          ocr_amount: number | null
+          ocr_payer: string | null
+          ocr_raw: Json | null
+          ocr_txn_id: string | null
+          ocr_txn_id_norm: string | null
           payer_phone: string | null
           payment_method_id: string | null
           proof_url: string | null
@@ -109,8 +153,16 @@ export type Database = {
         Insert: {
           admin_note?: string | null
           amount: number
+          auto_approved_at?: string | null
+          auto_note?: string | null
           created_at?: string
           id?: string
+          matched_message_id?: string | null
+          ocr_amount?: number | null
+          ocr_payer?: string | null
+          ocr_raw?: Json | null
+          ocr_txn_id?: string | null
+          ocr_txn_id_norm?: string | null
           payer_phone?: string | null
           payment_method_id?: string | null
           proof_url?: string | null
@@ -122,8 +174,16 @@ export type Database = {
         Update: {
           admin_note?: string | null
           amount?: number
+          auto_approved_at?: string | null
+          auto_note?: string | null
           created_at?: string
           id?: string
+          matched_message_id?: string | null
+          ocr_amount?: number | null
+          ocr_payer?: string | null
+          ocr_raw?: Json | null
+          ocr_txn_id?: string | null
+          ocr_txn_id_norm?: string | null
           payer_phone?: string | null
           payment_method_id?: string | null
           proof_url?: string | null
@@ -133,6 +193,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "deposits_matched_message_id_fkey"
+            columns: ["matched_message_id"]
+            isOneToOne: false
+            referencedRelation: "mm_messages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "deposits_payment_method_id_fkey"
             columns: ["payment_method_id"]
@@ -258,6 +325,56 @@ export type Database = {
           },
         ]
       }
+      mm_messages: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          matched_at: string | null
+          matched_deposit_id: string | null
+          payer_number: string | null
+          raw_text: string
+          received_at: string
+          sender: string | null
+          txn_id: string | null
+          txn_id_norm: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          matched_at?: string | null
+          matched_deposit_id?: string | null
+          payer_number?: string | null
+          raw_text: string
+          received_at?: string
+          sender?: string | null
+          txn_id?: string | null
+          txn_id_norm?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          matched_at?: string | null
+          matched_deposit_id?: string | null
+          payer_number?: string | null
+          raw_text?: string
+          received_at?: string
+          sender?: string | null
+          txn_id?: string | null
+          txn_id_norm?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mm_messages_matched_deposit_id_fkey"
+            columns: ["matched_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "deposits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_methods: {
         Row: {
           account_name: string | null
@@ -291,6 +408,36 @@ export type Database = {
           label?: string
           scope?: string
           type?: Database["public"]["Enums"]["payment_method_type"]
+        }
+        Relationships: []
+      }
+      payout_accounts: {
+        Row: {
+          account_name: string
+          account_number: string
+          created_at: string
+          id: string
+          is_default: boolean
+          method: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          method: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          method?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -360,7 +507,9 @@ export type Database = {
           referred_by: string | null
           total_earned: number
           total_invested: number
+          transfer_pin_hash: string | null
           updated_at: string
+          withdrawal_pin_hash: string | null
         }
         Insert: {
           balance?: number
@@ -376,7 +525,9 @@ export type Database = {
           referred_by?: string | null
           total_earned?: number
           total_invested?: number
+          transfer_pin_hash?: string | null
           updated_at?: string
+          withdrawal_pin_hash?: string | null
         }
         Update: {
           balance?: number
@@ -392,7 +543,72 @@ export type Database = {
           referred_by?: string | null
           total_earned?: number
           total_invested?: number
+          transfer_pin_hash?: string | null
           updated_at?: string
+          withdrawal_pin_hash?: string | null
+        }
+        Relationships: []
+      }
+      push_broadcasts: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          sent_count: number
+          title: string
+          url: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          sent_count?: number
+          title: string
+          url?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          sent_count?: number
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -492,9 +708,14 @@ export type Database = {
           account_number: string
           admin_note: string | null
           amount: number
+          auto_attempts: number
+          auto_note: string | null
+          auto_state: string
           created_at: string
+          dispatched_at: string | null
           id: string
           method: Database["public"]["Enums"]["payment_method_type"]
+          operator_ref: string | null
           reviewed_at: string | null
           status: Database["public"]["Enums"]["withdrawal_status"]
           user_id: string
@@ -504,9 +725,14 @@ export type Database = {
           account_number: string
           admin_note?: string | null
           amount: number
+          auto_attempts?: number
+          auto_note?: string | null
+          auto_state?: string
           created_at?: string
+          dispatched_at?: string | null
           id?: string
           method: Database["public"]["Enums"]["payment_method_type"]
+          operator_ref?: string | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["withdrawal_status"]
           user_id: string
@@ -516,9 +742,14 @@ export type Database = {
           account_number?: string
           admin_note?: string | null
           amount?: number
+          auto_attempts?: number
+          auto_note?: string | null
+          auto_state?: string
           created_at?: string
+          dispatched_at?: string | null
           id?: string
           method?: Database["public"]["Enums"]["payment_method_type"]
+          operator_ref?: string | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["withdrawal_status"]
           user_id?: string
@@ -612,7 +843,47 @@ export type Database = {
         Args: { _amount: number; _plan_id: string }
         Returns: Json
       }
+      auto_approve_deposit: {
+        Args: { _deposit_id: string; _message_id: string }
+        Returns: Json
+      }
+      can_withdraw: { Args: { _user_id: string }; Returns: boolean }
+      claim_auto_withdrawal: { Args: never; Returns: Json }
+      complete_auto_withdrawal: {
+        Args: { _id: string; _ref?: string }
+        Returns: Json
+      }
+      create_transfer: {
+        Args: {
+          _amount: number
+          _note?: string
+          _pin: string
+          _recipient_email: string
+        }
+        Returns: boolean
+      }
+      create_withdrawal: {
+        Args: {
+          _account_name: string
+          _account_number: string
+          _amount: number
+          _method: string
+          _pin: string
+        }
+        Returns: string
+      }
       distribute_profits: { Args: never; Returns: undefined }
+      fail_auto_withdrawal: {
+        Args: { _id: string; _note?: string }
+        Returns: Json
+      }
+      get_admin_user_emails: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+        }[]
+      }
       get_app_settings_admin: {
         Args: never
         Returns: {
@@ -622,7 +893,19 @@ export type Database = {
           announcement_message: string | null
           announcement_title: string | null
           announcement_version: number
+          auto_approve_enabled: boolean
+          auto_approve_max_amount: number | null
+          auto_withdraw_enabled: boolean
+          auto_withdraw_max_amount: number | null
+          auto_withdraw_ussd_template: string
+          deposit_max_amount: number
+          deposit_min_amount: number
           id: number
+          mm_webhook_secret: string | null
+          mtn_enabled: boolean
+          mtn_number: string | null
+          orange_enabled: boolean
+          orange_number: string | null
           referral_percent: number
           sendpulse_chat_id: string | null
           sendpulse_embed_html: string | null
@@ -675,6 +958,22 @@ export type Database = {
         }[]
       }
       referrer_name: { Args: { _code: string }; Returns: string }
+      reject_withdrawal: { Args: { _id: string }; Returns: undefined }
+      reload_schema_cache: { Args: never; Returns: undefined }
+      request_withdrawal: {
+        Args: {
+          _account_name: string
+          _account_number: string
+          _amount: number
+          _method: string
+        }
+        Returns: string
+      }
+      set_security_pin: {
+        Args: { _kind: string; _pin: string }
+        Returns: boolean
+      }
+      set_transfer_pin: { Args: { _pin: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
