@@ -507,7 +507,9 @@ export type Database = {
           referred_by: string | null
           total_earned: number
           total_invested: number
+          transfer_pin_hash: string | null
           updated_at: string
+          withdrawal_pin_hash: string | null
         }
         Insert: {
           balance?: number
@@ -523,7 +525,9 @@ export type Database = {
           referred_by?: string | null
           total_earned?: number
           total_invested?: number
+          transfer_pin_hash?: string | null
           updated_at?: string
+          withdrawal_pin_hash?: string | null
         }
         Update: {
           balance?: number
@@ -539,7 +543,9 @@ export type Database = {
           referred_by?: string | null
           total_earned?: number
           total_invested?: number
+          transfer_pin_hash?: string | null
           updated_at?: string
+          withdrawal_pin_hash?: string | null
         }
         Relationships: []
       }
@@ -841,15 +847,42 @@ export type Database = {
         Args: { _deposit_id: string; _message_id: string }
         Returns: Json
       }
+      can_withdraw: { Args: { _user_id: string }; Returns: boolean }
       claim_auto_withdrawal: { Args: never; Returns: Json }
       complete_auto_withdrawal: {
         Args: { _id: string; _ref?: string }
         Returns: Json
       }
+      create_transfer: {
+        Args: {
+          _amount: number
+          _note?: string
+          _pin: string
+          _recipient_email: string
+        }
+        Returns: boolean
+      }
+      create_withdrawal: {
+        Args: {
+          _account_name: string
+          _account_number: string
+          _amount: number
+          _method: string
+          _pin: string
+        }
+        Returns: string
+      }
       distribute_profits: { Args: never; Returns: undefined }
       fail_auto_withdrawal: {
         Args: { _id: string; _note?: string }
         Returns: Json
+      }
+      get_admin_user_emails: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+        }[]
       }
       get_app_settings_admin: {
         Args: never
@@ -936,6 +969,11 @@ export type Database = {
         }
         Returns: string
       }
+      set_security_pin: {
+        Args: { _kind: string; _pin: string }
+        Returns: boolean
+      }
+      set_transfer_pin: { Args: { _pin: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
