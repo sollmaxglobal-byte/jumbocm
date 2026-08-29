@@ -16,6 +16,12 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          announcement_enabled: boolean
+          announcement_link: string | null
+          announcement_link_label: string | null
+          announcement_message: string | null
+          announcement_title: string | null
+          announcement_version: number
           id: number
           referral_percent: number
           sendpulse_chat_id: string | null
@@ -35,6 +41,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          announcement_enabled?: boolean
+          announcement_link?: string | null
+          announcement_link_label?: string | null
+          announcement_message?: string | null
+          announcement_title?: string | null
+          announcement_version?: number
           id?: number
           referral_percent?: number
           sendpulse_chat_id?: string | null
@@ -54,6 +66,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          announcement_enabled?: boolean
+          announcement_link?: string | null
+          announcement_link_label?: string | null
+          announcement_message?: string | null
+          announcement_title?: string | null
+          announcement_version?: number
           id?: number
           referral_percent?: number
           sendpulse_chat_id?: string | null
@@ -158,25 +176,31 @@ export type Database = {
         Row: {
           enabled: boolean
           html_body: string
+          html_body_fr: string | null
           key: string
           name: string
           subject: string
+          subject_fr: string | null
           updated_at: string
         }
         Insert: {
           enabled?: boolean
           html_body: string
+          html_body_fr?: string | null
           key: string
           name: string
           subject: string
+          subject_fr?: string | null
           updated_at?: string
         }
         Update: {
           enabled?: boolean
           html_body?: string
+          html_body_fr?: string | null
           key?: string
           name?: string
           subject?: string
+          subject_fr?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -330,6 +354,7 @@ export type Database = {
           is_suspended: boolean
           kyc_status: string
           phone: string | null
+          preferred_language: string
           referral_code: string | null
           referral_earnings: number
           referred_by: string | null
@@ -345,6 +370,7 @@ export type Database = {
           is_suspended?: boolean
           kyc_status?: string
           phone?: string | null
+          preferred_language?: string
           referral_code?: string | null
           referral_earnings?: number
           referred_by?: string | null
@@ -360,12 +386,52 @@ export type Database = {
           is_suspended?: boolean
           kyc_status?: string
           phone?: string | null
+          preferred_language?: string
           referral_code?: string | null
           referral_earnings?: number
           referred_by?: string | null
           total_earned?: number
           total_invested?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      receipt_email_queue: {
+        Row: {
+          attempts: number
+          created_at: string
+          final_status: string
+          id: string
+          kind: string
+          last_error: string | null
+          ref_id: string
+          send_after: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          final_status: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          ref_id: string
+          send_after?: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          final_status?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          ref_id?: string
+          send_after?: string
+          sent_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -463,6 +529,12 @@ export type Database = {
     Views: {
       public_app_settings: {
         Row: {
+          announcement_enabled: boolean | null
+          announcement_link: string | null
+          announcement_link_label: string | null
+          announcement_message: string | null
+          announcement_title: string | null
+          announcement_version: number | null
           id: number | null
           referral_percent: number | null
           sendpulse_chat_id: string | null
@@ -474,6 +546,12 @@ export type Database = {
           tidio_public_key: string | null
         }
         Insert: {
+          announcement_enabled?: boolean | null
+          announcement_link?: string | null
+          announcement_link_label?: string | null
+          announcement_message?: string | null
+          announcement_title?: string | null
+          announcement_version?: number | null
           id?: number | null
           referral_percent?: number | null
           sendpulse_chat_id?: string | null
@@ -485,6 +563,12 @@ export type Database = {
           tidio_public_key?: string | null
         }
         Update: {
+          announcement_enabled?: boolean | null
+          announcement_link?: string | null
+          announcement_link_label?: string | null
+          announcement_message?: string | null
+          announcement_title?: string | null
+          announcement_version?: number | null
           id?: number | null
           referral_percent?: number | null
           sendpulse_chat_id?: string | null
@@ -532,6 +616,12 @@ export type Database = {
       get_app_settings_admin: {
         Args: never
         Returns: {
+          announcement_enabled: boolean
+          announcement_link: string | null
+          announcement_link_label: string | null
+          announcement_message: string | null
+          announcement_title: string | null
+          announcement_version: number
           id: number
           referral_percent: number
           sendpulse_chat_id: string | null
@@ -563,6 +653,17 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      my_referrals: {
+        Args: never
+        Returns: {
+          full_name: string
+          invested: number
+          investment_status: string
+          joined_at: string
+          plan_name: string
+          user_id: string
+        }[]
       }
       recent_activity: {
         Args: { _limit?: number }
