@@ -284,16 +284,13 @@ export function SocialProof() {
     let nextTimer: ReturnType<typeof setTimeout>;
 
     const cycle = () => {
-      // Prefer a real event; fall back to fabricated
+      // Only show genuine platform activity — no fabricated notices.
       const next = realQueue.current.shift();
       if (next) {
         setNotice(next);
-      } else {
-        counter.current += 1;
-        setNotice(makeFakeNotice(counter.current));
+        playChime();
+        hideTimer = setTimeout(() => setNotice(null), 5000);
       }
-      playChime();
-      hideTimer = setTimeout(() => setNotice(null), 5000);
       nextTimer = setTimeout(cycle, 11000);
     };
 
