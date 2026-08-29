@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/public/mm-sms")({
           payload.secret?.trim() ||
           null;
         const text = "text" in payload ? payload.text : payload.message;
-        const sender = "sender" in payload ? payload.sender : payload.from;
+        const sender = "sender" in payload ? payload.sender : "from" in payload ? payload.from : undefined;
 
         const { data: settings } = await supabaseAdmin
           .from("app_settings")
