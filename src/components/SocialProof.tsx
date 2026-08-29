@@ -3,7 +3,7 @@ import { ArrowDownCircle, ArrowUpCircle, X } from "lucide-react";
 import { formatXAF } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 
-// More than 500 distinct Cameroonian name combinations. Names can repeat naturally.
+// City labels used to decorate real activity notices.
 const CITIES = [
   "Douala",
   "Yaoundé",

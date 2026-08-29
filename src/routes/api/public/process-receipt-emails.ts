@@ -26,7 +26,7 @@ async function processQueue() {
     .select("site_name,site_url")
     .eq("id", 1)
     .maybeSingle();
-  const siteUrl = settings?.site_url || "https://fidelity-invest.lovable.app";
+  const siteUrl = settings?.site_url || "https://jumbocm.lovable.app";
 
   const { data: due } = await supabaseAdmin
     .from("receipt_email_queue")
