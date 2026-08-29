@@ -243,6 +243,7 @@ export type Database = {
           id: string
           instructions: string | null
           label: string
+          scope: string
           type: Database["public"]["Enums"]["payment_method_type"]
         }
         Insert: {
@@ -253,6 +254,7 @@ export type Database = {
           id?: string
           instructions?: string | null
           label: string
+          scope?: string
           type: Database["public"]["Enums"]["payment_method_type"]
         }
         Update: {
@@ -263,6 +265,7 @@ export type Database = {
           id?: string
           instructions?: string | null
           label?: string
+          scope?: string
           type?: Database["public"]["Enums"]["payment_method_type"]
         }
         Relationships: []
@@ -521,6 +524,10 @@ export type Database = {
         Args: { _amount: number; _plan_id: string }
         Returns: string
       }
+      activate_investment_v2: {
+        Args: { _amount: number; _plan_id: string }
+        Returns: Json
+      }
       distribute_profits: { Args: never; Returns: undefined }
       get_app_settings_admin: {
         Args: never
@@ -566,6 +573,7 @@ export type Database = {
           kind: string
         }[]
       }
+      referrer_name: { Args: { _code: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"
