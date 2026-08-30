@@ -16,7 +16,7 @@ import {
   Wallet,
   Sparkles,
 } from "lucide-react";
-import { formatDate, formatXAF } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -605,6 +605,3 @@ function ReferralCard({
     </div>
   );
 }
-
-// keep formatXAF import referenced for type stability in Money usage paths
-void formatXAF;
