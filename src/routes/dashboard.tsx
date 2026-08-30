@@ -84,20 +84,15 @@ function DashboardLayout() {
       className={`app-shell min-h-screen bg-background pb-24 md:pb-0 ${appMode ? "app-shell-standalone" : ""}`}
     >
       {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+      <header className="sticky top-0 z-30 bg-[#F5F4EF]/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="app-header mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground md:block">
-              Private wealth
-            </span>
-            <Link to="/" className="flex items-center">
-              <img
-                src="/fidelity-dashboard-logo.png"
-                alt="Fidelity Invest"
-                className="h-9 w-[150px] object-contain object-left sm:h-10 sm:w-[170px]"
-              />
-            </Link>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img
+              src="/fidelity-dashboard-logo.png"
+              alt="Fidelity Invest"
+              className="h-8 w-[140px] object-contain object-left sm:h-9 sm:w-[160px]"
+            />
+          </Link>
           <div className="flex items-center gap-1.5">
             <Button
               size="icon"
