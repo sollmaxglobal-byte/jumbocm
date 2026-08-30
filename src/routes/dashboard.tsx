@@ -84,20 +84,15 @@ function DashboardLayout() {
       className={`app-shell min-h-screen bg-background pb-24 md:pb-0 ${appMode ? "app-shell-standalone" : ""}`}
     >
       {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+      <header className="sticky top-0 z-30 bg-[#F5F4EF]/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="app-header mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground md:block">
-              Private wealth
-            </span>
-            <Link to="/" className="flex items-center">
-              <img
-                src="/fidelity-dashboard-logo.png"
-                alt="Fidelity Invest"
-                className="h-9 w-[150px] object-contain object-left sm:h-10 sm:w-[170px]"
-              />
-            </Link>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img
+              src="/fidelity-dashboard-logo.png"
+              alt="Fidelity Invest"
+              className="h-8 w-[140px] object-contain object-left sm:h-9 sm:w-[160px]"
+            />
+          </Link>
           <div className="flex items-center gap-1.5">
             <Button
               size="icon"
@@ -204,31 +199,24 @@ function DashboardLayout() {
         </main>
       </div>
 
-      {/* Bottom nav (mobile) — app-style with active pill */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4">
+      {/* Floating capsule nav (mobile) */}
+      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.9rem)] md:hidden">
+        <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#14112B] p-1.5 shadow-[0_16px_40px_-10px_rgba(20,17,43,0.55)]">
           {NAV.map((item) => {
             const active = isActive(item.to, item.exact);
             return (
               <Link
                 key={item.to}
                 to={item.to as never}
-                className="flex flex-col items-center justify-center gap-1 py-2 active:scale-95 transition-transform"
+                aria-label={t(item.label)}
+                className={`flex h-11 items-center justify-center gap-1.5 rounded-full px-3.5 transition active:scale-95 ${
+                  active ? "bg-[#C9F158] text-[#14112B]" : "text-white/60"
+                }`}
               >
-                <span
-                  className={`flex h-9 w-12 items-center justify-center rounded-full transition ${
-                    active
-                      ? "bg-primary text-primary-foreground shadow-elegant"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <span
-                  className={`text-[10px] font-medium ${active ? "text-primary" : "text-muted-foreground"}`}
-                >
-                  {t(item.label)}
-                </span>
+                <item.icon className="h-5 w-5" />
+                {active && (
+                  <span className="text-xs font-bold">{t(item.label)}</span>
+                )}
               </Link>
             );
           })}

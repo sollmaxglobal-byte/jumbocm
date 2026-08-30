@@ -10,13 +10,13 @@ import {
   Users,
   TrendingUp,
   ChevronRight,
-  Bell,
   ShieldCheck,
-  ArrowUpRight,
   Eye,
   EyeOff,
+  Wallet,
+  Sparkles,
 } from "lucide-react";
-import { formatDate, formatXAF } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -78,13 +78,6 @@ type ActiveInvestment = {
   plans: { name: string } | null;
 };
 
-const RANGES = [
-  { key: "1D", hours: 24, points: 12 },
-  { key: "1W", hours: 24 * 7, points: 14 },
-  { key: "1M", hours: 24 * 30, points: 15 },
-] as const;
-type RangeKey = (typeof RANGES)[number]["key"];
-
 function DashboardHome() {
   const { user } = useAuth();
   const { t } = useI18n();
@@ -130,153 +123,211 @@ function DashboardHome() {
     [investments],
   );
 
+  const firstName = (profile?.full_name ?? t("home.investor")).split(" ")[0];
+
   return (
     <motion.div
-      className="dashboard-home space-y-4 pb-4"
+      className="dh -mx-3 -my-4 min-h-screen space-y-5 px-4 pb-32 pt-5 sm:-mx-4 md:-my-6 md:pb-10"
       variants={containerVariants}
       initial="hidden"
       animate="show"
+      style={{
+        // Scoped premium palette — ink violet + lime on warm ivory
+        ["--dh-bg" as never]: "#F5F4EF",
+        ["--dh-ink" as never]: "#14112B",
+        ["--dh-ink-2" as never]: "#1E1A3E",
+        ["--dh-lime" as never]: "#C9F158",
+        ["--dh-violet" as never]: "#6C5CE7",
+        ["--dh-muted" as never]: "#75728C",
+        backgroundColor: "var(--dh-bg)",
+      }}
     >
-      {/* Greeting */}
-      <motion.div variants={itemVariants} className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            {t("home.welcomeBack")}
-          </p>
-          <h1 className="font-display text-xl text-primary md:text-2xl">
-            {profile?.full_name ?? t("home.investor")}
-          </h1>
+      {/* Greeting header */}
+      <motion.div variants={itemVariants} className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--dh-ink)] text-base font-bold text-[var(--dh-lime)]">
+            {firstName.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--dh-muted)]">
+              {t("home.welcomeBack")}
+            </p>
+            <h1 className="truncate text-lg font-bold tracking-tight text-[var(--dh-ink)]">
+              {firstName}
+            </h1>
+          </div>
         </div>
         <motion.span
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-success"
-          animate={{ opacity: [0.72, 1, 0.72] }}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--dh-lime)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--dh-ink)]"
+          animate={{ opacity: [0.75, 1, 0.75] }}
           transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-success" /> Live
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--dh-ink)]" /> Live
         </motion.span>
       </motion.div>
 
-      {/* Balance + chart card */}
+      {/* Balance hero — dark ink slab */}
       <motion.div
         variants={itemVariants}
-        className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-elegant"
+        className="relative overflow-hidden rounded-[1.75rem] bg-[var(--dh-ink)] p-6 shadow-[0_24px_48px_-16px_rgba(20,17,43,0.45)]"
       >
-        <div className="px-5 pt-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[var(--dh-violet)] opacity-30 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-24 -left-10 h-52 w-52 rounded-full bg-[var(--dh-lime)] opacity-20 blur-3xl"
+        />
+
+        <div className="relative">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
               {t("home.availableBalance")}
-            </div>
-            <Button
+            </span>
+            <button
               type="button"
-              size="icon"
-              variant="ghost"
-              className="h-9 w-9 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
               onClick={toggleBalance}
               aria-label={balanceVisible ? "Hide available balance" : "Show available balance"}
+              className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white/80 transition active:scale-90"
             >
               {balanceVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
+            </button>
           </div>
-          <div className="mt-1.5 font-display text-3xl leading-tight text-foreground sm:text-4xl">
+
+          <div className="mt-3 text-[2.1rem] font-bold leading-none tracking-tight text-white sm:text-4xl">
             {balanceVisible ? (
               <AnimatedNumber value={profile?.balance ?? 0} />
             ) : (
               <span aria-label="Balance hidden">••••••••</span>
             )}
           </div>
-        </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4">
-          <div className="rounded-2xl bg-secondary/60 p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Main wallet
-            </p>
-            <p className="mt-2 text-lg font-semibold text-foreground">
-              {balanceVisible ? <Money value={Number(profile?.balance ?? 0)} /> : "••••••"}
-            </p>
-            <p className="mt-1 text-[10px] text-muted-foreground">Available balance</p>
-          </div>
-          <div className="rounded-2xl bg-primary/10 p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Total profit
-            </p>
-            <p className="mt-2 text-lg font-semibold text-success">
-              {balanceVisible ? <Money value={totalProfit} /> : "••••••"}
-            </p>
-            <p className="mt-1 text-[10px] text-muted-foreground">Lifetime earnings</p>
+          {/* Actions — Deposit prominent, Transfer/Withdraw compact */}
+          <div className="mt-6 flex items-center gap-2.5">
+            <ActionSheet
+              label={t("common.deposit")}
+              icon={<ArrowDownToLine className="h-4 w-4" />}
+              title={t("common.deposit")}
+              description="Fund your account with Mobile Money or bank transfer. Funds appear once approved."
+              to="/dashboard/deposit"
+              cta={t("common.deposit")}
+              className="h-12 flex-1 rounded-full bg-[var(--dh-lime)] text-sm font-bold text-[var(--dh-ink)] shadow-[0_10px_24px_-8px_rgba(201,241,88,0.6)] transition active:scale-95"
+            />
+            <ActionSheet
+              label="Transfer"
+              icon={<Send className="h-5 w-5" />}
+              title="Transfer funds"
+              description="Send funds securely to another Fidelity Invest user by email."
+              to="/dashboard/wallet"
+              cta="Open wallet"
+              iconOnly
+              className="h-12 w-12 shrink-0 rounded-full bg-white/10 text-white transition active:scale-90"
+            />
+            <ActionSheet
+              label={t("common.withdraw")}
+              icon={<ArrowUpFromLine className="h-5 w-5" />}
+              title={t("common.withdraw")}
+              description="Minimum withdrawal is 250 XAF. Payouts are processed within 10 minutes."
+              to="/dashboard/withdraw"
+              cta={t("common.withdraw")}
+              iconOnly
+              className="h-12 w-12 shrink-0 rounded-full bg-white/10 text-white transition active:scale-90"
+            />
           </div>
         </div>
       </motion.div>
 
-      {/* Private banking summary */}
-      <motion.div variants={itemVariants} className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card p-4 sm:col-span-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              <ShieldCheck className="h-4 w-4 text-primary" /> Portfolio health
+      {/* Wallet / Profit — paired stat rows */}
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-3xl bg-white shadow-[0_12px_32px_-16px_rgba(20,17,43,0.18)]">
+        <div className="flex items-center gap-4 border-b border-[#EFEEE7] p-4">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--dh-violet)]/10">
+            <Wallet className="h-5 w-5 text-[var(--dh-violet)]" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-[var(--dh-ink)]">Main Wallet</p>
+            <p className="text-xs text-[var(--dh-muted)]">Available balance</p>
+          </div>
+          <p className="text-base font-bold text-[var(--dh-ink)]">
+            {balanceVisible ? <Money value={Number(profile?.balance ?? 0)} /> : "••••••"}
+          </p>
+        </div>
+        <div className="flex items-center gap-4 p-4">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--dh-lime)]/30">
+            <Sparkles className="h-5 w-5 text-[var(--dh-ink)]" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-[var(--dh-ink)]">Total Profit</p>
+            <p className="text-xs text-[var(--dh-muted)]">Lifetime earnings</p>
+          </div>
+          <p className="text-base font-bold text-[var(--dh-ink)]">
+            {balanceVisible ? <Money value={totalProfit} /> : "••••••"}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Portfolio health */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-3xl border border-[#EAE8E0] bg-white p-5 shadow-[0_12px_32px_-16px_rgba(20,17,43,0.12)]"
+      >
+        <div className="flex items-center gap-4">
+          {/* Health ring */}
+          <div className="relative h-16 w-16 shrink-0">
+            <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90">
+              <circle cx="32" cy="32" r="27" fill="none" stroke="#EFEEE7" strokeWidth="7" />
+              <circle
+                cx="32"
+                cy="32"
+                r="27"
+                fill="none"
+                stroke="var(--dh-lime)"
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 27}
+                strokeDashoffset={2 * Math.PI * 27 * 0.18}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center">
+              <ShieldCheck className="h-5 w-5 text-[var(--dh-ink)]" />
             </div>
-            <span className="text-xs font-semibold text-success">On track</span>
           </div>
-          <div className="mt-4 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-2xl font-semibold tracking-tight text-foreground">
-                {totalInvested > 0 ? "Balanced growth" : "Ready to invest"}
-              </p>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Your account is protected with secure transaction monitoring.
-              </p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold text-[var(--dh-ink)]">Portfolio Health</p>
+              <span className="rounded-full bg-[var(--dh-lime)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--dh-ink)]">
+                On track
+              </span>
             </div>
-            <ArrowUpRight className="h-8 w-8 shrink-0 text-primary" aria-hidden="true" />
+            <p className="mt-0.5 text-sm font-medium text-[var(--dh-violet)]">
+              {totalInvested > 0 ? "Balanced growth" : "Ready to invest"}
+            </p>
+            <p className="mt-1 text-xs leading-4 text-[var(--dh-muted)]">
+              Your account is protected with secure transaction monitoring.
+            </p>
           </div>
         </div>
-
       </motion.div>
 
-      {/* Quick actions — bottom sheets */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3">
-        <ActionSheet
-          label={t("common.deposit")}
-          icon={<ArrowDownToLine className="h-5 w-5" />}
-          title={t("common.deposit")}
-          description="Fund your account with Mobile Money or bank transfer. Funds appear once approved."
-          to="/dashboard/deposit"
-          cta={t("common.deposit")}
-          primary
-        />
-        <ActionSheet
-          label="Transfer"
-          icon={<Send className="h-5 w-5" />}
-          title="Transfer funds"
-          description="Send funds securely to another Fidelity Invest user by email."
-          to="/dashboard/wallet"
-          cta="Open wallet"
-        />
-        <ActionSheet
-          label={t("common.withdraw")}
-          icon={<ArrowUpFromLine className="h-5 w-5" />}
-          title={t("common.withdraw")}
-          description="Minimum withdrawal is 250 XAF. Payouts are processed within 10 minutes."
-          to="/dashboard/withdraw"
-          cta={t("common.withdraw")}
-        />
-      </motion.div>
-
-      {/* Investment allocation */}
-      <motion.div variants={itemVariants} className="rounded-2xl border border-border bg-card p-5">
+      {/* Portfolio allocation */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-3xl bg-white p-5 shadow-[0_12px_32px_-16px_rgba(20,17,43,0.12)]"
+      >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--dh-muted)]">
               Investment weight
             </p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
+            <h2 className="mt-1 text-base font-bold tracking-tight text-[var(--dh-ink)]">
               Portfolio allocation
             </h2>
           </div>
-          <TrendingUp className="h-5 w-5 text-primary" aria-hidden="true" />
+          <TrendingUp className="h-5 w-5 text-[var(--dh-violet)]" aria-hidden="true" />
         </div>
         <div className="mt-5 space-y-4">
           {investments.length === 0 ? (
-            <div className="rounded-xl bg-secondary/60 p-4 text-sm text-muted-foreground">
+            <div className="rounded-2xl bg-[var(--dh-bg)] p-4 text-sm text-[var(--dh-muted)]">
               Your allocation will appear after you activate an investment plan.
             </div>
           ) : (
@@ -285,14 +336,20 @@ function DashboardHome() {
               return (
                 <div key={inv.id}>
                   <div className="mb-2 flex items-center justify-between text-xs">
-                    <span className="font-medium text-foreground">
+                    <span className="font-semibold text-[var(--dh-ink)]">
                       {inv.plans?.name ?? "Investment plan"}
                     </span>
-                    <span className="tabular-nums text-muted-foreground">{Math.round(share)}%</span>
+                    <span className="tabular-nums text-[var(--dh-muted)]">{Math.round(share)}%</span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-secondary">
+                  <div className="h-2.5 overflow-hidden rounded-full bg-[var(--dh-bg)]">
                     <div
-                      className={`h-full rounded-full ${index === 0 ? "bg-primary" : index === 1 ? "bg-accent" : "bg-success"}`}
+                      className={`h-full rounded-full ${
+                        index === 0
+                          ? "bg-[var(--dh-ink)]"
+                          : index === 1
+                            ? "bg-[var(--dh-violet)]"
+                            : "bg-[var(--dh-lime)]"
+                      }`}
                       style={{ width: `${share}%` }}
                     />
                   </div>
@@ -312,16 +369,23 @@ function DashboardHome() {
         />
       </motion.div>
 
-      {/* Active investments with progress */}
+      {/* Active investments */}
       <motion.div variants={itemVariants} className="space-y-3">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-primary" />
-          <h2 className="font-display text-lg text-primary">Active investments</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold tracking-tight text-[var(--dh-ink)]">
+            Active investments
+          </h2>
+          <Link
+            to="/dashboard/invest"
+            className="text-xs font-bold text-[var(--dh-violet)]"
+          >
+            View all
+          </Link>
         </div>
         {investments.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          <div className="rounded-3xl border-2 border-dashed border-[#E2E0D6] p-6 text-center text-sm text-[var(--dh-muted)]">
             No active plan yet.{" "}
-            <Link to="/dashboard/invest" className="font-medium text-primary underline">
+            <Link to="/dashboard/invest" className="font-bold text-[var(--dh-violet)] underline">
               Start investing
             </Link>
           </div>
@@ -342,23 +406,33 @@ function InvestmentCard({ inv }: { inv: ActiveInvestment }) {
   );
 
   return (
-    <motion.div whileTap={{ scale: 0.99 }} className="rounded-2xl border border-border bg-card p-4">
+    <motion.div
+      whileTap={{ scale: 0.98 }}
+      className="rounded-3xl bg-white p-4 shadow-[0_12px_32px_-16px_rgba(20,17,43,0.12)]"
+    >
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="font-display text-base text-primary">
-            {inv.plans?.name ?? "Investment plan"}
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--dh-ink)]">
+            <TrendingUp className="h-4 w-4 text-[var(--dh-lime)]" />
           </div>
-          <div className="mt-0.5 text-xs text-muted-foreground">
-            <Money value={Number(inv.amount)} /> ·{" "}
-            <span className="text-success">
-              <Money value={Number(inv.total_earned)} />
-            </span>{" "}
-            earned
+          <div className="min-w-0">
+            <div className="truncate text-sm font-bold text-[var(--dh-ink)]">
+              {inv.plans?.name ?? "Investment plan"}
+            </div>
+            <div className="mt-0.5 text-xs text-[var(--dh-muted)]">
+              <Money value={Number(inv.amount)} /> ·{" "}
+              <span className="font-semibold text-[var(--dh-violet)]">
+                +<Money value={Number(inv.total_earned)} />
+              </span>{" "}
+              earned
+            </div>
           </div>
         </div>
         <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-            inv.is_paused ? "bg-muted text-muted-foreground" : "bg-success/10 text-success"
+          className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+            inv.is_paused
+              ? "bg-[var(--dh-bg)] text-[var(--dh-muted)]"
+              : "bg-[var(--dh-lime)] text-[var(--dh-ink)]"
           }`}
         >
           {inv.is_paused ? "Paused" : "Running"}
@@ -366,17 +440,17 @@ function InvestmentCard({ inv }: { inv: ActiveInvestment }) {
       </div>
 
       <div className="mt-4">
-        <div className="mb-2 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          <span>Investment progress</span>
+        <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--dh-muted)]">
+          <span>Progress</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-secondary">
+        <div className="h-2.5 overflow-hidden rounded-full bg-[var(--dh-bg)]">
           <div
-            className="h-full rounded-full bg-success transition-all"
+            className="h-full rounded-full bg-[var(--dh-violet)] transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="mt-2 flex items-center justify-between text-[10px] text-muted-foreground">
+        <div className="mt-2 flex items-center justify-between text-[10px] text-[var(--dh-muted)]">
           <span>Started {formatDate(inv.start_date)}</span>
           <span>Ends {formatDate(inv.end_date)}</span>
         </div>
@@ -392,7 +466,8 @@ function ActionSheet({
   description,
   to,
   cta,
-  primary,
+  className,
+  iconOnly,
 }: {
   label: string;
   icon: React.ReactNode;
@@ -400,19 +475,14 @@ function ActionSheet({
   description: string;
   to: string;
   cta: string;
-  primary?: boolean;
+  className?: string;
+  iconOnly?: boolean;
 }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button
-          className={`flex h-12 flex-row items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition active:scale-95 ${
-            primary
-              ? "bg-primary text-primary-foreground shadow-elegant"
-              : "border border-border bg-card text-foreground"
-          }`}
-        >
-          {icon} {label}
+        <button aria-label={label} className={`flex items-center justify-center gap-2 ${className ?? ""}`}>
+          {icon} {iconOnly ? null : label}
         </button>
       </SheetTrigger>
       <SheetContent
@@ -421,7 +491,7 @@ function ActionSheet({
       >
         <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-border" />
         <SheetHeader className="text-left">
-          <SheetTitle className="font-display text-primary">{title}</SheetTitle>
+          <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         <Button asChild size="lg" className="mt-4 w-full rounded-xl">
@@ -468,56 +538,70 @@ function ReferralCard({
     toast.success("Copied");
   };
   return (
-    <div className="rounded-2xl border border-primary/30 bg-card p-5">
-      <div className="flex items-center gap-2">
-        <Share2 className="h-4 w-4 text-primary" />
-        <h2 className="font-display text-lg text-primary">Refer &amp; earn</h2>
-      </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Earn commission on every profit your invitees make.
-      </p>
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-secondary p-3">
-          <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-            <Users className="h-3 w-3" /> Total referrals
+    <div className="relative overflow-hidden rounded-3xl bg-[var(--dh-violet)] p-5 text-white shadow-[0_16px_36px_-14px_rgba(108,92,231,0.6)]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full bg-white/15 blur-2xl"
+      />
+      <div className="relative">
+        <div className="flex items-center gap-2">
+          <Share2 className="h-4 w-4" />
+          <h2 className="text-base font-bold">Refer &amp; earn</h2>
+        </div>
+        <p className="mt-1 text-xs text-white/70">
+          Earn commission on every profit your invitees make.
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-white/10 p-3">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/60">
+              <Users className="h-3 w-3" /> Total referrals
+            </div>
+            <div className="mt-1 text-xl font-bold tabular-nums">{count}</div>
           </div>
-          <div className="mt-1 font-display text-xl font-bold uppercase tabular-nums text-primary">
-            {count}
+          <div className="rounded-2xl bg-white/10 p-3">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">
+              Commissions
+            </div>
+            <div className="mt-1 text-xl font-bold text-[var(--dh-lime)]">
+              <Money value={earnings} />
+            </div>
           </div>
         </div>
-        <div className="rounded-xl bg-secondary p-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Commissions
+        <div className="mt-3 rounded-2xl bg-white/10 p-2.5">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">
+            Your referral link
           </div>
-          <div className="mt-1 font-display text-xl text-success">
-            <Money value={earnings} />
-          </div>
+          <div className="mt-1 truncate font-mono text-xs text-white/90">{link || "—"}</div>
         </div>
-      </div>
-      <div className="mt-3 rounded-xl border border-border bg-secondary/50 p-2.5">
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          Your referral link
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copy}
+            disabled={!link}
+            className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
+          >
+            <Copy className="mr-1 h-4 w-4" /> Copy
+          </Button>
+          <Button
+            size="sm"
+            onClick={share}
+            disabled={!link}
+            className="bg-[var(--dh-lime)] font-bold text-[var(--dh-ink)] hover:opacity-90"
+          >
+            <Share2 className="mr-1 h-4 w-4" /> Share
+          </Button>
         </div>
-        <div className="mt-1 truncate font-mono text-xs">{link || "—"}</div>
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button variant="outline" size="sm" onClick={copy} disabled={!link}>
-          <Copy className="mr-1 h-4 w-4" /> Copy
-        </Button>
         <Button
+          asChild
           size="sm"
-          onClick={share}
-          disabled={!link}
-          className="bg-primary text-primary-foreground hover:opacity-90"
+          className="mt-2 w-full bg-white/10 text-white hover:bg-white/20"
         >
-          <Share2 className="mr-1 h-4 w-4" /> Share
+          <Link to="/dashboard/referrals">
+            <Users className="mr-1 h-4 w-4" /> My referrals
+          </Link>
         </Button>
       </div>
-      <Button asChild variant="secondary" size="sm" className="mt-2 w-full">
-        <Link to="/dashboard/referrals">
-          <Users className="mr-1 h-4 w-4" /> My referrals
-        </Link>
-      </Button>
     </div>
   );
 }
