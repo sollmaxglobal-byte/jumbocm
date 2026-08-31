@@ -7,7 +7,7 @@ export async function deliver(rows: PushRow[], message: PushMessage) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const vapid = {
-    subject: process.env["VAPID_SUBJECT"] ?? "mailto:support@fidelity.app",
+    subject: process.env["VAPID_SUBJECT"] ?? "mailto:support@jumbocm.app",
     publicKey: process.env["VAPID_PUBLIC_KEY"],
     privateKey: process.env["VAPID_PRIVATE_KEY"],
   };

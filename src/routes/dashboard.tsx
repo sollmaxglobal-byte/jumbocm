@@ -88,8 +88,8 @@ function DashboardLayout() {
         <div className="app-header mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center">
             <img
-              src="/fidelity-dashboard-logo.png"
-              alt="Fidelity Invest"
+              src="/jumbocm-dashboard-logo.png"
+              alt="JumboCM"
               className="h-8 w-[140px] object-contain object-left sm:h-9 sm:w-[160px]"
             />
           </Link>

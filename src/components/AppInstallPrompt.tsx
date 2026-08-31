@@ -9,7 +9,7 @@ interface InstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-const DISMISS_KEY = "fidelity-install-dismissed";
+const DISMISS_KEY = "jumbocm-install-dismissed";
 
 function isStandalone() {
   if (typeof window === "undefined") return true;
@@ -89,7 +89,7 @@ export function AppInstallAction({ compact = false }: AppInstallActionProps) {
               )
           : install
       }
-      aria-label={showIosHint ? "How to install Fidelity" : "Install Fidelity app"}
+      aria-label={showIosHint ? "How to install JumboCM" : "Install JumboCM app"}
     >
       {showIosHint ? (
         <Share className="mr-2 h-4 w-4" aria-hidden />
@@ -178,7 +178,7 @@ export function AppInstallPrompt() {
   return (
     <aside className="fixed inset-x-3 bottom-20 z-[70] mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-border bg-card p-3 text-card-foreground shadow-elegant md:bottom-5">
       <img
-        src="/fidelity-app-icon-192.png"
+        src="/jumbocm-app-icon-192.png"
         alt=""
         width={48}
         height={48}
@@ -186,7 +186,7 @@ export function AppInstallPrompt() {
       />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold">
-          {lang === "fr" ? "Installer Fidelity" : "Install Fidelity"}
+          {lang === "fr" ? "Installer JumboCM" : "Install JumboCM"}
         </p>
         <p className="text-xs font-medium text-muted-foreground">
           {showIosHint

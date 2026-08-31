@@ -40,15 +40,15 @@ export const adminRequestNotification = {
 export const adminSmsTemplates = {
   en: {
     deposit:
-      "Fidelity: New deposit request from {{name}} for {{amount}} via {{method}}. Ref {{transaction_id}}. Review: {{review_url}}",
+      "JumboCM: New deposit request from {{name}} for {{amount}} via {{method}}. Ref {{transaction_id}}. Review: {{review_url}}",
     withdrawal:
-      "Fidelity: New withdrawal request from {{name}} for {{amount}} via {{method}}. Ref {{transaction_id}}. Review: {{review_url}}",
+      "JumboCM: New withdrawal request from {{name}} for {{amount}} via {{method}}. Ref {{transaction_id}}. Review: {{review_url}}",
   },
   fr: {
     deposit:
-      "Fidelity : Nouvelle demande de dépôt de {{name}} pour {{amount}} via {{method}}. Réf. {{transaction_id}}. Vérifier : {{review_url}}",
+      "JumboCM : Nouvelle demande de dépôt de {{name}} pour {{amount}} via {{method}}. Réf. {{transaction_id}}. Vérifier : {{review_url}}",
     withdrawal:
-      "Fidelity : Nouvelle demande de retrait de {{name}} pour {{amount}} via {{method}}. Réf. {{transaction_id}}. Vérifier : {{review_url}}",
+      "JumboCM : Nouvelle demande de retrait de {{name}} pour {{amount}} via {{method}}. Réf. {{transaction_id}}. Vérifier : {{review_url}}",
   },
 };
 

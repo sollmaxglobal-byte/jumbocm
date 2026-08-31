@@ -13,12 +13,12 @@ import { AuthShell } from "@/components/AuthShell";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Forgot password — Fidelity" },
+      { title: "Forgot password — JumboCM" },
       {
         name: "description",
-        content: "Request a secure reset link to regain access to your Fidelity account.",
+        content: "Request a secure reset link to regain access to your JumboCM account.",
       },
-      { property: "og:title", content: "Forgot password — Fidelity" },
+      { property: "og:title", content: "Forgot password — JumboCM" },
       { property: "og:description", content: "Request a secure password reset link." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

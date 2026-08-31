@@ -10,9 +10,9 @@ import { formatXAF } from "@/lib/format";
 export const Route = createFileRoute("/invest/success/$id")({
   head: () => ({
     meta: [
-      { title: "Investment activated — Fidelity" },
+      { title: "Investment activated — JumboCM" },
       { name: "description", content: "Your investment plan was purchased successfully." },
-      { property: "og:title", content: "Investment activated — Fidelity" },
+      { property: "og:title", content: "Investment activated — JumboCM" },
       { property: "og:description", content: "Your investment plan was purchased successfully." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
