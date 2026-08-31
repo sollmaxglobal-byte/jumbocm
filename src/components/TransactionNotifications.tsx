@@ -44,9 +44,9 @@ export function TransactionNotifications() {
       setUnread(true);
       toast(row.status === "rejected" ? message : message);
       if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("Fidelity", {
+        new Notification("JumboCM", {
           body: message,
-          icon: "/fidelity-app-icon-192.png",
+          icon: "/jumbocm-app-icon-192.png",
           tag: `${kind}-${row.id}-${row.status}`,
         });
       }

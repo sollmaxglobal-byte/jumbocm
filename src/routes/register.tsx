@@ -16,15 +16,15 @@ import { AppInstallAction } from "@/components/AppInstallPrompt";
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Create your account — Fidelity" },
+      { title: "Create your account — JumboCM" },
       {
         name: "description",
-        content: "Register a free Fidelity account in under a minute and start investing in XAF.",
+        content: "Register a free JumboCM account in under a minute and start investing in XAF.",
       },
-      { property: "og:title", content: "Create your account — Fidelity" },
+      { property: "og:title", content: "Create your account — JumboCM" },
       {
         property: "og:description",
-        content: "Register a free Fidelity account in under a minute.",
+        content: "Register a free JumboCM account in under a minute.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

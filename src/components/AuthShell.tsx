@@ -29,7 +29,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
             </p>
           </div>
           <p className="relative text-xs text-primary-foreground/50">
-            © Fidelity 2026 · Your financial journey starts here.
+            © JumboCM 2026 · Your financial journey starts here.
           </p>
         </aside>
 

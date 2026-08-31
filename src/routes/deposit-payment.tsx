@@ -18,13 +18,13 @@ export const Route = createFileRoute("/deposit-payment")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Complete your payment — Fidelity" },
+      { title: "Complete your payment — JumboCM" },
       {
         name: "description",
-        content: "Send your deposit to the Fidelity payment account and confirm the transfer.",
+        content: "Send your deposit to the JumboCM payment account and confirm the transfer.",
       },
-      { property: "og:title", content: "Complete your payment — Fidelity" },
-      { property: "og:description", content: "Send your deposit to the Fidelity payment account." },
+      { property: "og:title", content: "Complete your payment — JumboCM" },
+      { property: "og:description", content: "Send your deposit to the JumboCM payment account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

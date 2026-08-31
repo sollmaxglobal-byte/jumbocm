@@ -218,7 +218,7 @@ function DashboardHome() {
               label="Transfer"
               icon={<Send className="h-5 w-5" />}
               title="Transfer funds"
-              description="Send funds securely to another Fidelity Invest user by email."
+              description="Send funds securely to another JumboCM user by email."
               to="/dashboard/wallet"
               cta="Open wallet"
               iconOnly
@@ -524,7 +524,7 @@ function ReferralCard({
     if (!link) return;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: "Join me on Fidelity", url: link });
+        await navigator.share({ title: "Join me on JumboCM", url: link });
         return;
       } catch {
         /* fall through to copy */

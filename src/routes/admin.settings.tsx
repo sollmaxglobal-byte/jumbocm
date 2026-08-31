@@ -114,7 +114,7 @@ function AdminSettings() {
     setBusy(true);
     try {
       const settingsPayload = {
-        site_name: s.site_name ?? "Fidelity",
+        site_name: s.site_name ?? "JumboCM",
         site_url: s.site_url,
         tidio_public_key: s.tidio_public_key,
         sendpulse_chat_id: s.sendpulse_chat_id,

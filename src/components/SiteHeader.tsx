@@ -27,7 +27,7 @@ export function SiteHeader() {
             <ShieldCheck className="h-5 w-5" />
           </div>
           <span className="font-display text-xl font-semibold tracking-tight text-primary">
-            Fidelity <span className="text-accent">Invest</span>
+            JumboCM <span className="text-accent">Invest</span>
           </span>
         </Link>
 

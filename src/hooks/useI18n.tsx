@@ -107,7 +107,7 @@ const DICT = {
     "auth.email": "Email",
     "auth.password": "Password",
     "auth.forgot": "Forgot password?",
-    "auth.newHere": "New to Fidelity?",
+    "auth.newHere": "New to JumboCM?",
     "auth.haveAccount": "Already have an account?",
     "auth.createOne": "Create one",
     "auth.disclaimer":
@@ -117,7 +117,7 @@ const DICT = {
     "auth.heroSub":
       "Capital + profit paid at the end of every plan. Manual verification. Real Cameroonian support.",
     "auth.welcomeToast": "Welcome back",
-    "auth.created": "Account created — welcome to Fidelity!",
+    "auth.created": "Account created — welcome to JumboCM!",
     "auth.loginTitle": "Sign in to your account",
     "auth.registerTitle": "Create your account",
     "auth.forgotTitle": "Reset your password",
@@ -336,7 +336,7 @@ const DICT = {
     "auth.email": "Email",
     "auth.password": "Mot de passe",
     "auth.forgot": "Mot de passe oublié ?",
-    "auth.newHere": "Nouveau sur Fidelity ?",
+    "auth.newHere": "Nouveau sur JumboCM ?",
     "auth.haveAccount": "Vous avez déjà un compte ?",
     "auth.createOne": "Créer un compte",
     "auth.disclaimer":
@@ -346,7 +346,7 @@ const DICT = {
     "auth.heroSub":
       "Capital + profit versés à la fin de chaque plan. Vérification manuelle. Support camerounais réel.",
     "auth.welcomeToast": "Bon retour",
-    "auth.created": "Compte créé — bienvenue sur Fidelity !",
+    "auth.created": "Compte créé — bienvenue sur JumboCM !",
     "auth.loginTitle": "Connexion à votre compte",
     "auth.registerTitle": "Créer votre compte",
     "auth.forgotTitle": "Réinitialiser votre mot de passe",

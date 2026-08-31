@@ -14,13 +14,13 @@ import { AppInstallAction } from "@/components/AppInstallPrompt";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — Fidelity" },
+      { title: "Sign in — JumboCM" },
       {
         name: "description",
-        content: "Sign in to your Fidelity dashboard to track deposits, plans and payouts.",
+        content: "Sign in to your JumboCM dashboard to track deposits, plans and payouts.",
       },
-      { property: "og:title", content: "Sign in — Fidelity" },
-      { property: "og:description", content: "Access your Fidelity account." },
+      { property: "og:title", content: "Sign in — JumboCM" },
+      { property: "og:description", content: "Access your JumboCM account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

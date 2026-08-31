@@ -139,8 +139,8 @@ function ProfilePage() {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: "Fidelity",
-          text: "Join me on Fidelity",
+          title: "JumboCM",
+          text: "Join me on JumboCM",
           url: referralLink,
         });
       } catch {

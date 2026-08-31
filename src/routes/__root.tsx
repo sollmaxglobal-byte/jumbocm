@@ -81,14 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Fidelity — Grow your capital with confidence" },
+      { title: "JumboCM — Grow your capital with confidence" },
       {
         name: "description",
         content:
-          "Fidelity is a professional investment platform in Cameroon. Earn daily returns in XAF with secure, transparent plans.",
+          "JumboCM is a professional investment platform in Cameroon. Earn daily returns in XAF with secure, transparent plans.",
       },
-      { name: "author", content: "Fidelity" },
-      { property: "og:title", content: "Fidelity — Grow your capital with confidence" },
+      { name: "author", content: "JumboCM" },
+      { property: "og:title", content: "JumboCM — Grow your capital with confidence" },
       {
         property: "og:description",
         content:
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "theme-color", content: "#171a1b" },
       { property: "og:url", content: "https://jumbocm.lovable.app/" },
-      { property: "og:site_name", content: "Fidelity Investment" },
+      { property: "og:site_name", content: "JumboCM" },
     ],
     links: [
       { rel: "canonical", href: "https://jumbocm.lovable.app/" },
@@ -115,7 +115,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/fidelity-app-icon-192.png" },
+      { rel: "apple-touch-icon", href: "/jumbocm-app-icon-192.png" },
     ],
   }),
   shellComponent: RootShell,

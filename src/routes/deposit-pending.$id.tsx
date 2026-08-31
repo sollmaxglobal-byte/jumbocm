@@ -23,9 +23,9 @@ export const Route = createFileRoute("/deposit-pending/$id")({
   component: PendingDepositPage,
   head: () => ({
     meta: [
-      { title: "Payment submitted — Fidelity" },
+      { title: "Payment submitted — JumboCM" },
       { name: "description", content: "Your payment was submitted and is being verified." },
-      { property: "og:title", content: "Payment submitted — Fidelity" },
+      { property: "og:title", content: "Payment submitted — JumboCM" },
       { property: "og:description", content: "Your payment was submitted and is being verified." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

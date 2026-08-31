@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
-    meta: [{ title: "Set new password — Fidelity" }],
+    meta: [{ title: "Set new password — JumboCM" }],
   }),
   component: ResetPasswordPage,
 });
@@ -53,7 +53,7 @@ function ResetPasswordPage() {
     <div className="grid min-h-screen place-items-center bg-background p-6">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center">
-          <img src="/fidelity-logo.png" alt="Fidelity Invest" className="h-10 w-auto object-contain" />
+          <img src="/jumbocm-logo.png" alt="JumboCM" className="h-10 w-auto object-contain" />
         </div>
         <h1 className="font-display text-3xl text-primary">Set a new password</h1>
         <p className="mt-1 text-sm text-muted-foreground">

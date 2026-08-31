@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { enablePush, pushEnabled, pushSupported, registerPushWorker } from "@/lib/push-client";
 
-const DISMISS_KEY = "fidelity_push_prompt_dismissed";
+const DISMISS_KEY = "jumbocm_push_prompt_dismissed";
 
 export function PushSetup() {
   const { user } = useAuth();

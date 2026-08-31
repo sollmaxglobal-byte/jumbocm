@@ -5,11 +5,11 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Fidelity" },
+      { title: "About — JumboCM" },
       {
         name: "description",
         content:
-          "Fidelity is a Cameroonian investment platform built on transparency, daily ROI and human support.",
+          "JumboCM is a Cameroonian investment platform built on transparency, daily ROI and human support.",
       },
     ],
   }),
@@ -23,7 +23,7 @@ function AboutPage() {
       <section className="bg-hero py-20 text-primary-foreground">
         <div className="mx-auto max-w-4xl px-4">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            About Fidelity
+            About JumboCM
           </div>
           <h1 className="mt-3 font-display text-5xl md:text-6xl">
             A new chapter for Cameroonian capital.
@@ -32,7 +32,7 @@ function AboutPage() {
       </section>
       <section className="mx-auto max-w-3xl px-4 py-16 text-lg leading-relaxed text-foreground/80">
         <p>
-          Fidelity was founded with a simple belief — that everyday Cameroonians deserve access to
+          JumboCM was founded with a simple belief — that everyday Cameroonians deserve access to
           real investment opportunities, paid in their own currency, on rails they already trust.
         </p>
         <p className="mt-6">

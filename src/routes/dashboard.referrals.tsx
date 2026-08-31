@@ -11,13 +11,13 @@ import { formatDate } from "@/lib/format";
 export const Route = createFileRoute("/dashboard/referrals")({
   head: () => ({
     meta: [
-      { title: "My referrals — Fidelity" },
+      { title: "My referrals — JumboCM" },
       {
         name: "description",
         content:
-          "Track everyone you referred to Fidelity and the investment plan they are running.",
+          "Track everyone you referred to JumboCM and the investment plan they are running.",
       },
-      { property: "og:title", content: "My referrals — Fidelity" },
+      { property: "og:title", content: "My referrals — JumboCM" },
       {
         property: "og:description",
         content: "See your referral team and their active investment plans.",

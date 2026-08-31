@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/reset-pin")({
-  head: () => ({ meta: [{ title: "Reset security PIN — Fidelity" }] }),
+  head: () => ({ meta: [{ title: "Reset security PIN — JumboCM" }] }),
   validateSearch: z.object({ kind: z.enum(["withdrawal", "transfer"]).catch("withdrawal") }),
   component: ResetPinPage,
 });
@@ -47,7 +47,7 @@ function ResetPinPage() {
   return (
     <div className="grid min-h-screen place-items-center bg-background p-6">
       <div className="w-full max-w-sm">
-        <img src="/fidelity-logo.png" alt="Fidelity Invest" className="mb-6 h-10 w-auto object-contain" />
+        <img src="/jumbocm-logo.png" alt="JumboCM" className="mb-6 h-10 w-auto object-contain" />
         <h1 className="font-display text-3xl text-primary">Reset {label} PIN</h1>
         <p className="mt-1 text-sm text-muted-foreground">Choose a new six-digit numeric PIN.</p>
         <form onSubmit={onSubmit} className="mt-6 space-y-4">

@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
           headers: { ...cors, "Content-Type": "application/json" },
         });
       const fullVars = {
-        site_name: settings.site_name ?? "Fidelity",
+        site_name: settings.site_name ?? "JumboCM",
         site_url: settings.site_url ?? "",
         ...variables,
       };

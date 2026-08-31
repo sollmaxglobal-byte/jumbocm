@@ -18,7 +18,7 @@ export function CheckoutShell({
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-xl items-center gap-2 px-4 py-3">
-          <img src="/fidelity-logo.png" alt="Fidelity Invest" className="h-9 w-auto object-contain" />
+          <img src="/jumbocm-logo.png" alt="JumboCM" className="h-9 w-auto object-contain" />
           <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
               Secure checkout · {step}/{total}
