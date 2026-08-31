@@ -129,10 +129,34 @@ async function processQueue() {
   return sent;
 }
 
-function isAuthorized(request: Request) {
-  const expected = process.env["SUPABASE_ANON_KEY"];
-  return !!expected && request.headers.get("apikey") === expected;
+/**
+ * Only the scheduled job may run this. It authenticates with a private secret
+ * stored in the settings table (never exposed to the browser). The public
+ * anon/publishable key is NOT accepted — it ships in the client bundle.
+ */
+async function isAuthorized(request: Request) {
+  const { secretMatches } = await import("@/lib/deposit-verify.server");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const authorization = request.headers.get("authorization");
+  const provided =
+    request.headers.get("x-cron-secret")?.trim() ||
+    (authorization ? authorization.replace(/^Bearer\s+/i, "").trim() : "") ||
+    null;
+  if (!provided) return false;
+
+  const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  if (serviceKey && secretMatches(provided, serviceKey)) return true;
+
+  const { data } = await supabaseAdmin
+    .from("app_settings")
+    .select("cron_secret")
+    .eq("id", 1)
+    .maybeSingle();
+  const expected = (data as { cron_secret?: string | null } | null)?.cron_secret ?? null;
+  return secretMatches(provided, expected);
 }
+
 
 export const Route = createFileRoute("/api/public/process-receipt-emails")({
   server: {
