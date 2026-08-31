@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "theme-color", content: "#171a1b" },
       { property: "og:url", content: "https://jumbocm.lovable.app/" },
-      { property: "og:site_name", content: "JumboCMment" },
+      { property: "og:site_name", content: "JumboCM" },
     ],
     links: [
       { rel: "canonical", href: "https://jumbocm.lovable.app/" },
