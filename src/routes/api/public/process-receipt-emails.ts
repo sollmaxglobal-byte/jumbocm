@@ -162,7 +162,7 @@ export const Route = createFileRoute("/api/public/process-receipt-emails")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        if (!isAuthorized(request))
+        if (!(await isAuthorized(request)))
           return Response.json({ error: "Unauthorized" }, { status: 401 });
         const sent = await processQueue();
         return new Response(JSON.stringify({ ok: true, sent }), {
@@ -170,7 +170,7 @@ export const Route = createFileRoute("/api/public/process-receipt-emails")({
         });
       },
       GET: async ({ request }) => {
-        if (!isAuthorized(request))
+        if (!(await isAuthorized(request)))
           return Response.json({ error: "Unauthorized" }, { status: 401 });
         const sent = await processQueue();
         return new Response(JSON.stringify({ ok: true, sent }), {
