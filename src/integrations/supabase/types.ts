@@ -27,6 +27,7 @@ export type Database = {
           auto_withdraw_enabled: boolean
           auto_withdraw_max_amount: number | null
           auto_withdraw_ussd_template: string
+          cron_secret: string
           deposit_max_amount: number
           deposit_min_amount: number
           id: number
@@ -64,6 +65,7 @@ export type Database = {
           auto_withdraw_enabled?: boolean
           auto_withdraw_max_amount?: number | null
           auto_withdraw_ussd_template?: string
+          cron_secret?: string
           deposit_max_amount?: number
           deposit_min_amount?: number
           id?: number
@@ -101,6 +103,7 @@ export type Database = {
           auto_withdraw_enabled?: boolean
           auto_withdraw_max_amount?: number | null
           auto_withdraw_ussd_template?: string
+          cron_secret?: string
           deposit_max_amount?: number
           deposit_min_amount?: number
           id?: number
@@ -898,6 +901,7 @@ export type Database = {
           auto_withdraw_enabled: boolean
           auto_withdraw_max_amount: number | null
           auto_withdraw_ussd_template: string
+          cron_secret: string
           deposit_max_amount: number
           deposit_min_amount: number
           id: number
