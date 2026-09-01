@@ -180,17 +180,22 @@ function DepositPage() {
         .from("payment-proofs")
         .upload(path, uploadedFile, { upsert: true, contentType: uploadedFile.type });
       if (uploadError) throw uploadError;
-      const { error } = await supabase.from("deposits").insert({
-        user_id: user.id,
-        amount: amountNumber,
-        payment_method_id: method,
-        reference,
-        proof_url: path,
-        status: "pending",
-      });
+      const { data: createdDeposit, error } = await supabase
+        .from("deposits")
+        .insert({
+          user_id: user.id,
+          amount: amountNumber,
+          payment_method_id: method,
+          reference,
+          proof_url: path,
+          status: "pending",
+        })
+        .select("id")
+        .single();
       if (error) throw error;
-      setSubmitted(true);
+      if (!createdDeposit) throw new Error("Deposit was created without an ID.");
       toast.success("Proof uploaded successfully");
+      navigate({ to: "/deposit-pending/$id", params: { id: createdDeposit.id } });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not submit your deposit.");
     } finally {
