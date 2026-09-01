@@ -323,42 +323,42 @@ function PendingDepositPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-[#f8f7f2]">
+    <div className="relative h-[100dvh] overflow-hidden bg-black text-[#f8f7f2]">
       <ConfettiField />
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative mx-auto w-full max-w-md space-y-6 px-5 pb-12 pt-14"
+        className="relative mx-auto flex h-full w-full max-w-md flex-col justify-between gap-3 overflow-hidden px-5 pb-4 pt-6"
       >
         {/* Success icon + heading */}
-        <div className="text-center">
-          <div className="relative mx-auto flex h-28 w-28 items-center justify-center">
+        <div className="shrink-0 text-center">
+          <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
             <SuccessBurst />
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 220, damping: 14 }}
-              className={`flex h-24 w-24 items-center justify-center rounded-full ${
+              className={`flex h-14 w-14 items-center justify-center rounded-full ${
                 rejected
                   ? "bg-red-500/15"
                   : "bg-green-500/10 shadow-[0_0_60px_rgba(34,197,94,0.45)] ring-1 ring-green-500/40"
               }`}
             >
               {rejected ? (
-                <XCircle className="h-14 w-14 text-red-500" />
+                <XCircle className="h-8 w-8 text-red-500" />
               ) : (
-                <CheckCircle2 className="h-14 w-14 text-green-500" strokeWidth={2.5} />
+                <CheckCircle2 className="h-8 w-8 text-green-500" strokeWidth={2.5} />
               )}
             </motion.div>
           </div>
-          <h1 className="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-[#f8f7f2]">
+          <h1 className="mt-2 text-xl font-extrabold leading-tight tracking-tight text-[#f8f7f2]">
             {approved
               ? "Deposit approved successfully!"
               : rejected
                 ? "Deposit rejected"
                 : "Payment submitted successfully!"}
           </h1>
-          <p className="mt-2 text-sm text-[#8f8f98]">
+          <p className="mt-1 text-xs text-[#8f8f98]">
             {approved
               ? "Your deposit has been confirmed and credited to your wallet."
               : rejected
@@ -368,11 +368,11 @@ function PendingDepositPage() {
         </div>
 
         {/* Amount + reference card with dynamic method badge */}
-        <div className="rounded-2xl border border-[#2a2a30] bg-[#17171c] px-5 py-6 text-center">
-          <div className="font-display text-4xl font-extrabold uppercase tabular-nums text-[#f6c85a]">
+        <div className="shrink-0 rounded-2xl border border-[#2a2a30] bg-[#17171c] px-4 py-3 text-center">
+          <div className="font-display text-3xl font-extrabold uppercase tabular-nums text-[#f6c85a]">
             {formatXAF(deposit.amount).replace("XAF", "FCFA")}
           </div>
-          <div className="mt-2 flex items-center justify-center gap-2 text-sm text-[#8f8f98]">
+          <div className="mt-1.5 flex items-center justify-center gap-2 text-xs text-[#8f8f98]">
             <span>
               Reference · <span className="font-semibold text-[#a8a39a]">JCM-{reference.slice(0, 6)}</span>
             </span>
@@ -382,10 +382,10 @@ function PendingDepositPage() {
               aria-label="Copy reference"
               className="text-[#8f8f98] transition-colors hover:text-[#f6c85a]"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="mt-4 flex justify-center">
+          <div className="mt-2.5 flex justify-center">
             <MethodBadge method={method} />
           </div>
         </div>
