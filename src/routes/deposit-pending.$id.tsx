@@ -5,19 +5,18 @@ import {
   Check,
   CheckCircle2,
   Clock,
-  Home,
+  Copy,
   Loader2,
   MessageCircle,
   Smartphone,
   Building2,
   Bitcoin,
   XCircle,
-  History,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { formatXAF, txRef } from "@/lib/format";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/deposit-pending/$id")({
   component: PendingDepositPage,
@@ -52,29 +51,105 @@ type PaymentMethod = {
   label: string;
 };
 
-/** Dynamic method logo: picks a branded badge from the method the customer actually used. */
-function MethodLogo({ method }: { method: PaymentMethod | null }) {
+/** Branded provider pill, matching the method the customer actually used. */
+function MethodBadge({ method }: { method: PaymentMethod | null }) {
   const label = (method?.label ?? "").toLowerCase();
-  const base =
-    "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[11px] font-black";
   if (label.includes("mtn"))
-    return <span className={`${base} bg-[#ffcc00] text-black shadow-[0_0_20px_rgba(255,204,0,0.35)]`}>MTN</span>;
+    return (
+      <span className="inline-flex items-center gap-2 rounded-full bg-[#ffcc00] px-4 py-1.5 shadow-[0_0_24px_rgba(255,204,0,0.35)]">
+        <span className="flex items-center rounded-full bg-white px-1.5 py-0.5 text-[10px] font-black italic text-[#00467f]">
+          MTN
+        </span>
+        <span className="text-sm font-bold text-black">Mobile Money</span>
+      </span>
+    );
   if (label.includes("orange"))
-    return <span className={`${base} bg-[#ff7900] text-white shadow-[0_0_20px_rgba(255,121,0,0.35)]`}>OM</span>;
+    return (
+      <span className="inline-flex items-center gap-2 rounded-full bg-[#ff7900] px-4 py-1.5 shadow-[0_0_24px_rgba(255,121,0,0.35)]">
+        <span className="flex items-center rounded-full bg-white px-1.5 py-0.5 text-[10px] font-black text-[#ff7900]">
+          OM
+        </span>
+        <span className="text-sm font-bold text-white">Orange Money</span>
+      </span>
+    );
   if (method?.type === "crypto")
-    return <span className={`${base} bg-[#f7931a]/15 text-[#f7931a]`}><Bitcoin className="h-6 w-6" /></span>;
+    return (
+      <span className="inline-flex items-center gap-2 rounded-full bg-[#f7931a]/15 px-4 py-1.5 text-[#f7931a]">
+        <Bitcoin className="h-4 w-4" />
+        <span className="text-sm font-bold">{method?.label ?? "Crypto"}</span>
+      </span>
+    );
   if (method?.type === "bank_transfer")
-    return <span className={`${base} bg-[#f6c85a]/15 text-[#f6c85a]`}><Building2 className="h-6 w-6" /></span>;
-  return <span className={`${base} bg-[#f6c85a]/15 text-[#f6c85a]`}><Smartphone className="h-6 w-6" /></span>;
+    return (
+      <span className="inline-flex items-center gap-2 rounded-full bg-[#f6c85a]/15 px-4 py-1.5 text-[#f6c85a]">
+        <Building2 className="h-4 w-4" />
+        <span className="text-sm font-bold">{method?.label ?? "Bank Transfer"}</span>
+      </span>
+    );
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full bg-[#f6c85a]/15 px-4 py-1.5 text-[#f6c85a]">
+      <Smartphone className="h-4 w-4" />
+      <span className="text-sm font-bold">{method?.label ?? "Mobile Money"}</span>
+    </span>
+  );
 }
 
-function Confetti() {
+/** Golden confetti shower across the top of the screen. */
+function ConfettiField() {
+  const pieces = Array.from({ length: 46 });
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-64 overflow-hidden">
+      {pieces.map((_, i) => {
+        const left = (i * 37) % 100;
+        const size = 3 + (i % 4) * 2;
+        const delay = (i % 12) * 0.12;
+        const duration = 2.4 + (i % 5) * 0.4;
+        const gold = i % 3 !== 2;
+        return (
+          <motion.span
+            key={i}
+            className="absolute top-0"
+            style={{
+              left: `${left}%`,
+              width: size,
+              height: size * (i % 2 === 0 ? 2.2 : 1),
+              background: gold ? "#f6c85a" : "#f8f7f2",
+              borderRadius: i % 2 === 0 ? 1 : "50%",
+              rotate: (i * 53) % 360,
+            }}
+            initial={{ y: -24, opacity: 0 }}
+            animate={{ y: [null, 180 + (i % 5) * 20], opacity: [0, 1, 1, 0] }}
+            transition={{
+              duration,
+              delay,
+              repeat: Infinity,
+              repeatDelay: 1.6,
+              ease: "easeIn",
+            }}
+          />
+        );
+      })}
+      {/* sparkles */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <motion.span
+          key={`s-${i}`}
+          className="absolute h-1 w-1 rounded-full bg-[#f8f7f2]"
+          style={{ left: `${8 + i * 12}%`, top: `${18 + (i % 4) * 14}%` }}
+          animate={{ opacity: [0, 1, 0], scale: [0.5, 1.4, 0.5] }}
+          transition={{ duration: 1.8, delay: i * 0.3, repeat: Infinity }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SuccessBurst() {
   const pieces = Array.from({ length: 14 });
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-visible">
       {pieces.map((_, i) => {
         const angle = (i / pieces.length) * Math.PI * 2;
-        const dist = 46 + (i % 4) * 12;
+        const dist = 52 + (i % 4) * 14;
         return (
           <motion.span
             key={i}
@@ -95,13 +170,15 @@ function Confetti() {
   );
 }
 
-function TimelineRow({
+function TimelineStep({
+  step,
   done,
   active,
   last,
   label,
   sub,
 }: {
+  step: number;
   done?: boolean;
   active?: boolean;
   last?: boolean;
@@ -110,31 +187,39 @@ function TimelineRow({
 }) {
   return (
     <div className="flex gap-3">
+      {/* Step label column */}
+      <div className={`w-10 shrink-0 pt-1 text-xs font-semibold ${done || active ? "text-[#8f8f98]" : "text-[#5b5b63]"}`}>
+        Step {step}
+      </div>
+      {/* Icon + connector column */}
       <div className="flex flex-col items-center">
         <span
-          className={`flex h-7 w-7 items-center justify-center rounded-full border-2 ${
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
             done
-              ? "border-green-500 bg-green-500 text-[#101014]"
+              ? "bg-green-500 text-[#101014] shadow-[0_0_16px_rgba(34,197,94,0.4)]"
               : active
-                ? "border-[#f6c85a] bg-[#f6c85a]/10 text-[#f6c85a]"
-                : "border-[#3b3b42] bg-transparent text-[#6b6b73]"
+                ? "bg-[#f6c85a]/15 text-[#f6c85a]"
+                : "bg-[#26262c] text-[#5b5b63]"
           }`}
         >
           {done ? (
-            <Check className="h-4 w-4" strokeWidth={3} />
+            <Check className="h-4.5 w-4.5" strokeWidth={3} />
           ) : active ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <span className="h-1.5 w-1.5 rounded-full bg-current" />
-          )}
+            <Loader2 className="h-4.5 w-4.5 animate-spin" />
+          ) : null}
         </span>
-        {!last && <span className={`mt-1 w-0.5 flex-1 ${done ? "bg-green-500/60" : "bg-[#3b3b42]"}`} />}
+        {!last && <span className={`mt-1 w-px flex-1 ${done ? "bg-green-500/40" : "bg-[#2a2a30]"}`} />}
       </div>
-      <div className={last ? "pb-0" : "pb-5"}>
-        <div className={`text-sm font-semibold ${done || active ? "text-[#f8f7f2]" : "text-[#6b6b73]"}`}>
+      {/* Text column */}
+      <div className={`min-w-0 ${last ? "pb-0" : "pb-6"}`}>
+        <div
+          className={`text-base font-bold ${
+            done ? "text-[#f8f7f2]" : active ? "text-[#f6c85a]" : "text-[#5b5b63]"
+          }`}
+        >
           {label}
         </div>
-        <div className="text-xs text-[#8f8f98]">{sub}</div>
+        <div className={`mt-0.5 text-sm ${done || active ? "text-[#8f8f98]" : "text-[#5b5b63]"}`}>{sub}</div>
       </div>
     </div>
   );
@@ -216,7 +301,7 @@ function PendingDepositPage() {
 
   if (loading || !deposit) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#0f0f12]">
+      <div className="grid min-h-screen place-items-center bg-black">
         <Loader2 className="h-8 w-8 animate-spin text-[#f6c85a]" />
       </div>
     );
@@ -228,85 +313,88 @@ function PendingDepositPage() {
   const approved = deposit.status === "approved";
   const rejected = deposit.status === "rejected";
 
+  const copyRef = async () => {
+    try {
+      await navigator.clipboard.writeText(reference);
+      toast.success("Reference copied");
+    } catch {
+      toast.error("Could not copy");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0f0f12] text-[#f8f7f2]">
+    <div className="relative min-h-screen overflow-hidden bg-black text-[#f8f7f2]">
+      <ConfettiField />
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mx-auto w-full max-w-md space-y-5 px-4 py-8 pb-10 sm:max-w-lg"
+        className="relative mx-auto w-full max-w-md space-y-6 px-5 pb-12 pt-14"
       >
         {/* Success icon + heading */}
         <div className="text-center">
-          <div className="relative mx-auto flex h-24 w-24 items-center justify-center">
-            {approved && <Confetti />}
+          <div className="relative mx-auto flex h-28 w-28 items-center justify-center">
+            <SuccessBurst />
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 220, damping: 14 }}
-              className={`flex h-20 w-20 items-center justify-center rounded-full ${
-                approved
-                  ? "bg-green-500/15 shadow-[0_0_40px_rgba(34,197,94,0.35)]"
-                  : rejected
-                    ? "bg-red-500/15"
-                    : "bg-green-500/15 shadow-[0_0_40px_rgba(34,197,94,0.25)]"
+              className={`flex h-24 w-24 items-center justify-center rounded-full ${
+                rejected
+                  ? "bg-red-500/15"
+                  : "bg-green-500/10 shadow-[0_0_60px_rgba(34,197,94,0.45)] ring-1 ring-green-500/40"
               }`}
             >
               {rejected ? (
-                <XCircle className="h-11 w-11 text-red-500" />
+                <XCircle className="h-14 w-14 text-red-500" />
               ) : (
-                <CheckCircle2 className="h-11 w-11 text-green-500" />
+                <CheckCircle2 className="h-14 w-14 text-green-500" strokeWidth={2.5} />
               )}
             </motion.div>
           </div>
-          <h1 className="mt-4 font-display text-2xl font-bold text-[#f6c85a] sm:text-3xl">
+          <h1 className="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-[#f8f7f2]">
             {approved
-              ? "Deposit approved successfully"
+              ? "Deposit approved successfully!"
               : rejected
                 ? "Deposit rejected"
-                : "Payment submitted successfully"}
+                : "Payment submitted successfully!"}
           </h1>
-          <p className="mt-1 text-sm text-[#8f8f98]">
+          <p className="mt-2 text-sm text-[#8f8f98]">
             {approved
               ? "Your deposit has been confirmed and credited to your wallet."
               : rejected
                 ? "We couldn't verify this payment. Contact support if you believe this is a mistake."
-                : "Now waiting for approval — this might take up to 15 minutes."}
+                : "Your deposit is being verified"}
           </p>
         </div>
 
-        {/* Amount + reference card with dynamic method logo */}
-        <div className="rounded-2xl border border-[#2a2a30] bg-[#17171c] p-5">
-          <div className="flex items-center gap-3">
-            <MethodLogo method={method} />
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] uppercase tracking-widest text-[#8f8f98]">
-                Payment amount
-              </div>
-              <div className="truncate font-display text-2xl font-bold uppercase tabular-nums text-[#f6c85a] sm:text-3xl">
-                {formatXAF(deposit.amount)}
-              </div>
-            </div>
+        {/* Amount + reference card with dynamic method badge */}
+        <div className="rounded-2xl border border-[#2a2a30] bg-[#17171c] px-5 py-6 text-center">
+          <div className="font-display text-4xl font-extrabold uppercase tabular-nums text-[#f6c85a]">
+            {formatXAF(deposit.amount).replace("XAF", "FCFA")}
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-[#2a2a30] pt-3">
-            <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-widest text-[#8f8f98]">Method</div>
-              <div className="truncate text-sm font-semibold">{method?.label ?? "Mobile Money"}</div>
-            </div>
-            <div className="text-right">
-              <div className="text-[10px] uppercase tracking-widest text-[#8f8f98]">Reference</div>
-              <div className="font-mono text-sm font-semibold text-[#f6c85a]">{reference}</div>
-            </div>
+          <div className="mt-2 flex items-center justify-center gap-2 text-sm text-[#8f8f98]">
+            <span>
+              Reference · <span className="font-semibold text-[#a8a39a]">JCM-{reference.slice(0, 6)}</span>
+            </span>
+            <button
+              type="button"
+              onClick={copyRef}
+              aria-label="Copy reference"
+              className="text-[#8f8f98] transition-colors hover:text-[#f6c85a]"
+            >
+              <Copy className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <MethodBadge method={method} />
           </div>
         </div>
 
         {/* Vertical timeline */}
-        <div className="rounded-2xl border border-[#2a2a30] bg-[#17171c] p-5">
-          <TimelineRow
-            done
-            label="Uploaded"
-            sub="Payment proof received"
-          />
-          <TimelineRow
+        <div className="pt-1">
+          <TimelineStep step={1} done label="Uploaded" sub="Payment proof received · just now" />
+          <TimelineStep
+            step={2}
             done={approved}
             active={!approved && !rejected}
             label={rejected ? "Verification failed" : "Verifying"}
@@ -315,28 +403,29 @@ function PendingDepositPage() {
                 ? "Payment confirmed by our team"
                 : rejected
                   ? "We couldn't match this payment"
-                  : "Our team is confirming your payment"
+                  : "Verifying your payment now… our team is checking"
             }
           />
-          <TimelineRow
+          <TimelineStep
+            step={3}
             done={approved}
             last
             label="Credited"
-            sub={approved ? "Funds added to your wallet" : "Funds will appear in your wallet"}
+            sub={approved ? "Funds added to your wallet" : "Funds will be credited to your wallet"}
           />
         </div>
 
         {/* ETA / transaction info */}
         <div className="rounded-2xl border border-[#7f6731] bg-[#1d1a12] p-4">
-          <div className="flex items-center justify-between text-sm font-medium">
-            <span>Estimated time: 5–15 minutes</span>
-            <Clock className="h-5 w-5 text-[#f6c85a]" />
+          <div className="flex items-center gap-3">
+            <Clock className="h-9 w-9 shrink-0 text-[#f6c85a]" strokeWidth={1.75} />
+            <div className="min-w-0">
+              <div className="text-sm font-bold">Estimated time: 5–15 minutes</div>
+              <div className="text-sm text-[#a8a39a]">You&apos;ll receive a notification once credited</div>
+            </div>
           </div>
-          <p className="mt-1 text-sm text-[#a8a39a]">
-            You&apos;ll receive a notification once credited.
-          </p>
-          <p className="mt-3 text-sm text-[#a8a39a]">
-            Transaction ID: <span className="font-mono text-[#f8f7f2]">{deposit.id}</span>
+          <p className="mt-3 border-t border-[#7f6731]/40 pt-3 text-sm text-[#a8a39a]">
+            Transaction ID: <span className="font-mono text-[#f8f7f2]">TXN-{reference}</span>
           </p>
         </div>
 
@@ -346,7 +435,7 @@ function PendingDepositPage() {
             <span>Progress</span>
             <span className="text-[#f6c85a]">{approved ? 100 : displayPct}%</span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-[#26262c]">
+          <div className="h-2.5 overflow-hidden rounded-full bg-[#26262c]">
             <motion.div
               className={`h-full rounded-full ${approved ? "bg-green-500" : "bg-[#f6c85a]"}`}
               animate={{ width: `${approved ? 100 : displayPct}%` }}
@@ -357,34 +446,34 @@ function PendingDepositPage() {
 
         {/* Actions */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Button asChild className="h-12 bg-[#eab532] font-semibold text-[#101014] hover:bg-[#f6c85a]">
-            <Link to="/dashboard">
-              <Home className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Link>
-          </Button>
+          <Link
+            to="/dashboard"
+            className="flex h-13 items-center justify-center rounded-xl bg-[#eab532] py-3.5 text-center text-base font-bold text-[#101014] transition-colors hover:bg-[#f6c85a]"
+          >
+            Back to Dashboard
+          </Link>
           {whatsappLink ? (
-            <Button
-              asChild
-              variant="outline"
-              className="h-12 border-[#d9b54a] bg-transparent font-semibold text-[#f6c85a] hover:bg-[#f6c85a]/10"
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-13 items-center justify-center gap-2 rounded-xl border border-[#d9b54a] bg-transparent py-3.5 text-sm font-bold text-[#f6c85a] transition-colors hover:bg-[#f6c85a]/10"
             >
-              <a href={whatsappLink} target="_blank" rel="noreferrer">
-                <MessageCircle className="mr-2 h-4 w-4" />
-                WhatsApp Support
-              </a>
-            </Button>
+              <MessageCircle className="h-5 w-5 shrink-0" />
+              <span>
+                Contact Support
+                <br className="sm:hidden" /> on WhatsApp
+              </span>
+            </a>
           ) : (
-            <Button
-              asChild
-              variant="outline"
-              className="h-12 border-[#d9b54a] bg-transparent font-semibold text-[#f6c85a] hover:bg-[#f6c85a]/10"
+            <Link
+              to="/dashboard/wallet"
+              search={{ filter: "Deposits" } as never}
+              className="flex h-13 items-center justify-center gap-2 rounded-xl border border-[#d9b54a] bg-transparent py-3.5 text-sm font-bold text-[#f6c85a] transition-colors hover:bg-[#f6c85a]/10"
             >
-              <Link to="/dashboard/wallet" search={{ filter: "Deposits" } as never}>
-                <History className="mr-2 h-4 w-4" />
-                History
-              </Link>
-            </Button>
+              <MessageCircle className="h-5 w-5 shrink-0" />
+              Contact Support
+            </Link>
           )}
         </div>
       </motion.div>
