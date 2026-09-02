@@ -207,18 +207,18 @@ function DepositPage() {
 
   if (loading)
     return (
-      <div className="mx-auto max-w-md py-16 text-center text-sm text-[#a9a9b0]">
+      <div className="grid h-dvh place-items-center text-sm text-[#a9a9b0]" style={{ background: INK }}>
         Loading deposit options…
       </div>
     );
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-col gap-7 px-5 pb-36 pt-6 text-white"
+      className="fixed inset-0 z-30 mx-auto flex w-full max-w-md flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-4 text-white"
       style={{ background: INK }}
     >
       {/* progress */}
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <span className="h-1.5 w-24 rounded-full" style={{ background: GOLD }} />
         {[1, 2, 3, 4].map((n) => (
           <span
@@ -229,7 +229,7 @@ function DepositPage() {
         ))}
         <span className="h-1.5 flex-1 rounded-full bg-[#2c2c33]" />
       </div>
-
+      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden py-3">
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div
@@ -237,15 +237,16 @@ function DepositPage() {
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-7"
+            className="flex flex-col gap-5"
           >
-            <h1 className="text-[34px] font-extrabold leading-[1.1] tracking-tight">
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
               How much do you want to deposit?
             </h1>
 
+
             <div className="flex flex-col items-center gap-3">
               <div
-                className="flex w-full items-center justify-center rounded-2xl border-2 px-4 py-6"
+                className="flex w-full items-center justify-center rounded-2xl border-2 px-4 py-4"
                 style={{ borderColor: GOLD, background: "#141418" }}
               >
                 <Input
@@ -255,7 +256,7 @@ function DepositPage() {
                   placeholder="0"
                   inputMode="numeric"
                   aria-label="Amount in FCFA"
-                  className="h-auto w-full border-0 bg-transparent p-0 text-center text-[34px] font-extrabold tracking-tight shadow-none focus-visible:ring-0"
+                  className="h-auto w-full border-0 bg-transparent p-0 text-center text-[30px] font-extrabold tracking-tight shadow-none focus-visible:ring-0"
                   style={{ color: GOLD }}
                 />
                 <span className="pl-2 text-[26px] font-extrabold" style={{ color: GOLD }}>
@@ -268,7 +269,7 @@ function DepositPage() {
               {amountError && <p className="text-sm text-destructive">{amountError}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-2">
               {QUICK_AMOUNTS.map((value) => {
                 const active = amountNumber === value;
                 return (
@@ -276,7 +277,7 @@ function DepositPage() {
                     key={value}
                     type="button"
                     onClick={() => setAmount(String(value))}
-                    className="rounded-2xl border-2 py-4 text-xl font-bold transition"
+                    className="rounded-xl border-2 py-3 text-base font-bold transition"
                     style={{
                       borderColor: GOLD,
                       background: active ? GOLD : "transparent",
@@ -297,9 +298,9 @@ function DepositPage() {
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-4"
           >
-            <h1 className="text-[32px] font-extrabold leading-[1.1] tracking-tight">
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
               Select payment method
             </h1>
 
@@ -311,7 +312,7 @@ function DepositPage() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {activeMethods.map((item) => {
                   const active = method === item.id;
                   return (
@@ -351,10 +352,10 @@ function DepositPage() {
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-5 text-center"
+            className="flex flex-col gap-3 text-center"
           >
             <div>
-              <h1 className="text-[32px] font-extrabold leading-[1.1] tracking-tight">
+              <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
                 Complete your payment
               </h1>
               <p className="mt-2 text-base font-semibold text-white/90">Send exact amount</p>
@@ -396,11 +397,11 @@ function DepositPage() {
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-5 text-center"
+            className="flex flex-col gap-3 text-center"
           >
             <label
               htmlFor="proof"
-              className="flex min-h-52 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-6"
+              className="flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4"
               style={{ borderColor: GOLD }}
             >
               <Upload className="size-9" style={{ color: GOLD }} />
@@ -508,11 +509,12 @@ function DepositPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       {!submitted && (
         <div
-          className="fixed inset-x-0 bottom-16 z-10 border-t border-[#26262d] p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] backdrop-blur"
-          style={{ background: `${CARD}f2` }}
+          className="shrink-0 rounded-2xl border-t border-[#26262d] pt-3"
+          style={{ background: `${CARD}00` }}
         >
           <div className="mx-auto flex max-w-md gap-3">
             {step > 1 && (
@@ -572,7 +574,7 @@ function GoldRow({
           {label}
         </p>
         <p
-          className="mt-0.5 break-words text-[26px] font-extrabold leading-tight"
+          className="mt-0.5 break-words text-[22px] font-extrabold leading-tight"
           style={{ color: light ? "#ffffff" : GOLD }}
         >
           {value}

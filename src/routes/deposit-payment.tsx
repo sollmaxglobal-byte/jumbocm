@@ -63,12 +63,12 @@ function DepositPaymentPage() {
   const Icon = sel ? ICONS[sel.type] : Smartphone;
 
   return (
-    <div className="min-h-screen bg-[#101014] text-[#f8f7f2] py-4"><CheckoutShell step={2} total={3} title={t("deposit.payTitle")} subtitle={t("deposit.paySub")}>
+    <div className="h-dvh overflow-hidden bg-[#101014] text-[#f8f7f2]"><CheckoutShell step={2} total={3} title={t("deposit.payTitle")} subtitle={t("deposit.paySub")}>
       {!sel ? (
         <div className="p-8 text-center text-sm text-muted-foreground">{t("common.loading")}</div>
       ) : (
         <>
-          <div className="rounded-2xl bg-hero p-6 text-primary-foreground shadow-elegant">
+          <div className="rounded-2xl bg-hero p-4 text-primary-foreground shadow-elegant">
             <div className="text-[10px] uppercase tracking-widest opacity-80">
               {t("deposit.amountToSend")}
             </div>
@@ -77,7 +77,7 @@ function DepositPaymentPage() {
             </div>
           </div>
 
-          <div className="space-y-5 rounded-2xl border border-border bg-card p-5">
+          <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
