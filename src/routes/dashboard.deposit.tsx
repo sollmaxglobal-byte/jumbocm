@@ -229,8 +229,7 @@ function DepositPage() {
         ))}
         <span className="h-1.5 flex-1 rounded-full bg-[#2c2c33]" />
       </div>
-
-
+      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden py-3">
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div
@@ -238,11 +237,12 @@ function DepositPage() {
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-7"
+            className="flex flex-col gap-5"
           >
-            <h1 className="text-[34px] font-extrabold leading-[1.1] tracking-tight">
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
               How much do you want to deposit?
             </h1>
+
 
             <div className="flex flex-col items-center gap-3">
               <div
