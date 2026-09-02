@@ -147,7 +147,7 @@ function DepositProofPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-5 pb-28 md:pb-6">
+    <div className="mx-auto flex h-dvh max-w-xl flex-col justify-center gap-4 overflow-hidden px-4 pb-24 pt-4">
       <header>
         <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-success">
           <ShieldCheck className="h-4 w-4" /> Payment confirmed · Step 3 of 3
@@ -178,14 +178,14 @@ function DepositProofPage() {
             <img
               src={preview}
               alt="Selected payment proof"
-              className="mx-auto max-h-72 rounded-md object-contain"
+              className="mx-auto max-h-48 rounded-md object-contain"
             />
             <div className="flex items-center justify-center gap-2 text-sm font-medium text-success">
               <Check className="h-4 w-4" /> {file?.name}
             </div>
           </div>
         ) : (
-          <div className="flex min-h-52 flex-col items-center justify-center text-center">
+          <div className="flex min-h-32 flex-col items-center justify-center text-center">
             <span className="mb-3 grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary">
               <Upload className="h-7 w-7" />
             </span>
@@ -208,7 +208,7 @@ function DepositProofPage() {
         transaction reference are visible before submitting.
       </div>
 
-      <div className="fixed inset-x-0 bottom-16 z-20 border-t border-border bg-background/95 p-2 backdrop-blur md:static md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 p-2 backdrop-blur md:static md:border-0 md:bg-transparent md:p-0">
         <div className="mx-auto flex max-w-xl gap-2">
           <Button asChild variant="outline" className="h-10 flex-1">
             <Link to="/deposit-payment" search={{ amount, method }}>
