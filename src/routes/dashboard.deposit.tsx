@@ -207,18 +207,18 @@ function DepositPage() {
 
   if (loading)
     return (
-      <div className="mx-auto max-w-md py-16 text-center text-sm text-[#a9a9b0]">
+      <div className="grid h-dvh place-items-center text-sm text-[#a9a9b0]" style={{ background: INK }}>
         Loading deposit options…
       </div>
     );
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-col gap-7 px-5 pb-36 pt-6 text-white"
+      className="fixed inset-0 z-30 mx-auto flex w-full max-w-md flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-4 text-white"
       style={{ background: INK }}
     >
       {/* progress */}
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <span className="h-1.5 w-24 rounded-full" style={{ background: GOLD }} />
         {[1, 2, 3, 4].map((n) => (
           <span
@@ -229,6 +229,7 @@ function DepositPage() {
         ))}
         <span className="h-1.5 flex-1 rounded-full bg-[#2c2c33]" />
       </div>
+
 
       <AnimatePresence mode="wait">
         {step === 1 && (
