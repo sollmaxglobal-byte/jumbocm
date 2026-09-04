@@ -12,7 +12,7 @@ export function TidioLoader() {
       let key = FALLBACK_TIDIO_KEY;
       try {
         const { data } = await supabase
-          .from("app_settings")
+          .from("public_settings")
           .select("tidio_public_key")
           .maybeSingle();
         const saved = data?.tidio_public_key?.trim();

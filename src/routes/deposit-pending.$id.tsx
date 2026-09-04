@@ -236,7 +236,7 @@ function PendingDepositPage() {
           .select("id,user_id,amount,status,created_at,payment_method_id")
           .eq("id", id)
           .maybeSingle(),
-        supabase.from("app_settings").select("announcement_link").eq("id", 1).maybeSingle(),
+        supabase.from("public_settings").select("announcement_link").eq("id", 1).maybeSingle(),
       ]);
       if (settings?.announcement_link) setWhatsappLink(settings.announcement_link);
       if (cancelled) return;

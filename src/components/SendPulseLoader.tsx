@@ -14,7 +14,7 @@ export function SendPulseLoader() {
       let embedHtml = "";
       try {
         const { data } = await supabase
-          .from("app_settings")
+          .from("public_settings")
           .select("sendpulse_chat_id, sendpulse_embed_html")
           .eq("id", 1)
           .maybeSingle();
