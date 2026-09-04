@@ -35,7 +35,7 @@ function shortMoney(value: number) {
   return value >= 1000 ? `${value / 1000}k` : String(value);
 }
 function makeReference() {
-  return `FID-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+  return `JCM-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 }
 function methodName(method: Method | undefined) {
   return method?.name ?? "Mobile Money";

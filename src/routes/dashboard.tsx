@@ -199,7 +199,8 @@ function DashboardLayout() {
         </main>
       </div>
 
-      {/* Floating capsule nav (mobile) */}
+      {/* Floating capsule nav (mobile) — hidden during the deposit flow */}
+      {!path.startsWith("/dashboard/deposit") && (
       <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.9rem)] md:hidden">
         <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#14112B] p-1.5 shadow-[0_16px_40px_-10px_rgba(20,17,43,0.55)]">
           {NAV.map((item) => {
