@@ -27,7 +27,7 @@ export function AnnouncementPopup() {
     (async () => {
       try {
         const { data, error } = await supabase
-          .from("app_settings")
+          .from("public_settings")
           .select(
             "announcement_enabled,announcement_title,announcement_message,announcement_link,announcement_link_label,announcement_version",
           )

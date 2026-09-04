@@ -92,7 +92,7 @@ function DepositPage() {
     (async () => {
       const [{ data: settingsData }, { data: methodsData }] = await Promise.all([
         supabase
-          .from("app_settings")
+          .from("public_settings")
           .select("deposit_min_amount, deposit_max_amount")
           .eq("id", 1)
           .maybeSingle(),

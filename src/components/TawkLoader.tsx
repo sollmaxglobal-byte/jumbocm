@@ -17,7 +17,7 @@ export function TawkLoader() {
       let widgetId = "default";
       try {
         const { data } = await supabase
-          .from("app_settings")
+          .from("public_settings")
           .select("tawk_property_id, tawk_widget_id")
           .eq("id", 1)
           .maybeSingle();
