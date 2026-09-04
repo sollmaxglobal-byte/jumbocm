@@ -817,21 +817,72 @@ export type Database = {
       }
       public_settings: {
         Row: {
+          announcement_enabled: boolean | null
+          announcement_link: string | null
+          announcement_link_label: string | null
+          announcement_message: string | null
+          announcement_title: string | null
+          announcement_version: number | null
+          deposit_max_amount: number | null
+          deposit_min_amount: number | null
           id: number | null
+          mtn_enabled: boolean | null
+          mtn_number: string | null
+          orange_enabled: boolean | null
+          orange_number: string | null
+          referral_percent: number | null
+          sendpulse_chat_id: string | null
+          sendpulse_embed_html: string | null
           site_name: string | null
           site_url: string | null
+          tawk_property_id: string | null
+          tawk_widget_id: string | null
           tidio_public_key: string | null
         }
         Insert: {
+          announcement_enabled?: boolean | null
+          announcement_link?: string | null
+          announcement_link_label?: string | null
+          announcement_message?: string | null
+          announcement_title?: string | null
+          announcement_version?: number | null
+          deposit_max_amount?: number | null
+          deposit_min_amount?: number | null
           id?: number | null
+          mtn_enabled?: boolean | null
+          mtn_number?: string | null
+          orange_enabled?: boolean | null
+          orange_number?: string | null
+          referral_percent?: number | null
+          sendpulse_chat_id?: string | null
+          sendpulse_embed_html?: string | null
           site_name?: string | null
           site_url?: string | null
+          tawk_property_id?: string | null
+          tawk_widget_id?: string | null
           tidio_public_key?: string | null
         }
         Update: {
+          announcement_enabled?: boolean | null
+          announcement_link?: string | null
+          announcement_link_label?: string | null
+          announcement_message?: string | null
+          announcement_title?: string | null
+          announcement_version?: number | null
+          deposit_max_amount?: number | null
+          deposit_min_amount?: number | null
           id?: number | null
+          mtn_enabled?: boolean | null
+          mtn_number?: string | null
+          orange_enabled?: boolean | null
+          orange_number?: string | null
+          referral_percent?: number | null
+          sendpulse_chat_id?: string | null
+          sendpulse_embed_html?: string | null
           site_name?: string | null
           site_url?: string | null
+          tawk_property_id?: string | null
+          tawk_widget_id?: string | null
           tidio_public_key?: string | null
         }
         Relationships: []
