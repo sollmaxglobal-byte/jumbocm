@@ -223,6 +223,7 @@ function DashboardLayout() {
           })}
         </div>
       </nav>
+      )}
       <PushSetup />
       <SocialProof />
     </div>
