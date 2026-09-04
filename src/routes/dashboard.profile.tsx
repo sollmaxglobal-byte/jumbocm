@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  User,
   Mail,
   Phone,
   ShieldCheck,
@@ -11,10 +10,11 @@ import {
   LogOut,
   KeyRound,
   Share2,
-  Leaf,
   CreditCard,
   Plus,
   Trash2,
+  BadgeCheck,
+  ChevronRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,6 +41,16 @@ type PayoutAccount = {
   account_number: string;
   is_default: boolean;
 };
+
+function initials(name: string | null | undefined, email: string | undefined) {
+  const source = name?.trim() || email || "J";
+  return source
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
 
 function ProfilePage() {
   const { user, signOut } = useAuth();
@@ -160,55 +170,67 @@ function ProfilePage() {
   const kyc = kycMap[profile?.kyc_status ?? "not_submitted"];
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="font-display text-2xl text-primary md:text-3xl">Profile</h1>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Account details, security and referrals.
-        </p>
-      </div>
-
-      {/* Identity card */}
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Leaf className="h-6 w-6" />
-          </div>
-          <div className="min-w-0">
-            <div className="truncate font-display text-lg text-primary">
-              {profile?.full_name ?? "—"}
+    <div className="space-y-4">
+      {/* Identity header */}
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="bg-[#14112B] p-5 pb-8">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#C9F158] font-display text-xl font-bold text-[#14112B]">
+              {initials(profile?.full_name, user?.email)}
             </div>
-            <div className="truncate text-xs text-muted-foreground">{user?.email}</div>
+            <div className="min-w-0">
+              <h1 className="truncate font-display text-xl font-bold text-white">
+                {profile?.full_name ?? "Member"}
+              </h1>
+              <p className="truncate text-xs text-white/60">{user?.email}</p>
+              <span
+                className={`mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${kyc.cls}`}
+              >
+                <BadgeCheck className="h-3 w-3" />
+                KYC · {kyc.label}
+              </span>
+            </div>
           </div>
         </div>
-
-        <div className="mt-4 space-y-2 text-sm">
-          <Row icon={User} label="Full name" value={profile?.full_name ?? "—"} />
-          <Row icon={Mail} label="Email" value={user?.email ?? "—"} />
-          <Row icon={Phone} label="Phone" value={profile?.phone ?? "—"} />
+        <div className="grid grid-cols-2 divide-x divide-border border-t border-border/40">
+          <div className="flex items-center gap-2.5 p-3.5">
+            <Mail className="h-4 w-4 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Email
+              </div>
+              <div className="truncate text-sm font-medium">{user?.email ?? "—"}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 p-3.5">
+            <Phone className="h-4 w-4 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Phone
+              </div>
+              <div className="truncate text-sm font-medium">{profile?.phone ?? "—"}</div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* KYC */}
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <section className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-primary" />
-            <span className="font-display text-base text-primary">KYC verification</span>
+            <span className="font-display text-base text-primary">Identity verification</span>
           </div>
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium uppercase ${kyc.cls}`}
-          >
-            {kyc.label}
-          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          KYC unlocks higher withdrawal limits. Contact support to submit your documents.
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Verify your identity to unlock higher withdrawal limits. Contact support to submit
+          your documents.
         </p>
-      </div>
+      </section>
 
       {/* Referral */}
-      <div className="rounded-2xl border border-border bg-card p-5">
+      <section className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <Share2 className="h-4 w-4 text-primary" />
           <span className="font-display text-base text-primary">Refer & earn</span>
@@ -223,19 +245,21 @@ function ProfilePage() {
               {profile?.referral_code ?? "—"}
             </div>
           </div>
-          <Button size="sm" variant="outline" onClick={copyReferral}>
+          <Button size="sm" variant="outline" onClick={copyReferral} aria-label="Copy referral link">
             <Copy className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
             onClick={shareReferral}
             className="bg-primary text-primary-foreground hover:opacity-90"
+            aria-label="Share referral link"
           >
             <Share2 className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </section>
 
+      {/* Payout accounts */}
       <section className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <CreditCard className="h-4 w-4 text-primary" />
@@ -250,9 +274,9 @@ function ProfilePage() {
               key={account.id}
               className="flex items-center justify-between gap-3 rounded-lg bg-secondary p-3"
             >
-              <div>
-                <div className="text-sm font-medium">{account.account_name}</div>
-                <div className="text-xs text-muted-foreground">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium">{account.account_name}</div>
+                <div className="truncate text-xs text-muted-foreground">
                   {account.method.replace("_", " ")} · {account.account_number}
                   {account.is_default ? " · Default" : ""}
                 </div>
@@ -290,6 +314,7 @@ function ProfilePage() {
 
       <PushToggle />
 
+      {/* Security */}
       <section className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2">
           <KeyRound className="h-4 w-4 text-primary" />
@@ -344,18 +369,6 @@ function ProfilePage() {
       >
         <LogOut className="mr-2 h-4 w-4" /> Sign out
       </Button>
-    </div>
-  );
-}
-
-function Row({ icon: Icon, label, value }: { icon: typeof User; label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-secondary p-2.5">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="h-4 w-4" />
-        <span className="text-xs uppercase tracking-wider">{label}</span>
-      </div>
-      <span className="truncate text-sm font-medium">{value}</span>
     </div>
   );
 }
