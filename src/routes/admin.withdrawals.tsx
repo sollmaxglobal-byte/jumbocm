@@ -74,15 +74,23 @@ function AdminWithdrawals() {
           })
           .eq("id", w.id);
         if (error) throw error;
-        // Funds were already held when the user submitted; just log it once.
+        // Funds are already held (and logged) when the user submits.
+        // Only log here if no hold entry exists, to avoid double-counting.
         if (w.status === "pending") {
-          await supabase.from("transactions").insert({
-            user_id: w.user_id,
-            type: "withdrawal",
-            amount: -Number(w.amount),
-            description: `Withdrawal ${status} (${w.method})`,
-            ref_id: w.id,
-          });
+          const { count } = await supabase
+            .from("transactions")
+            .select("id", { count: "exact", head: true })
+            .eq("ref_id", w.id)
+            .eq("type", "withdrawal_hold");
+          if (!count) {
+            await supabase.from("transactions").insert({
+              user_id: w.user_id,
+              type: "withdrawal",
+              amount: -Number(w.amount),
+              description: `Withdrawal ${status} (${w.method})`,
+              ref_id: w.id,
+            });
+          }
         }
       }
 
