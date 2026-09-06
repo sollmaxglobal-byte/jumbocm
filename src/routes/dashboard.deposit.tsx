@@ -364,7 +364,46 @@ function DepositPage() {
               Select payment method
             </h1>
 
-            {activeMethods.length === 0 ? (
+            {instantEnabled && (
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={() => setMethod(KORAPAY)}
+                className="relative flex items-center gap-4 rounded-2xl border-2 p-4 text-left"
+                style={{
+                  borderColor: GOLD,
+                  background: instant ? GOLD : "#141418",
+                }}
+              >
+                <span
+                  className="flex h-11 w-14 shrink-0 items-center justify-center rounded-md text-[11px] font-black"
+                  style={{ background: instant ? "#141418" : GOLD, color: instant ? GOLD : "#141418" }}
+                >
+                  PAY
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span
+                    className="truncate text-lg font-bold"
+                    style={{ color: instant ? "#141418" : "#ffffff" }}
+                  >
+                    Pay instantly
+                  </span>
+                  <span
+                    className="truncate text-sm"
+                    style={{ color: instant ? "rgba(20,20,24,0.7)" : "#9a9aa2" }}
+                  >
+                    MTN / Orange prompt • credited automatically
+                  </span>
+                </span>
+                {instant && (
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#141418]/15">
+                    <Check className="size-4 text-[#141418]" />
+                  </span>
+                )}
+              </motion.button>
+            )}
+
+            {activeMethods.length === 0 && !instantEnabled ? (
               <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#3c3c47] p-8 text-center">
                 <Clock3 className="size-8 text-[#9a9aa2]" />
                 <p className="text-sm text-[#9a9aa2]">
@@ -406,7 +445,52 @@ function DepositPage() {
           </motion.div>
         )}
 
-        {step === 3 && selectedMethod && (
+        {step === 3 && instant && (
+          <motion.div
+            key="instant"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            className="flex flex-col gap-4 text-center"
+          >
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
+              {chargeId ? "Check your phone" : "Pay instantly"}
+            </h1>
+            <p className="text-base font-semibold" style={{ color: GOLD }}>
+              {money(amount)} FCFA
+            </p>
+
+            {chargeId ? (
+              <div className="flex flex-col items-center gap-3">
+                <Clock3 className="size-10 animate-pulse" style={{ color: GOLD }} />
+                <p className="text-sm text-[#c8c8d0]">
+                  Enter your mobile money PIN on the prompt sent to {payPhone}. Your wallet is
+                  credited automatically once the payment goes through.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="pay-phone" className="text-sm font-semibold" style={{ color: GOLD }}>
+                  Mobile money number
+                </label>
+                <Input
+                  id="pay-phone"
+                  value={payPhone}
+                  inputMode="numeric"
+                  placeholder="6XX XXX XXX"
+                  onChange={(e) => setPayPhone(e.target.value.replace(/\D/g, "").slice(0, 12))}
+                  className="h-14 rounded-2xl border-2 bg-[#141418] text-center text-2xl font-extrabold text-white"
+                  style={{ borderColor: GOLD }}
+                />
+                <p className="text-xs text-[#9a9aa2]">
+                  You will receive a payment prompt on this number. No screenshot needed.
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {step === 3 && !instant && selectedMethod && (
           <motion.div
             key="payment"
             initial={{ opacity: 0, x: 15 }}
@@ -588,15 +672,24 @@ function DepositPage() {
               </Button>
             )}
             <Button
-              onClick={step < 4 ? next : submitProof}
+              onClick={
+                step === 3 && instant ? payInstantly : step < 4 ? next : submitProof
+              }
               disabled={
-                (step === 2 && activeMethods.length === 0) ||
+                (step === 2 && activeMethods.length === 0 && !instantEnabled) ||
+                (step === 3 && instant && charging) ||
                 (step === 4 && (!uploadedFile || submitting))
               }
               className="h-12 flex-1 rounded-xl text-base font-bold hover:opacity-90"
               style={{ background: GOLD, color: "#141418" }}
             >
-              {step === 3
+              {step === 3 && instant
+                ? chargeId
+                  ? "Waiting for your approval…"
+                  : charging
+                    ? "Starting…"
+                    : "Pay now"
+                : step === 3
                 ? "I have paid"
                 : step === 4
                   ? submitting
