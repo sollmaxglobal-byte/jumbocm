@@ -31,6 +31,7 @@ export type Database = {
           deposit_max_amount: number
           deposit_min_amount: number
           id: number
+          korapay_enabled: boolean
           mm_webhook_secret: string | null
           mtn_enabled: boolean
           mtn_number: string | null
@@ -69,6 +70,7 @@ export type Database = {
           deposit_max_amount?: number
           deposit_min_amount?: number
           id?: number
+          korapay_enabled?: boolean
           mm_webhook_secret?: string | null
           mtn_enabled?: boolean
           mtn_number?: string | null
@@ -107,6 +109,7 @@ export type Database = {
           deposit_max_amount?: number
           deposit_min_amount?: number
           id?: number
+          korapay_enabled?: boolean
           mm_webhook_secret?: string | null
           mtn_enabled?: boolean
           mtn_number?: string | null
@@ -138,6 +141,9 @@ export type Database = {
           auto_approved_at: string | null
           auto_note: string | null
           created_at: string
+          gateway: string | null
+          gateway_ref: string | null
+          gateway_status: string | null
           id: string
           matched_message_id: string | null
           ocr_amount: number | null
@@ -159,6 +165,9 @@ export type Database = {
           auto_approved_at?: string | null
           auto_note?: string | null
           created_at?: string
+          gateway?: string | null
+          gateway_ref?: string | null
+          gateway_status?: string | null
           id?: string
           matched_message_id?: string | null
           ocr_amount?: number | null
@@ -180,6 +189,9 @@ export type Database = {
           auto_approved_at?: string | null
           auto_note?: string | null
           created_at?: string
+          gateway?: string | null
+          gateway_ref?: string | null
+          gateway_status?: string | null
           id?: string
           matched_message_id?: string | null
           ocr_amount?: number | null
@@ -826,6 +838,7 @@ export type Database = {
           deposit_max_amount: number | null
           deposit_min_amount: number | null
           id: number | null
+          korapay_enabled: boolean | null
           mtn_enabled: boolean | null
           mtn_number: string | null
           orange_enabled: boolean | null
@@ -849,6 +862,7 @@ export type Database = {
           deposit_max_amount?: number | null
           deposit_min_amount?: number | null
           id?: number | null
+          korapay_enabled?: boolean | null
           mtn_enabled?: boolean | null
           mtn_number?: string | null
           orange_enabled?: boolean | null
@@ -872,6 +886,7 @@ export type Database = {
           deposit_max_amount?: number | null
           deposit_min_amount?: number | null
           id?: number | null
+          korapay_enabled?: boolean | null
           mtn_enabled?: boolean | null
           mtn_number?: string | null
           orange_enabled?: boolean | null
@@ -956,6 +971,7 @@ export type Database = {
           deposit_max_amount: number
           deposit_min_amount: number
           id: number
+          korapay_enabled: boolean
           mm_webhook_secret: string | null
           mtn_enabled: boolean
           mtn_number: string | null
@@ -1029,6 +1045,10 @@ export type Database = {
         Returns: boolean
       }
       set_transfer_pin: { Args: { _pin: string }; Returns: boolean }
+      settle_gateway_deposit: {
+        Args: { _gateway_ref: string; _outcome: string; _reference: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
