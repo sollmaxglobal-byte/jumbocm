@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Check, Clock3, Copy, FileImage, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +21,13 @@ type Method = {
   instructions?: string;
   accountName?: string;
 };
-type Settings = { deposit_min_amount?: number; deposit_max_amount?: number };
+type Settings = {
+  deposit_min_amount?: number;
+  deposit_max_amount?: number;
+  korapay_enabled?: boolean;
+};
+
+const KORAPAY = "korapay";
 
 const QUICK_AMOUNTS = [5000, 10000, 25000, 50000];
 const fallbackSettings = { deposit_min_amount: 1000, deposit_max_amount: 1000000 };
@@ -76,9 +84,16 @@ function DepositPage() {
   const [submitted, setSubmitted] = useState(false);
   const [remaining, setRemaining] = useState(900);
   const [depositStatus, setDepositStatus] = useState("pending");
+  const [payPhone, setPayPhone] = useState("");
+  const [charging, setCharging] = useState(false);
+  const [chargeId, setChargeId] = useState<string | null>(null);
+  const startCharge = useServerFn(startKorapayDeposit);
+  const checkCharge = useServerFn(checkKorapayDeposit);
 
   const [activeMethods, setActiveMethods] = useState<Method[]>([]);
   const selectedMethod = activeMethods.find((m) => m.id === method);
+  const instant = method === KORAPAY;
+  const instantEnabled = Boolean(settings.korapay_enabled);
   const amountNumber = Number(amount);
   const minAmount = Number(settings.deposit_min_amount ?? fallbackSettings.deposit_min_amount);
   const maxAmount = Number(settings.deposit_max_amount ?? fallbackSettings.deposit_max_amount);
@@ -93,7 +108,7 @@ function DepositPage() {
       const [{ data: settingsData }, { data: methodsData }] = await Promise.all([
         supabase
           .from("public_settings")
-          .select("deposit_min_amount, deposit_max_amount")
+          .select("deposit_min_amount, deposit_max_amount, korapay_enabled")
           .eq("id", 1)
           .maybeSingle(),
         supabase
@@ -125,8 +140,9 @@ function DepositPage() {
   }, []);
 
   useEffect(() => {
-    if (step === 2 && activeMethods.length === 1) setMethod(activeMethods[0].id);
-  }, [step, activeMethods]);
+    if (step === 2 && activeMethods.length === 1 && !settings.korapay_enabled)
+      setMethod(activeMethods[0].id);
+  }, [step, activeMethods, settings.korapay_enabled]);
 
   useEffect(() => {
     if (step !== 3 || remaining <= 0) return;
@@ -147,6 +163,27 @@ function DepositPage() {
     return () => window.clearInterval(poll);
   }, [submitted, reference]);
 
+  useEffect(() => {
+    if (!chargeId) return;
+    const poll = window.setInterval(async () => {
+      try {
+        const res = await checkCharge({ data: { depositId: chargeId } });
+        if (res.status === "approved") {
+          window.clearInterval(poll);
+          navigate({ to: "/deposit-pending/$id", params: { id: chargeId } });
+        } else if (res.status === "rejected") {
+          window.clearInterval(poll);
+          setCharging(false);
+          setChargeId(null);
+          toast.error("The payment was not completed. Please try again.");
+        }
+      } catch {
+        /* keep polling */
+      }
+    }, 5000);
+    return () => window.clearInterval(poll);
+  }, [chargeId, checkCharge, navigate]);
+
   async function copy(value: string) {
     await navigator.clipboard.writeText(value);
     toast.success("Copied to clipboard");
@@ -166,6 +203,29 @@ function DepositPage() {
       }
       setStep(3);
     } else if (step === 3) setStep(4);
+  }
+
+  async function payInstantly() {
+    if (charging) return;
+    const phone = payPhone.replace(/\D/g, "");
+    if (phone.replace(/^237/, "").length !== 9) {
+      toast.error("Enter your 9-digit mobile money number.");
+      return;
+    }
+    setCharging(true);
+    setDepositStatus("pending");
+    try {
+      const res = await startCharge({ data: { amount: amountNumber, phone } });
+      setChargeId(res.depositId);
+      if (res.status === "approved") {
+        navigate({ to: "/deposit-pending/$id", params: { id: res.depositId } });
+      } else {
+        toast.success("Approve the payment prompt on your phone.");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not start the payment.");
+      setCharging(false);
+    }
   }
 
   async function submitProof() {
@@ -304,7 +364,46 @@ function DepositPage() {
               Select payment method
             </h1>
 
-            {activeMethods.length === 0 ? (
+            {instantEnabled && (
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={() => setMethod(KORAPAY)}
+                className="relative flex items-center gap-4 rounded-2xl border-2 p-4 text-left"
+                style={{
+                  borderColor: GOLD,
+                  background: instant ? GOLD : "#141418",
+                }}
+              >
+                <span
+                  className="flex h-11 w-14 shrink-0 items-center justify-center rounded-md text-[11px] font-black"
+                  style={{ background: instant ? "#141418" : GOLD, color: instant ? GOLD : "#141418" }}
+                >
+                  PAY
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span
+                    className="truncate text-lg font-bold"
+                    style={{ color: instant ? "#141418" : "#ffffff" }}
+                  >
+                    Pay instantly
+                  </span>
+                  <span
+                    className="truncate text-sm"
+                    style={{ color: instant ? "rgba(20,20,24,0.7)" : "#9a9aa2" }}
+                  >
+                    MTN / Orange prompt • credited automatically
+                  </span>
+                </span>
+                {instant && (
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#141418]/15">
+                    <Check className="size-4 text-[#141418]" />
+                  </span>
+                )}
+              </motion.button>
+            )}
+
+            {activeMethods.length === 0 && !instantEnabled ? (
               <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#3c3c47] p-8 text-center">
                 <Clock3 className="size-8 text-[#9a9aa2]" />
                 <p className="text-sm text-[#9a9aa2]">
@@ -346,7 +445,52 @@ function DepositPage() {
           </motion.div>
         )}
 
-        {step === 3 && selectedMethod && (
+        {step === 3 && instant && (
+          <motion.div
+            key="instant"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            className="flex flex-col gap-4 text-center"
+          >
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
+              {chargeId ? "Check your phone" : "Pay instantly"}
+            </h1>
+            <p className="text-base font-semibold" style={{ color: GOLD }}>
+              {money(amount)} FCFA
+            </p>
+
+            {chargeId ? (
+              <div className="flex flex-col items-center gap-3">
+                <Clock3 className="size-10 animate-pulse" style={{ color: GOLD }} />
+                <p className="text-sm text-[#c8c8d0]">
+                  Enter your mobile money PIN on the prompt sent to {payPhone}. Your wallet is
+                  credited automatically once the payment goes through.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="pay-phone" className="text-sm font-semibold" style={{ color: GOLD }}>
+                  Mobile money number
+                </label>
+                <Input
+                  id="pay-phone"
+                  value={payPhone}
+                  inputMode="numeric"
+                  placeholder="6XX XXX XXX"
+                  onChange={(e) => setPayPhone(e.target.value.replace(/\D/g, "").slice(0, 12))}
+                  className="h-14 rounded-2xl border-2 bg-[#141418] text-center text-2xl font-extrabold text-white"
+                  style={{ borderColor: GOLD }}
+                />
+                <p className="text-xs text-[#9a9aa2]">
+                  You will receive a payment prompt on this number. No screenshot needed.
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {step === 3 && !instant && selectedMethod && (
           <motion.div
             key="payment"
             initial={{ opacity: 0, x: 15 }}
@@ -528,15 +672,24 @@ function DepositPage() {
               </Button>
             )}
             <Button
-              onClick={step < 4 ? next : submitProof}
+              onClick={
+                step === 3 && instant ? payInstantly : step < 4 ? next : submitProof
+              }
               disabled={
-                (step === 2 && activeMethods.length === 0) ||
+                (step === 2 && activeMethods.length === 0 && !instantEnabled) ||
+                (step === 3 && instant && charging) ||
                 (step === 4 && (!uploadedFile || submitting))
               }
               className="h-12 flex-1 rounded-xl text-base font-bold hover:opacity-90"
               style={{ background: GOLD, color: "#141418" }}
             >
-              {step === 3
+              {step === 3 && instant
+                ? chargeId
+                  ? "Waiting for your approval…"
+                  : charging
+                    ? "Starting…"
+                    : "Pay now"
+                : step === 3
                 ? "I have paid"
                 : step === 4
                   ? submitting

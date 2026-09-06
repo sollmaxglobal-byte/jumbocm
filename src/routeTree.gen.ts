@@ -42,6 +42,7 @@ import { Route as DashboardReferralsRouteImport } from './routes/dashboard.refer
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardWithdrawRouteImport } from './routes/dashboard.withdraw'
 import { Route as DepositPendingIdRouteImport } from './routes/deposit-pending.$id'
+import { Route as ApiPublicKorapayWebhookRouteImport } from './routes/api/public/korapay-webhook'
 import { Route as ApiPublicMmSmsRouteImport } from './routes/api/public/mm-sms'
 import { Route as ApiPublicProcessReceiptEmailsRouteImport } from './routes/api/public/process-receipt-emails'
 import { Route as ApiPublicWithdrawQueueRouteImport } from './routes/api/public/withdraw-queue'
@@ -215,6 +216,11 @@ const DepositPendingIdRoute = DepositPendingIdRouteImport.update({
   path: '/deposit-pending/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicKorapayWebhookRoute = ApiPublicKorapayWebhookRouteImport.update({
+  id: '/api/public/korapay-webhook',
+  path: '/api/public/korapay-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMmSmsRoute = ApiPublicMmSmsRouteImport.update({
   id: '/api/public/mm-sms',
   path: '/api/public/mm-sms',
@@ -286,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/deposit-pending/$id': typeof DepositPendingIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/deposit-pending/$id': typeof DepositPendingIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
@@ -369,6 +377,7 @@ export interface FileRoutesById {
   '/deposit-pending/$id': typeof DepositPendingIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
@@ -413,6 +422,7 @@ export interface FileRouteTypes {
     | '/deposit-pending/$id'
     | '/admin/'
     | '/dashboard/'
+    | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/deposit-pending/$id'
     | '/admin'
     | '/dashboard'
+    | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/deposit-pending/$id'
     | '/admin/'
     | '/dashboard/'
+    | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
@@ -520,6 +532,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ResetPinRoute: typeof ResetPinRoute
   DepositPendingIdRoute: typeof DepositPendingIdRoute
+  ApiPublicKorapayWebhookRoute: typeof ApiPublicKorapayWebhookRoute
   ApiPublicMmSmsRoute: typeof ApiPublicMmSmsRoute
   ApiPublicProcessReceiptEmailsRoute: typeof ApiPublicProcessReceiptEmailsRoute
   ApiPublicWithdrawQueueRoute: typeof ApiPublicWithdrawQueueRoute
@@ -761,6 +774,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DepositPendingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/korapay-webhook': {
+      id: '/api/public/korapay-webhook'
+      path: '/api/public/korapay-webhook'
+      fullPath: '/api/public/korapay-webhook'
+      preLoaderRoute: typeof ApiPublicKorapayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/mm-sms': {
       id: '/api/public/mm-sms'
       path: '/api/public/mm-sms'
@@ -885,6 +905,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ResetPinRoute: ResetPinRoute,
   DepositPendingIdRoute: DepositPendingIdRoute,
+  ApiPublicKorapayWebhookRoute: ApiPublicKorapayWebhookRoute,
   ApiPublicMmSmsRoute: ApiPublicMmSmsRoute,
   ApiPublicProcessReceiptEmailsRoute: ApiPublicProcessReceiptEmailsRoute,
   ApiPublicWithdrawQueueRoute: ApiPublicWithdrawQueueRoute,
