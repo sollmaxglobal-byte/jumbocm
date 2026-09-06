@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Check, Clock3, Copy, FileImage, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +21,13 @@ type Method = {
   instructions?: string;
   accountName?: string;
 };
-type Settings = { deposit_min_amount?: number; deposit_max_amount?: number };
+type Settings = {
+  deposit_min_amount?: number;
+  deposit_max_amount?: number;
+  korapay_enabled?: boolean;
+};
+
+const KORAPAY = "korapay";
 
 const QUICK_AMOUNTS = [5000, 10000, 25000, 50000];
 const fallbackSettings = { deposit_min_amount: 1000, deposit_max_amount: 1000000 };
@@ -76,9 +84,16 @@ function DepositPage() {
   const [submitted, setSubmitted] = useState(false);
   const [remaining, setRemaining] = useState(900);
   const [depositStatus, setDepositStatus] = useState("pending");
+  const [payPhone, setPayPhone] = useState("");
+  const [charging, setCharging] = useState(false);
+  const [chargeId, setChargeId] = useState<string | null>(null);
+  const startCharge = useServerFn(startKorapayDeposit);
+  const checkCharge = useServerFn(checkKorapayDeposit);
 
   const [activeMethods, setActiveMethods] = useState<Method[]>([]);
   const selectedMethod = activeMethods.find((m) => m.id === method);
+  const instant = method === KORAPAY;
+  const instantEnabled = Boolean(settings.korapay_enabled);
   const amountNumber = Number(amount);
   const minAmount = Number(settings.deposit_min_amount ?? fallbackSettings.deposit_min_amount);
   const maxAmount = Number(settings.deposit_max_amount ?? fallbackSettings.deposit_max_amount);
@@ -93,7 +108,7 @@ function DepositPage() {
       const [{ data: settingsData }, { data: methodsData }] = await Promise.all([
         supabase
           .from("public_settings")
-          .select("deposit_min_amount, deposit_max_amount")
+          .select("deposit_min_amount, deposit_max_amount, korapay_enabled")
           .eq("id", 1)
           .maybeSingle(),
         supabase
@@ -125,8 +140,9 @@ function DepositPage() {
   }, []);
 
   useEffect(() => {
-    if (step === 2 && activeMethods.length === 1) setMethod(activeMethods[0].id);
-  }, [step, activeMethods]);
+    if (step === 2 && activeMethods.length === 1 && !settings.korapay_enabled)
+      setMethod(activeMethods[0].id);
+  }, [step, activeMethods, settings.korapay_enabled]);
 
   useEffect(() => {
     if (step !== 3 || remaining <= 0) return;
@@ -147,6 +163,27 @@ function DepositPage() {
     return () => window.clearInterval(poll);
   }, [submitted, reference]);
 
+  useEffect(() => {
+    if (!chargeId) return;
+    const poll = window.setInterval(async () => {
+      try {
+        const res = await checkCharge({ data: { depositId: chargeId } });
+        if (res.status === "approved") {
+          window.clearInterval(poll);
+          navigate({ to: "/deposit-pending/$id", params: { id: chargeId } });
+        } else if (res.status === "rejected") {
+          window.clearInterval(poll);
+          setCharging(false);
+          setChargeId(null);
+          toast.error("The payment was not completed. Please try again.");
+        }
+      } catch {
+        /* keep polling */
+      }
+    }, 5000);
+    return () => window.clearInterval(poll);
+  }, [chargeId, checkCharge, navigate]);
+
   async function copy(value: string) {
     await navigator.clipboard.writeText(value);
     toast.success("Copied to clipboard");
@@ -166,6 +203,29 @@ function DepositPage() {
       }
       setStep(3);
     } else if (step === 3) setStep(4);
+  }
+
+  async function payInstantly() {
+    if (charging) return;
+    const phone = payPhone.replace(/\D/g, "");
+    if (phone.replace(/^237/, "").length !== 9) {
+      toast.error("Enter your 9-digit mobile money number.");
+      return;
+    }
+    setCharging(true);
+    setDepositStatus("pending");
+    try {
+      const res = await startCharge({ data: { amount: amountNumber, phone } });
+      setChargeId(res.depositId);
+      if (res.status === "approved") {
+        navigate({ to: "/deposit-pending/$id", params: { id: res.depositId } });
+      } else {
+        toast.success("Approve the payment prompt on your phone.");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not start the payment.");
+      setCharging(false);
+    }
   }
 
   async function submitProof() {
