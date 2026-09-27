@@ -87,7 +87,7 @@ export async function settleDeposit(
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin.rpc("settle_gateway_deposit", {
     _reference: reference,
-    _gateway_ref: gatewayRef,
+    _gateway_ref: gatewayRef ?? "",
     _outcome: outcome,
   });
   if (error) throw error;

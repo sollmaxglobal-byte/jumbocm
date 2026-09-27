@@ -1,58 +1,44 @@
 import { Link } from "@tanstack/react-router";
-import { ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { SocialProof } from "@/components/SocialProof";
 import { BrandLogo } from "@/components/BrandLogo";
 
 export function AuthShell({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto grid min-h-screen max-w-7xl md:grid-cols-[0.9fr_1.1fr]">
-        <aside className="relative hidden overflow-hidden bg-primary p-10 text-primary-foreground md:flex md:flex-col md:justify-between lg:p-14">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-primary-foreground/10" />
-          <div className="relative flex items-center gap-3">
-            <BrandLogo className="h-12" />
+      <div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[1.05fr_0.95fr]">
+        <aside className="hidden bg-primary px-12 py-10 text-primary-foreground lg:flex lg:flex-col lg:justify-between">
+          <BrandLogo className="h-11 text-primary-foreground" />
+          <div className="max-w-lg">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/65">
+              Private wealth, made clear <ArrowUpRight className="h-4 w-4" />
+            </span>
+            <h2 className="mt-6 max-w-md font-display text-6xl leading-[0.98]">Your money. One clear view.</h2>
+            <p className="mt-6 max-w-sm text-base leading-7 text-primary-foreground/70">{t("auth.heroSub")}</p>
           </div>
-          <div className="relative max-w-md">
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60">
-              Secure investing, made simple
-            </p>
-            <h2 className="font-display text-5xl leading-[1.05] lg:text-6xl">
-              {t("auth.heroLine1")}{" "}
-              <em className="not-italic text-accent">{t("auth.heroLine2")}</em>.
-            </h2>
-            <p className="mt-6 max-w-sm text-sm leading-6 text-primary-foreground/75">
-              {t("auth.heroSub")}
-            </p>
+          <div className="flex items-center gap-2 text-xs text-primary-foreground/60">
+            <ShieldCheck className="h-4 w-4" /> Secure access to your JumboCM account
           </div>
-          <p className="relative text-xs text-primary-foreground/50">
-            © JumboCM 2026 · Your financial journey starts here.
-          </p>
         </aside>
 
-        <main className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 md:px-12 lg:px-20">
-          <div className="w-full max-w-md">
-            <div className="mb-10 flex items-center justify-between">
-              <Link to="/login" className="inline-flex items-center">
+        <main className="flex min-h-screen flex-col px-5 pb-8 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-10 lg:justify-center lg:px-16">
+          <div className="mx-auto w-full max-w-md">
+            <header className="mb-10 flex items-center justify-between lg:mb-12">
+              <Link to="/" className="inline-flex items-center" aria-label="JumboCM home">
                 <BrandLogo className="h-10" />
               </Link>
-              <div className="ml-auto">
-                <LanguageToggle />
-              </div>
-            </div>
-            <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-elegant sm:p-9">
-              {children}
-            </div>
-            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="h-3.5 w-3.5 text-success" /> Protected account access
+              <LanguageToggle />
+            </header>
+            <section>{children}</section>
+            <div className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <ShieldCheck className="h-4 w-4 text-success" /> Encrypted and protected
             </div>
           </div>
         </main>
       </div>
-      <SocialProof />
     </div>
   );
 }

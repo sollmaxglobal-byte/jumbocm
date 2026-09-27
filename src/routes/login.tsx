@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/AuthShell";
-import { AppInstallAction } from "@/components/AppInstallPrompt";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -74,22 +73,22 @@ function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="mb-7">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-          Welcome back
+      <div className="mb-8">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          Account access
         </p>
-        <h1 className="font-display text-4xl leading-tight text-foreground">
+        <h1 className="font-display text-4xl leading-tight text-foreground sm:text-5xl">
           {t("auth.welcomeBack")}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">{t("auth.signInSub")}</p>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">Enter your details to continue securely.</p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-5">
-        <div>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="space-y-2">
           <Label htmlFor="email">{t("auth.email")}</Label>
-          <Input id="email" name="email" type="email" required autoComplete="email" />
+          <Input className="h-12 rounded-xl bg-card px-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
         </div>
-        <div>
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">{t("auth.password")}</Label>
             <Link to="/forgot-password" className="text-xs text-primary hover:underline">
@@ -97,6 +96,7 @@ function LoginPage() {
             </Link>
           </div>
           <Input
+            className="h-12 rounded-xl bg-card px-4"
             id="password"
             name="password"
             type="password"
@@ -107,17 +107,13 @@ function LoginPage() {
         <Button
           type="submit"
           disabled={busy}
-          className="w-full bg-primary text-primary-foreground hover:opacity-90"
+          className="mt-2 h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {busy ? t("common.pleaseWait") : t("auth.signIn")}
         </Button>
       </form>
 
-      <div className="mt-6">
-        <AppInstallAction compact />
-      </div>
-
-      <div className="mt-6 text-center text-sm text-muted-foreground">
+      <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
         {t("auth.noAccount")}{" "}
         <Link to="/register" className="font-medium text-primary underline underline-offset-4">
           {t("auth.registerLink")}
