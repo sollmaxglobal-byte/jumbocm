@@ -113,6 +113,15 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-bot-surface: var(--bot-surface);
+  --color-bot-panel: var(--bot-panel);
+  --color-bot-accent: var(--bot-accent);
+  --color-bot-accent-foreground: var(--bot-accent-foreground);
+  --color-bot-cyan: var(--bot-cyan);
+  --color-auth-surface: var(--auth-surface);
+  --color-auth-panel: var(--auth-panel);
+  --color-auth-foreground: var(--auth-foreground);
+  --color-auth-muted: var(--auth-muted);
   --font-display: "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
@@ -172,6 +181,15 @@ body {
   --sidebar-accent-foreground: oklch(0.97 0.01 95);
   --sidebar-border: oklch(0.3 0.04 200);
   --sidebar-ring: oklch(0.7 0.14 70);
+  --bot-surface: oklch(0.13 0.018 260);
+  --bot-panel: oklch(0.18 0.028 260);
+  --bot-accent: oklch(0.7 0.18 155);
+  --bot-accent-foreground: oklch(0.13 0.025 160);
+  --bot-cyan: oklch(0.74 0.12 205);
+  --auth-surface: oklch(0.97 0.008 240);
+  --auth-panel: oklch(0.13 0.025 260);
+  --auth-foreground: oklch(0.97 0.006 240);
+  --auth-muted: oklch(0.72 0.025 240);
 }
 
 .dark {
@@ -192,6 +210,47 @@ body {
   --border: oklch(0.3 0.02 220);
   --input: oklch(0.3 0.02 220);
   --ring: oklch(0.72 0.13 70);
+  --auth-surface: oklch(0.14 0.02 260);
+}
+
+@keyframes bot-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bot-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.68; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes bot-scan {
+  0% { transform: translateX(-120%); opacity: 0; }
+  25%, 75% { opacity: 0.65; }
+  100% { transform: translateX(320%); opacity: 0; }
+}
+
+@utility bot-orbit {
+  animation: bot-orbit 8s linear infinite;
+}
+
+@utility bot-orbit-reverse {
+  animation: bot-orbit 12s linear infinite reverse;
+}
+
+@utility bot-breathe {
+  animation: bot-breathe 3s ease-in-out infinite;
+}
+
+@utility bot-scan {
+  animation: bot-scan 3.5s ease-in-out infinite;
+}
+
+@utility auth-grid {
+  background-image: linear-gradient(color-mix(in oklab, var(--bot-cyan) 8%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--bot-cyan) 8%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bot-orbit, .bot-orbit-reverse, .bot-breathe, .bot-scan { animation: none; }
 }
 
 @layer base {

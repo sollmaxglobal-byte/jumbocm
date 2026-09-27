@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,20 +74,17 @@ function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="mb-8">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          Account access
-        </p>
-        <h1 className="font-display text-4xl leading-tight text-foreground sm:text-5xl">
-          {t("auth.welcomeBack")}
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">Enter your details to continue securely.</p>
+      <div className="mb-7">
+        <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl border border-bot-accent/20 bg-bot-accent/10 text-bot-accent"><LockKeyhole className="h-5 w-5" /></div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-bot-accent">Secure sign in</p>
+        <h1 className="font-sans text-4xl font-semibold leading-tight text-foreground">Welcome back.</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Access your portfolio and automated trading activity.</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">{t("auth.email")}</Label>
-          <Input className="h-12 rounded-xl bg-card px-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
+          <div className="relative"><Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="h-13 rounded-xl bg-card pl-11 pr-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" /></div>
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -96,7 +94,7 @@ function LoginPage() {
             </Link>
           </div>
           <Input
-            className="h-12 rounded-xl bg-card px-4"
+            className="h-13 rounded-xl bg-card px-4"
             id="password"
             name="password"
             type="password"
@@ -107,9 +105,9 @@ function LoginPage() {
         <Button
           type="submit"
           disabled={busy}
-          className="mt-2 h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+          className="mt-2 h-13 w-full rounded-xl bg-bot-accent font-semibold text-bot-accent-foreground hover:bg-bot-accent/90"
         >
-          {busy ? t("common.pleaseWait") : t("auth.signIn")}
+          {busy ? t("common.pleaseWait") : <>{t("auth.signIn")} <ArrowRight className="h-4 w-4" /></>}
         </Button>
       </form>
 

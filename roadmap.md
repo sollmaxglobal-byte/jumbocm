@@ -6,3 +6,6 @@
 - [x] Replace the customer dashboard with a clean mobile-first USD/XAF overview
 - [x] Replace the login and registration screens and remove app-download prompts
 - [x] Remove public deposit and withdrawal activity alerts
+- [ ] Add an animated trading bot panel driven by real customer profit data
+- [ ] Rework login and registration into compact mobile-first screens
+- [ ] Keep registration fully visible without page scrolling
