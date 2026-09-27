@@ -217,7 +217,7 @@ function DepositPage() {
     try {
       const res = await startCharge({ data: { amount: amountNumber, phone } });
       setChargeId(res.depositId);
-      if (res.status === "approved") {
+      if (res.status === "success") {
         navigate({ to: "/deposit-pending/$id", params: { id: res.depositId } });
       } else {
         toast.success("Approve the payment prompt on your phone.");

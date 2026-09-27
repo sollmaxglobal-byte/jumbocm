@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/AuthShell";
-import { AppInstallAction } from "@/components/AppInstallPrompt";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
@@ -119,32 +118,33 @@ function RegisterPage() {
         </div>
       )}
 
-      <div className="mb-7">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-          Get started
+      <div className="mb-8">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          New account
         </p>
-        <h1 className="font-display text-4xl leading-tight text-foreground">
+        <h1 className="font-display text-4xl leading-tight text-foreground sm:text-5xl">
           {t("auth.registerTitle")}
         </h1>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">{t("auth.signUpSub")}</p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-5">
-        <div>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="space-y-2">
           <Label htmlFor="full_name">{t("auth.fullName")}</Label>
-          <Input id="full_name" name="full_name" required maxLength={80} />
+          <Input className="h-12 rounded-xl bg-card px-4" id="full_name" name="full_name" required maxLength={80} placeholder="Your full name" />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="phone">{t("auth.phone")}</Label>
-          <Input id="phone" name="phone" type="tel" required placeholder="+237 6XX XXX XXX" />
+          <Input className="h-12 rounded-xl bg-card px-4" id="phone" name="phone" type="tel" required placeholder="+237 6XX XXX XXX" />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="email">{t("auth.email")}</Label>
-          <Input id="email" name="email" type="email" required autoComplete="email" />
+          <Input className="h-12 rounded-xl bg-card px-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="password">{t("auth.password")}</Label>
           <Input
+            className="h-12 rounded-xl bg-card px-4"
             id="password"
             name="password"
             type="password"
@@ -152,14 +152,14 @@ function RegisterPage() {
             autoComplete="new-password"
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="withdrawal_pin">Withdrawal PIN</Label>
-          <Input id="withdrawal_pin" name="withdrawal_pin" type="password" inputMode="numeric" pattern="[0-9]{6}" minLength={6} maxLength={6} required autoComplete="off" />
+          <Input className="h-12 rounded-xl bg-card px-4" id="withdrawal_pin" name="withdrawal_pin" type="password" inputMode="numeric" pattern="[0-9]{6}" minLength={6} maxLength={6} required autoComplete="off" placeholder="6 digits" />
           <p className="mt-1 text-xs text-muted-foreground">Use exactly 6 numbers. You will need this PIN before every withdrawal.</p>
         </div>
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="withdrawal_pin_confirm">Confirm withdrawal PIN</Label>
-          <Input id="withdrawal_pin_confirm" name="withdrawal_pin_confirm" type="password" inputMode="numeric" pattern="[0-9]{6}" minLength={6} maxLength={6} required autoComplete="off" />
+          <Input className="h-12 rounded-xl bg-card px-4" id="withdrawal_pin_confirm" name="withdrawal_pin_confirm" type="password" inputMode="numeric" pattern="[0-9]{6}" minLength={6} maxLength={6} required autoComplete="off" placeholder="Repeat 6 digits" />
         </div>
         {refCode && (
           <div>
@@ -170,17 +170,13 @@ function RegisterPage() {
         <Button
           type="submit"
           disabled={busy}
-          className="w-full bg-primary text-primary-foreground hover:opacity-90"
+          className="mt-2 h-12 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {busy ? t("common.pleaseWait") : t("auth.signUp")}
         </Button>
       </form>
 
-      <div className="mt-6">
-        <AppInstallAction compact />
-      </div>
-
-      <div className="mt-6 text-center text-sm text-muted-foreground">
+      <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
         {t("auth.haveAccount")}{" "}
         <Link to="/login" className="font-medium text-primary underline underline-offset-4">
           {t("auth.loginLink")}

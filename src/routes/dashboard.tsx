@@ -12,7 +12,6 @@ import {
   Layers,
   FileText,
   LogOut,
-  Bell,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
@@ -27,7 +26,6 @@ import {
   SheetTitle,
   SheetClose,
 } from "@/components/ui/sheet";
-import { SocialProof } from "@/components/SocialProof";
 import { PushSetup } from "@/components/PushSetup";
 import { isStandalone } from "@/lib/push-client";
 
@@ -94,14 +92,6 @@ function DashboardLayout() {
             />
           </Link>
           <div className="flex items-center gap-1.5">
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Open notifications"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            >
-              <Bell className="h-4 w-4" />
-            </Button>
             <LanguageToggle />
             <ThemeToggle />
             {isAdmin && (
@@ -225,7 +215,6 @@ function DashboardLayout() {
       </nav>
       )}
       <PushSetup />
-      <SocialProof />
     </div>
   );
 }

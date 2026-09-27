@@ -14,7 +14,6 @@ import { TidioLoader } from "@/components/TidioLoader";
 import { SendPulseLoader } from "@/components/SendPulseLoader";
 import { TawkLoader } from "@/components/TawkLoader";
 import { Toaster } from "@/components/ui/sonner";
-import { AppInstallPrompt } from "@/components/AppInstallPrompt";
 import { AnnouncementPopup } from "@/components/AnnouncementPopup";
 
 import appCss from "../styles.css?url";
@@ -151,7 +150,6 @@ function RootComponent() {
             <TawkLoader />
             <TidioLoader />
             <SendPulseLoader />
-            <AppInstallPrompt />
             <AnnouncementPopup />
           </AuthProvider>
         </I18nProvider>
