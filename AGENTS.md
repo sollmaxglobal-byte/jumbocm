@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Customer dashboard money summaries use USD as the primary display with XAF equivalents at an indicative 1 USD = 600 XAF rate, because account records remain denominated in XAF.
+- Trading-bot status and profit figures must be derived from the customer's active investments and recorded profit transactions; never simulate activity or earnings.
