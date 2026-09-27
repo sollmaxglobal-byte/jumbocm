@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Customer dashboard money summaries use USD as the primary display with XAF equivalents at an indicative 1 USD = 600 XAF rate, because account records remain denominated in XAF.
