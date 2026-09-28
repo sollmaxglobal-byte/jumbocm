@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatXAF } from "@/lib/format";
+import { TradingBot, type BotInvestment } from "@/components/TradingBot";
 
 export const Route = createFileRoute("/dashboard/")({
   head: () => ({
@@ -73,7 +74,7 @@ function DashboardHome() {
     void (async () => {
       const [{ data: p }, { data: inv }, { count }] = await Promise.all([
         supabase.from("profiles").select("full_name,balance,referral_code,referral_earnings").eq("id", user.id).maybeSingle(),
-        supabase.from("investments").select("id,amount,total_earned,start_date,end_date,is_paused,plans(name)").eq("user_id", user.id).eq("status", "active").order("end_date"),
+        supabase.from("investments").select("id,amount,total_earned,start_date,end_date,is_paused,daily_roi_percent,last_payout_at,plans(name,profit_type,fixed_daily_profit)").eq("user_id", user.id).eq("status", "active").order("end_date"),
         supabase.from("profiles").select("*", { count: "exact", head: true }).eq("referred_by", user.id),
       ]);
       setProfile(p as Profile | null);
@@ -135,6 +136,8 @@ function DashboardHome() {
           <QuickAction to="/dashboard/withdraw" label="Withdraw" icon={ArrowUpRight} />
           <QuickAction to="/dashboard/wallet" label="Wallet" icon={WalletCards} />
         </div>
+
+        <TradingBot investments={investments as unknown as BotInvestment[]} />
 
         <section className="grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-5">
