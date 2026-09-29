@@ -77,15 +77,13 @@ function RegisterPage() {
         phone: fd.get("phone"),
         email: fd.get("email"),
         password: fd.get("password"),
-        withdrawal_pin: fd.get("withdrawal_pin"),
-        withdrawal_pin_confirm: fd.get("withdrawal_pin_confirm"),
       });
       const { error } = await supabase.auth.signUp({
         email: v.email,
         password: v.password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: { full_name: v.full_name, phone: v.phone, referral_code: refCode, withdrawal_pin: v.withdrawal_pin },
+          data: { full_name: v.full_name, phone: v.phone, referral_code: refCode },
         },
       });
       if (error) throw error;
