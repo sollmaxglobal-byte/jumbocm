@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatXAF, formatDate, txRef } from "@/lib/format";
 import { StatusBadge } from "./dashboard.deposit";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/dashboard/withdraw")({
   component: WithdrawPage,
@@ -58,8 +57,6 @@ function WithdrawPage() {
   const [methods, setMethods] = useState<WMethod[]>([]);
   const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
   const [busy, setBusy] = useState(false);
-  const [pending, setPending] = useState<z.infer<typeof schema> | null>(null);
-  const [pin, setPin] = useState("");
 
   async function refresh() {
     if (!user) return;
