@@ -9,3 +9,9 @@
 - [x] Add an animated trading bot panel driven by real customer profit data
 - [ ] Rework login and registration into compact mobile-first screens
 - [ ] Keep registration fully visible without page scrolling
+- [ ] Remove the withdrawal PIN everywhere (database, registration, withdrawal, profile, reset page)
+- [ ] Save payout accounts and show "Add another account" instead of the always-open form
+- [ ] Redesign the profile page in the obsidian and gold style
+- [ ] Rebuild the deposit flow: every step a single no-scroll mobile page
+- [ ] Deposit proof is upload only — no transaction ID field anywhere
+- [ ] Make the payment processing page lively and animated on one no-scroll screen
