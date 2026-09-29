@@ -256,14 +256,6 @@ function WithdrawPage() {
         </div>
       </form>
 
-      <Dialog open={Boolean(pending)} onOpenChange={(open) => { if (!open && !busy) { setPending(null); setPin(""); } }}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Confirm withdrawal</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">Enter your 6-digit PIN to confirm {pending ? formatXAF(pending.amount) : ""} withdrawal.</p>
-          <Input value={pin} onChange={(e) => setPin(e.target.value.replace(/\\D/g, "").slice(0, 6))} inputMode="numeric" type="password" autoComplete="off" placeholder="6-digit PIN" aria-label="Withdrawal PIN" />
-          <DialogFooter><Button variant="outline" type="button" onClick={() => { setPending(null); setPin(""); }}>Cancel</Button><Button type="button" onClick={confirmWithdrawal} disabled={busy || pin.length !== 6}>{busy ? "Confirming…" : "Confirm withdrawal"}</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <div>
         <h2 className="mb-3 font-display text-xl text-primary">{t("withdraw.recent")}</h2>
