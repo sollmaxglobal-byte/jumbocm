@@ -37,11 +37,6 @@ const signupSchema = z.object({
   phone: z.string().min(7).max(20),
   email: z.string().email(),
   password: z.string().min(1, "Enter a password").max(72),
-  withdrawal_pin: z.string().regex(/^\d{6}$/, "Withdrawal PIN must be exactly 6 digits"),
-  withdrawal_pin_confirm: z.string(),
-}).refine((value) => value.withdrawal_pin === value.withdrawal_pin_confirm, {
-  message: "Withdrawal PINs do not match",
-  path: ["withdrawal_pin_confirm"],
 });
 
 function RegisterPage() {
@@ -143,10 +138,6 @@ function RegisterPage() {
             autoComplete="new-password"
             placeholder="Password"
           />
-        </div>
-        <div className="grid grid-cols-2 gap-2.5">
-          <div><Label className="sr-only" htmlFor="withdrawal_pin">Withdrawal PIN</Label><Input className="h-10 rounded-xl bg-card px-3 text-sm" id="withdrawal_pin" name="withdrawal_pin" type="password" inputMode="numeric" pattern="[0-9]{6}" minLength={6} maxLength={6} required autoComplete="off" placeholder="6-digit PIN" /></div>
-          <div><Label className="sr-only" htmlFor="withdrawal_pin_confirm">Confirm withdrawal PIN</Label><Input className="h-10 rounded-xl bg-card px-3 text-sm" id="withdrawal_pin_confirm" name="withdrawal_pin_confirm" type="password" inputMode="numeric" pattern="[0-9]{6}" minLength={6} maxLength={6} required autoComplete="off" placeholder="Confirm PIN" /></div>
         </div>
         {refCode && (
           <div>
