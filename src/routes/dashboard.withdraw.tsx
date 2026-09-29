@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatXAF, formatDate, txRef } from "@/lib/format";
 import { StatusBadge } from "./dashboard.deposit";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/dashboard/withdraw")({
   component: WithdrawPage,
@@ -58,8 +57,6 @@ function WithdrawPage() {
   const [methods, setMethods] = useState<WMethod[]>([]);
   const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
   const [busy, setBusy] = useState(false);
-  const [pending, setPending] = useState<z.infer<typeof schema> | null>(null);
-  const [pin, setPin] = useState("");
 
   async function refresh() {
     if (!user) return;
@@ -101,7 +98,8 @@ function WithdrawPage() {
     e.preventDefault();
     if (!user) return;
     setBusy(true);
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     try {
       const v = schema.parse({
         amount: Number(fd.get("amount")),
@@ -118,7 +116,25 @@ function WithdrawPage() {
         throw new Error(
           "Withdrawals are unavailable for this account. An active investment may be required.",
         );
-      setPending(v);
+      const { data: newId, error } = await supabase.rpc("create_withdrawal", {
+        _amount: v.amount,
+        _method: v.method,
+        _account_name: v.account_name,
+        _account_number: v.account_number,
+      } as never);
+      if (error) throw error;
+      const withdrawalId = newId as unknown as string;
+      void notifyAdminOfRequest("withdrawal", {
+        id: withdrawalId,
+        name: requestName(user),
+        email: user.email ?? "Not provided",
+        amount: formatXAF(v.amount),
+        method: v.method.replace("_", " "),
+        account: `${v.account_name} (${v.account_number})`,
+      });
+      toast.success(t("withdraw.submitted"));
+      form.reset();
+      navigate({ to: "/dashboard/wallet", search: { filter: "Withdrawals" } as never });
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
       toast.error(msg);
@@ -127,23 +143,6 @@ function WithdrawPage() {
     }
   }
 
-  async function confirmWithdrawal() {
-    if (!user || !pending || !/^\d{6}$/.test(pin)) return toast.error("Enter your 6-digit PIN");
-    setBusy(true);
-    try {
-      const { data: newId, error } = await supabase.rpc("create_withdrawal", {
-        _amount: pending.amount, _method: pending.method, _account_name: pending.account_name,
-        _account_number: pending.account_number, _pin: pin,
-      } as never);
-      if (error) throw error;
-      const withdrawalId = newId as unknown as string;
-      void notifyAdminOfRequest("withdrawal", { id: withdrawalId, name: requestName(user), email: user.email ?? "Not provided", amount: formatXAF(pending.amount), method: pending.method.replace("_", " "), account: `${pending.account_name} (${pending.account_number})` });
-      toast.success(t("withdraw.submitted"));
-      setPending(null); setPin("");
-      navigate({ to: "/dashboard/wallet", search: { filter: "Withdrawals" } as never });
-    } catch (err) { toast.error((err as Error).message); }
-    finally { setBusy(false); }
-  }
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -254,14 +253,6 @@ function WithdrawPage() {
         </div>
       </form>
 
-      <Dialog open={Boolean(pending)} onOpenChange={(open) => { if (!open && !busy) { setPending(null); setPin(""); } }}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Confirm withdrawal</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">Enter your 6-digit PIN to confirm {pending ? formatXAF(pending.amount) : ""} withdrawal.</p>
-          <Input value={pin} onChange={(e) => setPin(e.target.value.replace(/\\D/g, "").slice(0, 6))} inputMode="numeric" type="password" autoComplete="off" placeholder="6-digit PIN" aria-label="Withdrawal PIN" />
-          <DialogFooter><Button variant="outline" type="button" onClick={() => { setPending(null); setPin(""); }}>Cancel</Button><Button type="button" onClick={confirmWithdrawal} disabled={busy || pin.length !== 6}>{busy ? "Confirming…" : "Confirm withdrawal"}</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <div>
         <h2 className="mb-3 font-display text-xl text-primary">{t("withdraw.recent")}</h2>
