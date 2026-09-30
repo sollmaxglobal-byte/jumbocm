@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bot, Activity } from "lucide-react";
+import robotImg from "@/assets/trading-robot.png";
 import { formatXAF } from "@/lib/format";
 
 export type BotInvestment = {
@@ -56,21 +57,34 @@ export function TradingBot({ investments }: { investments: BotInvestment[] }) {
 
   return (
     <section className="overflow-hidden rounded-2xl border border-success/25 bg-card p-5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <motion.div className="grid h-11 w-11 place-items-center rounded-xl bg-success/10 text-success"
-            animate={{ scale: [1, 1.08, 1] }} transition={{ repeat: Infinity, duration: 1.6 }}>
-            <Bot className="h-6 w-6" />
-          </motion.div>
-          <div>
-            <p className="text-sm font-semibold text-foreground">Trading bot</p>
-            <p className="flex items-center gap-1 text-xs text-success">
-              <motion.span className="h-1.5 w-1.5 rounded-full bg-success" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1 }} />
-              Active · {running.length} {running.length === 1 ? "plan" : "plans"}
-            </p>
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-b from-success/15 to-transparent">
+          <motion.img
+            src={robotImg}
+            alt="JumboCM trading robot"
+            width={1024}
+            height={1024}
+            className="h-full w-full object-cover object-top"
+            animate={{ y: [0, -4, 0], rotate: [0, -1.5, 0, 1.5, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="pointer-events-none absolute inset-x-0 h-6 bg-gradient-to-b from-transparent via-success/40 to-transparent"
+            animate={{ top: ["-20%", "100%"] }}
+            transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
+          />
         </div>
-        <Activity className="h-5 w-5 text-success" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-foreground">Trading bot</p>
+            <Activity className="h-5 w-5 text-success" />
+          </div>
+          <p className="flex items-center gap-1 text-xs text-success">
+            <motion.span className="h-1.5 w-1.5 rounded-full bg-success" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1 }} />
+            Active · {running.length} {running.length === 1 ? "plan" : "plans"}
+          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">Working on your plan’s daily profit</p>
+        </div>
       </div>
 
       <div className="mt-4 flex h-12 items-end gap-1">
