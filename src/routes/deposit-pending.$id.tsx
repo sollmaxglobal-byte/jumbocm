@@ -413,9 +413,21 @@ function PendingDepositPage() {
               <div className="text-[11px] text-[#a8a39a]">You&apos;ll receive a notification once credited</div>
             </div>
           </div>
-          <p className="mt-2 border-t border-[#7f6731]/40 pt-2 text-[11px] text-[#a8a39a]">
-            Transaction ID: <span className="font-mono text-[#f8f7f2]">TXN-{reference}</span>
-          </p>
+          {!approved && !rejected && (
+            <div className="mt-2 flex items-center gap-2 border-t border-[#7f6731]/40 pt-2 text-[11px] text-[#a8a39a]">
+              <span className="flex gap-1">
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="h-1.5 w-1.5 rounded-full bg-[#f6c85a]"
+                    animate={{ opacity: [0.2, 1, 0.2], y: [0, -3, 0] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                  />
+                ))}
+              </span>
+              Checking your payment proof live — this page updates by itself
+            </div>
+          )}
         </div>
 
         {/* Progress */}
@@ -426,10 +438,18 @@ function PendingDepositPage() {
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-[#26262c]">
             <motion.div
-              className={`h-full rounded-full ${approved ? "bg-green-500" : "bg-[#f6c85a]"}`}
+              className={`relative h-full overflow-hidden rounded-full ${approved ? "bg-green-500" : "bg-[#f6c85a]"}`}
               animate={{ width: `${approved ? 100 : displayPct}%` }}
               transition={{ ease: "linear", duration: 0.6 }}
-            />
+            >
+              {!approved && !rejected && (
+                <motion.span
+                  className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/60 to-transparent"
+                  animate={{ x: ["-100%", "300%"] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+                />
+              )}
+            </motion.div>
           </div>
         </div>
 

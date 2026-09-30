@@ -937,7 +937,6 @@ export type Database = {
           _account_number: string
           _amount: number
           _method: string
-          _pin?: string
         }
         Returns: string
       }
