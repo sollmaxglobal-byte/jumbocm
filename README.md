@@ -1,26 +1,18 @@
-# jumbocm
+# JumboCM
 
-I want to import my project from GitHub
+**Live app**: https://jumbocm.vercel.app
 
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://jumbocm.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/a367e544-80b1-4fd8-9ea3-c484b8088859).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+Built with TanStack Start, React, Tailwind CSS and Supabase, deployed on Vercel.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+```sh
+bun install
+bun run dev
+```
+
+## Build
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun run build
 ```

@@ -14,7 +14,7 @@ export type OcrResult = {
 };
 
 async function aiFetch(body: unknown, attempt = 0): Promise<Response> {
-  const key = process.env["AI_GATEWAY_API_KEY"] ?? process.env["LOVABLE_API_KEY"];
+  const key = process.env["AI_GATEWAY_API_KEY"];
   if (!key) throw new Error("AI is not configured");
   const res = await fetch(AI_URL, {
     method: "POST",
