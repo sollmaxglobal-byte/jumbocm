@@ -27,7 +27,10 @@ export default defineConfig(({ command, mode }) => {
           client: { files: ["**/server/**"], specifiers: ["server-only"] },
         },
       }),
-      ...(command === "build" ? [nitro()] : []),
+      // Explicitly select the Vercel preset when building on Vercel so the Nitro
+    // beta generates the Build Output API (.vercel/output.json) regardless of
+    // auto-detection quirks.  Local builds fall back to the default preset.
+    ...(command === "build" ? [nitro(process.env.VERCEL ? { preset: "vercel" } : {})] : []),
       viteReact(),
     ],
     // The project stores Supabase variables with NEXT_PUBLIC_* names in Vercel,
