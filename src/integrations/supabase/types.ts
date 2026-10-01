@@ -53,6 +53,7 @@ export type Database = {
           tawk_widget_id: string | null
           tidio_public_key: string | null
           updated_at: string
+          zendesk_widget_key: string | null
         }
         Insert: {
           announcement_enabled?: boolean
@@ -92,6 +93,7 @@ export type Database = {
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
           updated_at?: string
+          zendesk_widget_key?: string | null
         }
         Update: {
           announcement_enabled?: boolean
@@ -131,6 +133,7 @@ export type Database = {
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
           updated_at?: string
+          zendesk_widget_key?: string | null
         }
         Relationships: []
       }
@@ -851,6 +854,7 @@ export type Database = {
           tawk_property_id: string | null
           tawk_widget_id: string | null
           tidio_public_key: string | null
+          zendesk_widget_key: string | null
         }
         Insert: {
           announcement_enabled?: boolean | null
@@ -875,6 +879,7 @@ export type Database = {
           tawk_property_id?: string | null
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
+          zendesk_widget_key?: string | null
         }
         Update: {
           announcement_enabled?: boolean | null
@@ -899,6 +904,7 @@ export type Database = {
           tawk_property_id?: string | null
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
+          zendesk_widget_key?: string | null
         }
         Relationships: []
       }
@@ -992,6 +998,7 @@ export type Database = {
           tawk_widget_id: string | null
           tidio_public_key: string | null
           updated_at: string
+          zendesk_widget_key: string | null
         }[]
         SetofOptions: {
           from: "*"

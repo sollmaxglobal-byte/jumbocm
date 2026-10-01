@@ -15,7 +15,7 @@ export type BotInvestment = {
 };
 
 const DAY = 86_400_000;
-const PAIRS = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT"];
+const PAIRS = ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD"];
 
 function dailyProfit(i: BotInvestment) {
   if (i.plans?.profit_type === "fixed" && Number(i.plans.fixed_daily_profit) > 0) return Number(i.plans.fixed_daily_profit);
@@ -76,7 +76,7 @@ export function TradingBot({ investments }: { investments: BotInvestment[] }) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Trading bot</p>
+            <p className="text-sm font-semibold text-foreground">Forex strategy robot</p>
             <Activity className="h-5 w-5 text-success" />
           </div>
           <p className="flex items-center gap-1 text-xs text-success">
@@ -97,8 +97,8 @@ export function TradingBot({ investments }: { investments: BotInvestment[] }) {
 
       <motion.div key={tick} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
         className="mt-3 flex items-center justify-between rounded-lg bg-success/10 px-3 py-2 text-xs">
-        <span className="font-medium text-foreground">{pair}</span>
-        <span className="font-semibold text-success">+{formatXAF(Math.max(1, step))}</span>
+          <span className="font-medium text-foreground">Scanning {pair}</span>
+          <span className="font-semibold text-success">+{formatXAF(Math.max(1, step))} plan pace</span>
       </motion.div>
 
       <div className="mt-4 flex items-end justify-between">

@@ -15,6 +15,13 @@
       "when": 1790741610616,
       "tag": "0001_remove_withdrawal_pin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790844162382,
+      "tag": "0002_add_zendesk_widget_key",
+      "breakpoints": true
     }
   ]
 }
