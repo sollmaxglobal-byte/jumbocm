@@ -1,0 +1,32 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "SUPABASE_SERVICE_ROLE_KEY",
+      "description": "Supabase service-role key for admin/server-side operations (deposit settlement, push notifications, email). Obtain from Supabase dashboard → Settings → API → service_role key.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "KORAPAY_SECRET_KEY",
+      "description": "Korapay secret API key for payment processing. Obtain from Korapay dashboard.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "VAPID_PUBLIC_KEY",
+      "description": "VAPID public key for web push notifications. Generate with web-push tools.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "VAPID_PRIVATE_KEY",
+      "description": "VAPID private key for web push notifications. Generate with web-push tools.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "AI_GATEWAY_API_KEY",
+      "description": "AI gateway API key for deposit receipt verification. Obtain from your AI provider.",
+      "requiredAtBoot": false
+    }
+  ]
+}
