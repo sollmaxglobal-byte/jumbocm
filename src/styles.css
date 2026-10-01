@@ -122,6 +122,8 @@ body {
   --color-auth-panel: var(--auth-panel);
   --color-auth-foreground: var(--auth-foreground);
   --color-auth-muted: var(--auth-muted);
+  --color-auth-accent: var(--auth-accent);
+  --color-auth-accent-foreground: var(--auth-accent-foreground);
   --font-display: "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
@@ -186,10 +188,12 @@ body {
   --bot-accent: oklch(0.7 0.18 155);
   --bot-accent-foreground: oklch(0.13 0.025 160);
   --bot-cyan: oklch(0.74 0.12 205);
-  --auth-surface: oklch(0.97 0.008 240);
-  --auth-panel: oklch(0.13 0.025 260);
+  --auth-surface: oklch(0.98 0.004 240);
+  --auth-panel: oklch(0.15 0.003 240);
   --auth-foreground: oklch(0.97 0.006 240);
-  --auth-muted: oklch(0.72 0.025 240);
+  --auth-muted: oklch(0.65 0.02 240);
+  --auth-accent: oklch(0.74 0.15 85);
+  --auth-accent-foreground: oklch(0.16 0.01 240);
 }
 
 .dark {
@@ -211,6 +215,11 @@ body {
   --input: oklch(0.3 0.02 220);
   --ring: oklch(0.72 0.13 70);
   --auth-surface: oklch(0.14 0.02 260);
+  --auth-panel: oklch(0.15 0.003 240);
+  --auth-foreground: oklch(0.97 0.006 240);
+  --auth-muted: oklch(0.65 0.02 240);
+  --auth-accent: oklch(0.74 0.15 85);
+  --auth-accent-foreground: oklch(0.16 0.01 240);
 }
 
 @keyframes bot-orbit {

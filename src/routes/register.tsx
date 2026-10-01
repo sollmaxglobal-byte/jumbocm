@@ -78,7 +78,7 @@ function RegisterPage() {
         email: fd.get("email"),
         password: fd.get("password"),
       });
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: v.email,
         password: v.password,
         options: {
@@ -89,6 +89,10 @@ function RegisterPage() {
       if (error) throw error;
       sendEmail({ to: v.email, template_key: "welcome", variables: { name: v.full_name } });
       toast.success(t("auth.created"));
+      // If session is returned (email confirmation disabled), redirect immediately
+      if (data.session) {
+        nav({ to: "/dashboard" });
+      }
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
       toast.error(msg);
@@ -107,12 +111,11 @@ function RegisterPage() {
       )}
 
       <div className="mb-3">
-        <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-bot-accent">Start investing</p>
-        <h1 className="font-sans text-2xl font-semibold leading-tight text-foreground sm:text-3xl">Create your account.</h1>
-        <p className="mt-1 text-xs text-muted-foreground">One secure profile for your portfolio.</p>
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-auth-accent">Get started</p>
+        <h1 className="font-sans text-2xl font-semibold leading-tight text-foreground">Create your account.</h1>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-2.5">
+      <form onSubmit={onSubmit} className="space-y-2">
         <div>
           <Label className="sr-only" htmlFor="full_name">{t("auth.fullName")}</Label>
           <Input className="h-10 rounded-xl bg-card px-3 text-sm" id="full_name" name="full_name" required maxLength={80} placeholder="Full name" />
@@ -146,7 +149,7 @@ function RegisterPage() {
         <Button
           type="submit"
           disabled={busy}
-          className="h-11 w-full rounded-xl bg-bot-accent font-semibold text-bot-accent-foreground hover:bg-bot-accent/90"
+          className="h-11 w-full rounded-xl bg-auth-accent font-semibold text-auth-accent-foreground hover:bg-auth-accent/90"
         >
           {busy ? t("common.pleaseWait") : <>{t("auth.signUp")} <ArrowRight className="h-4 w-4" /></>}
         </Button>
@@ -154,7 +157,7 @@ function RegisterPage() {
 
       <div className="mt-2 text-center text-xs text-muted-foreground">
         {t("auth.haveAccount")}{" "}
-        <Link to="/login" className="font-medium text-primary underline underline-offset-4">
+        <Link to="/login" className="font-medium text-auth-accent underline underline-offset-4">
           {t("auth.loginLink")}
         </Link>
       </div>
