@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,27 +74,26 @@ function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="mb-7">
-        <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl border border-bot-accent/20 bg-bot-accent/10 text-bot-accent"><LockKeyhole className="h-5 w-5" /></div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-bot-accent">Secure sign in</p>
-        <h1 className="font-sans text-4xl font-semibold leading-tight text-foreground">Welcome back.</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">Access your portfolio and automated trading activity.</p>
+      <div className="mb-6">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-auth-accent">Sign in</p>
+        <h1 className="font-sans text-3xl font-semibold leading-tight text-foreground">Welcome back.</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Access your portfolio and automated trading activity.</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">{t("auth.email")}</Label>
-          <div className="relative"><Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="h-13 rounded-xl bg-card pl-11 pr-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" /></div>
+          <div className="relative"><Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="h-12 rounded-xl bg-card pl-11 pr-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" /></div>
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">{t("auth.password")}</Label>
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+            <Link to="/forgot-password" className="text-xs text-auth-accent hover:underline">
               {t("auth.forgot")}
             </Link>
           </div>
           <Input
-            className="h-13 rounded-xl bg-card px-4"
+            className="h-12 rounded-xl bg-card px-4"
             id="password"
             name="password"
             type="password"
@@ -105,15 +104,15 @@ function LoginPage() {
         <Button
           type="submit"
           disabled={busy}
-          className="mt-2 h-13 w-full rounded-xl bg-bot-accent font-semibold text-bot-accent-foreground hover:bg-bot-accent/90"
+          className="h-12 w-full rounded-xl bg-auth-accent font-semibold text-auth-accent-foreground hover:bg-auth-accent/90"
         >
           {busy ? t("common.pleaseWait") : <>{t("auth.signIn")} <ArrowRight className="h-4 w-4" /></>}
         </Button>
       </form>
 
-      <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+      <div className="mt-6 border-t border-border pt-5 text-center text-sm text-muted-foreground">
         {t("auth.noAccount")}{" "}
-        <Link to="/register" className="font-medium text-primary underline underline-offset-4">
+        <Link to="/register" className="font-medium text-auth-accent underline underline-offset-4">
           {t("auth.registerLink")}
         </Link>
       </div>
