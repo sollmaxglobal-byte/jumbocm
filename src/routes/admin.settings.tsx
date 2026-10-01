@@ -168,8 +168,8 @@ function AdminSettings() {
   if (!s) return <div className="text-muted-foreground">Loading…</div>;
 
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setS({ ...s, [k]: v });
-  const endpointUrl = `${(s.site_url || "https://jumbocm.lovable.app").replace(/\/$/, "")}/api/public/mm-sms`;
-  const baseUrl = (s.site_url || "https://jumbocm.lovable.app").replace(/\/$/, "");
+  const endpointUrl = `${(s.site_url || "https://jumbocm.vercel.app").replace(/\/$/, "")}/api/public/mm-sms`;
+  const baseUrl = (s.site_url || "https://jumbocm.vercel.app").replace(/\/$/, "");
   const queueUrl = `${baseUrl}/api/public/withdraw-queue`;
   const resultUrl = `${baseUrl}/api/public/withdraw-result`;
 

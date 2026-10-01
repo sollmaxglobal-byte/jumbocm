@@ -96,13 +96,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
       { name: "theme-color", content: "#171a1b" },
-      { property: "og:url", content: "https://jumbocm.lovable.app/" },
+      { property: "og:url", content: "https://jumbocm.vercel.app/" },
       { property: "og:site_name", content: "JumboCM" },
     ],
     links: [
-      { rel: "canonical", href: "https://jumbocm.lovable.app/" },
+      { rel: "canonical", href: "https://jumbocm.vercel.app/" },
       {
         rel: "stylesheet",
         href: appCss,
