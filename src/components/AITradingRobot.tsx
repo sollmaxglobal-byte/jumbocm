@@ -69,8 +69,6 @@ export function AITradingRobot({ active }: { active: boolean }) {
     return () => clearInterval(interval);
   }, [active, nextId]);
 
-  if (!active) return null;
-
   const winRate = (winCount / tradeCount) * 100;
 
   return (

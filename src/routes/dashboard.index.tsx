@@ -140,7 +140,7 @@ function DashboardHome() {
 
         <TradingBot investments={investments as unknown as BotInvestment[]} />
 
-        <AITradingRobot active={investments.length > 0} />
+        <AITradingRobot active />
 
         <section className="grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-5">
