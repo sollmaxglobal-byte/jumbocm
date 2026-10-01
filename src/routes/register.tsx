@@ -78,7 +78,7 @@ function RegisterPage() {
         email: fd.get("email"),
         password: fd.get("password"),
       });
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: v.email,
         password: v.password,
         options: {
@@ -89,6 +89,10 @@ function RegisterPage() {
       if (error) throw error;
       sendEmail({ to: v.email, template_key: "welcome", variables: { name: v.full_name } });
       toast.success(t("auth.created"));
+      // If session is returned (email confirmation disabled), redirect immediately
+      if (data.session) {
+        nav({ to: "/dashboard" });
+      }
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
       toast.error(msg);
