@@ -22,6 +22,7 @@ import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatXAF } from "@/lib/format";
 import { TradingBot, type BotInvestment } from "@/components/TradingBot";
+import { AITradingRobot } from "@/components/AITradingRobot";
 
 export const Route = createFileRoute("/dashboard/")({
   head: () => ({
@@ -138,6 +139,8 @@ function DashboardHome() {
         </div>
 
         <TradingBot investments={investments as unknown as BotInvestment[]} />
+
+        <AITradingRobot active={investments.length > 0} />
 
         <section className="grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-5">
