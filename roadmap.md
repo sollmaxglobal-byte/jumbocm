@@ -15,3 +15,6 @@
 - [x] Rebuild the deposit flow: every step a single no-scroll mobile page
 - [x] Deposit proof is upload only — no transaction ID field anywhere
 - [x] Make the payment processing page lively and animated on one no-scroll screen
+- [x] Add Zendesk chat configuration to admin settings and load it when configured
+- [x] Replace the customer profile with a clean native-style mobile account page
+- [x] Present the active-plan robot as an animated Forex strategy monitor without fabricated win-rate claims

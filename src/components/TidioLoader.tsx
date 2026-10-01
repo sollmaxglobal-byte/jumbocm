@@ -1,15 +1,12 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-// Tidio public test key. Admin can override via app_settings.tidio_public_key.
-const FALLBACK_TIDIO_KEY = "xyzabc12";
-
-/** Loads the Tidio chat widget site-wide. Uses admin-saved key if present, otherwise a test key. */
+/** Loads Tidio only when an administrator has configured a real public key. */
 export function TidioLoader() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      let key = FALLBACK_TIDIO_KEY;
+      let key = "";
       try {
         const { data } = await supabase
           .from("public_settings")
@@ -18,9 +15,9 @@ export function TidioLoader() {
         const saved = data?.tidio_public_key?.trim();
         if (saved) key = saved;
       } catch {
-        // table may be unreachable for anon — fall back to test key
+        return;
       }
-      if (cancelled) return;
+      if (cancelled || !key) return;
       if (document.getElementById("tidio-script")) return;
       const s = document.createElement("script");
       s.id = "tidio-script";

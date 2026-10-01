@@ -13,6 +13,7 @@ import { I18nProvider } from "@/hooks/useI18n";
 import { TidioLoader } from "@/components/TidioLoader";
 import { SendPulseLoader } from "@/components/SendPulseLoader";
 import { TawkLoader } from "@/components/TawkLoader";
+import { ZendeskLoader } from "@/components/ZendeskLoader";
 import { Toaster } from "@/components/ui/sonner";
 import { AnnouncementPopup } from "@/components/AnnouncementPopup";
 
@@ -150,6 +151,7 @@ function RootComponent() {
             <TawkLoader />
             <TidioLoader />
             <SendPulseLoader />
+            <ZendeskLoader />
             <AnnouncementPopup />
           </AuthProvider>
         </I18nProvider>

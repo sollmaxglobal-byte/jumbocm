@@ -33,6 +33,7 @@ type Settings = {
   sendpulse_embed_html: string | null;
   tawk_property_id: string | null;
   tawk_widget_id: string | null;
+  zendesk_widget_key: string | null;
   referral_percent: number | null;
   smtp_host: string | null;
   smtp_port: number | null;
@@ -121,6 +122,7 @@ function AdminSettings() {
         sendpulse_embed_html: s.sendpulse_embed_html,
         tawk_property_id: s.tawk_property_id,
         tawk_widget_id: s.tawk_widget_id,
+        zendesk_widget_key: s.zendesk_widget_key,
         referral_percent: s.referral_percent ?? 5,
         smtp_host: s.smtp_host,
         smtp_port: s.smtp_port,
@@ -574,6 +576,18 @@ function AdminSettings() {
               placeholder="Optional"
             />
             <p className="mt-1 text-xs text-muted-foreground">Leave empty to disable Tidio.</p>
+          </div>
+          <div className="sm:col-span-2">
+            <Label>Zendesk Web Widget code or key</Label>
+            <Textarea
+              className="min-h-[96px] font-mono text-xs"
+              value={s.zendesk_widget_key ?? ""}
+              onChange={(e) => set("zendesk_widget_key", e.target.value)}
+              placeholder={'Paste the Zendesk installation code or the value after "?key="'}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Saving a valid Zendesk code enables chat automatically. Leave empty to disable it.
+            </p>
           </div>
           <div className="sm:col-span-2">
             <Label>SendPulse full embed snippet (recommended)</Label>
