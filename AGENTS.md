@@ -11,3 +11,7 @@
 - `SUPABASE_SERVICE_ROLE_KEY` is required for admin/server-side operations (deposit settlement, push, email) but not for booting.
 - Remote Supabase is used for both auth and data; no local database service is needed.
 - `bunfig.toml` sets a 24h `minimumReleaseAge` supply-chain guard; `--frozen-lockfile` installs from the existing lockfile without issue.
+- Keep the direct React Router and router-plugin pins compatible with React Start when upgrading; mismatched releases can install duplicate router cores.
+- Reflected-XSS advisory GHSA-qx66-fv34-fjm8 is patched by `@tanstack/react-start@1.168.60` and its `@tanstack/start-server-core@1.169.39` dependency. Do not use Vercel's dangerous-deployment override instead of the patch.
+- Verify the Vercel preset with `docker compose -f docker-compose.base44.yml exec -T -e VERCEL=1 web bun run build`; Nitro emits `.vercel/output/config.json` and the `__server.func` server function. Vercel installs using the frozen Bun lockfile.
+- Unauthenticated requests to `/` redirect to `/login`; use `curl -fsSL http://localhost:3000/` to check rendered HTML rather than treating the empty redirect body as a blank page.
