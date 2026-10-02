@@ -8,7 +8,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 export function AuthShell({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
     <div
-      className={`relative ${compact ? "h-dvh overflow-hidden" : "min-h-dvh"} bg-auth-panel text-auth-foreground`}
+      className={`relative overflow-hidden ${compact ? "h-dvh" : "min-h-dvh"} bg-auth-panel text-auth-foreground`}
     >
       <div className="pointer-events-none absolute -top-32 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-auth-accent/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-20 h-72 w-72 rounded-full bg-auth-accent/10 blur-3xl" />
