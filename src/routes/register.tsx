@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { sendEmail } from "@/lib/email-client";
+import { registerAccount } from "@/lib/register.functions";
 import { AuthShell, AuthField } from "@/components/AuthShell";
 
 export const Route = createFileRoute("/register")({
@@ -81,21 +82,24 @@ function RegisterPage() {
         email: fd.get("email"),
         password: fd.get("password"),
       });
-      const { data, error } = await supabase.auth.signUp({
-        email: v.email,
-        password: v.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: { full_name: v.full_name, phone: v.phone, referral_code: refCode },
+      // Account is created server-side (email auto-confirmed, no strong-password policy).
+      await registerAccount({
+        data: {
+          full_name: v.full_name,
+          phone: v.phone,
+          email: v.email,
+          password: v.password,
+          referral_code: refCode,
         },
       });
-      if (error) throw error;
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: v.email,
+        password: v.password,
+      });
+      if (signInError) throw signInError;
       sendEmail({ to: v.email, template_key: "welcome", variables: { name: v.full_name } });
       toast.success(t("auth.created"));
-      // If session is returned (email confirmation disabled), redirect immediately
-      if (data.session) {
-        nav({ to: "/dashboard" });
-      }
+      nav({ to: "/dashboard" });
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
       toast.error(msg);
