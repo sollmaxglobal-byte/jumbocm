@@ -38,6 +38,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardDepositRouteImport } from './routes/dashboard.deposit'
 import { Route as DashboardInvestRouteImport } from './routes/dashboard.invest'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
+import { Route as DashboardReferRouteImport } from './routes/dashboard.refer'
 import { Route as DashboardReferralsRouteImport } from './routes/dashboard.referrals'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardWithdrawRouteImport } from './routes/dashboard.withdraw'
@@ -197,6 +198,11 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardReferRoute = DashboardReferRouteImport.update({
+  id: '/refer',
+  path: '/refer',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardReferralsRoute = DashboardReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -293,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/deposit': typeof DashboardDepositRoute
   '/dashboard/invest': typeof DashboardInvestRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/refer': typeof DashboardReferRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/withdraw': typeof DashboardWithdrawRoute
@@ -335,6 +342,7 @@ export interface FileRoutesByTo {
   '/dashboard/deposit': typeof DashboardDepositRoute
   '/dashboard/invest': typeof DashboardInvestRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/refer': typeof DashboardReferRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/withdraw': typeof DashboardWithdrawRoute
@@ -380,6 +388,7 @@ export interface FileRoutesById {
   '/dashboard/deposit': typeof DashboardDepositRoute
   '/dashboard/invest': typeof DashboardInvestRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/refer': typeof DashboardReferRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/withdraw': typeof DashboardWithdrawRoute
@@ -426,6 +435,7 @@ export interface FileRouteTypes {
     | '/dashboard/deposit'
     | '/dashboard/invest'
     | '/dashboard/profile'
+    | '/dashboard/refer'
     | '/dashboard/referrals'
     | '/dashboard/wallet'
     | '/dashboard/withdraw'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/dashboard/deposit'
     | '/dashboard/invest'
     | '/dashboard/profile'
+    | '/dashboard/refer'
     | '/dashboard/referrals'
     | '/dashboard/wallet'
     | '/dashboard/withdraw'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/dashboard/deposit'
     | '/dashboard/invest'
     | '/dashboard/profile'
+    | '/dashboard/refer'
     | '/dashboard/referrals'
     | '/dashboard/wallet'
     | '/dashboard/withdraw'
@@ -760,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProfileRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/refer': {
+      id: '/dashboard/refer'
+      path: '/refer'
+      fullPath: '/dashboard/refer'
+      preLoaderRoute: typeof DashboardReferRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/referrals': {
       id: '/dashboard/referrals'
       path: '/referrals'
@@ -888,6 +907,7 @@ interface DashboardRouteChildren {
   DashboardDepositRoute: typeof DashboardDepositRoute
   DashboardInvestRoute: typeof DashboardInvestRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardReferRoute: typeof DashboardReferRoute
   DashboardReferralsRoute: typeof DashboardReferralsRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardWithdrawRoute: typeof DashboardWithdrawRoute
@@ -899,6 +919,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDepositRoute: DashboardDepositRoute,
   DashboardInvestRoute: DashboardInvestRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardReferRoute: DashboardReferRoute,
   DashboardReferralsRoute: DashboardReferralsRoute,
   DashboardWalletRoute: DashboardWalletRoute,
   DashboardWithdrawRoute: DashboardWithdrawRoute,
