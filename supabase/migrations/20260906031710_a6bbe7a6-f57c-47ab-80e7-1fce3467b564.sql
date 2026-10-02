@@ -25,6 +25,6 @@ GRANT SELECT (id, site_name, site_url, tidio_public_key, tawk_property_id, tawk_
 
 DROP POLICY IF EXISTS "Public can read safe settings columns" ON public.app_settings;
 CREATE POLICY "Public can read safe settings columns"
-  ON public.app_settings FOR SELECT
+ON public.app_settings FOR SELECT
   TO anon, authenticated
   USING (id = 1);

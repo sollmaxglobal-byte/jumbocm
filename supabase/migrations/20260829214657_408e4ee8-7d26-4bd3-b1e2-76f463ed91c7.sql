@@ -67,7 +67,7 @@ $$;
 REVOKE ALL ON FUNCTION public.reject_withdrawal(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.reject_withdrawal(uuid) TO authenticated, service_role;
 
-CREATE TABLE public.push_subscriptions (
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL,
   endpoint text NOT NULL UNIQUE,
@@ -82,10 +82,12 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.push_subscriptions TO authenticat
 GRANT ALL ON public.push_subscriptions TO service_role;
 ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage their own push subscriptions" ON public.push_subscriptions;
 CREATE POLICY "Users manage their own push subscriptions"
 ON public.push_subscriptions FOR ALL TO authenticated
 USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can view push subscriptions" ON public.push_subscriptions;
 CREATE POLICY "Admins can view push subscriptions"
 ON public.push_subscriptions FOR SELECT TO authenticated
 USING (public.has_role(auth.uid(), 'admin'));
@@ -94,11 +96,12 @@ CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
 BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
 
+DROP TRIGGER IF EXISTS update_push_subscriptions_updated_at ON public.push_subscriptions;
 CREATE TRIGGER update_push_subscriptions_updated_at
 BEFORE UPDATE ON public.push_subscriptions
 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-CREATE TABLE public.push_broadcasts (
+CREATE TABLE IF NOT EXISTS public.push_broadcasts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   body text NOT NULL,
@@ -112,9 +115,11 @@ GRANT SELECT ON public.push_broadcasts TO authenticated;
 GRANT ALL ON public.push_broadcasts TO service_role;
 ALTER TABLE public.push_broadcasts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Signed-in users can read broadcasts" ON public.push_broadcasts;
 CREATE POLICY "Signed-in users can read broadcasts"
 ON public.push_broadcasts FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Admins can create broadcasts" ON public.push_broadcasts;
 CREATE POLICY "Admins can create broadcasts"
 ON public.push_broadcasts FOR INSERT TO authenticated
 WITH CHECK (public.has_role(auth.uid(), 'admin'));
@@ -122,9 +127,10 @@ WITH CHECK (public.has_role(auth.uid(), 'admin'));
 GRANT SELECT (id, announcement_enabled, announcement_title, announcement_message, announcement_link, announcement_link_label, announcement_version) ON public.app_settings TO anon, authenticated;
 
 INSERT INTO public.plans (name, description, min_amount, max_amount, fixed_amount, amount_type, profit_type, fixed_daily_profit, daily_roi_percent, duration_days, payout_frequency, active)
-VALUES ('FIDE 0', 'Entry plan', 1000, 1000, 1000, 'fixed', 'fixed', 50, 0, 30, 'daily', true);
+SELECT * FROM (VALUES ('FIDE 0', 'Entry plan', 1000, 1000, 1000, 'fixed', 'fixed', 50, 0, 30, 'daily', true)) AS _v(name, description, min_amount, max_amount, fixed_amount, amount_type, profit_type, fixed_daily_profit, daily_roi_percent, duration_days, payout_frequency, active)
+WHERE NOT EXISTS (SELECT 1 FROM public.plans _p WHERE _p.name = _v.name);
 
-CREATE TABLE public.mm_messages (
+CREATE TABLE IF NOT EXISTS public.mm_messages (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   raw_text text NOT NULL,
   sender text,
@@ -141,10 +147,12 @@ CREATE TABLE public.mm_messages (
 GRANT SELECT ON public.mm_messages TO authenticated;
 GRANT ALL ON public.mm_messages TO service_role;
 ALTER TABLE public.mm_messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Admins read mm_messages" ON public.mm_messages FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins read mm_messages" ON public.mm_messages;
+CREATE POLICY "Admins read mm_messages"
+ON public.mm_messages FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'::app_role));
 
-CREATE UNIQUE INDEX mm_messages_txn_id_norm_key ON public.mm_messages (txn_id_norm) WHERE txn_id_norm IS NOT NULL;
-CREATE INDEX mm_messages_received_at_idx ON public.mm_messages (received_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS mm_messages_txn_id_norm_key ON public.mm_messages (txn_id_norm) WHERE txn_id_norm IS NOT NULL;
+CREATE INDEX IF NOT EXISTS mm_messages_received_at_idx ON public.mm_messages (received_at DESC);
 
 ALTER TABLE public.deposits
   ADD COLUMN IF NOT EXISTS ocr_txn_id text,
@@ -428,15 +436,23 @@ create table if not exists public.payout_accounts (
 
 alter table public.payout_accounts enable row level security;
 
-create policy "payout_accounts_select_own" on public.payout_accounts
+DROP POLICY IF EXISTS "payout_accounts_select_own" ON public.payout_accounts;
+CREATE POLICY "payout_accounts_select_own"
+ON public.payout_accounts
   for select to authenticated using ((select auth.uid()) = user_id);
-create policy "payout_accounts_insert_own" on public.payout_accounts
+DROP POLICY IF EXISTS "payout_accounts_insert_own" ON public.payout_accounts;
+CREATE POLICY "payout_accounts_insert_own"
+ON public.payout_accounts
   for insert to authenticated with check ((select auth.uid()) = user_id);
-create policy "payout_accounts_update_own" on public.payout_accounts
+DROP POLICY IF EXISTS "payout_accounts_update_own" ON public.payout_accounts;
+CREATE POLICY "payout_accounts_update_own"
+ON public.payout_accounts
   for update to authenticated
   using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
-create policy "payout_accounts_delete_own" on public.payout_accounts
+DROP POLICY IF EXISTS "payout_accounts_delete_own" ON public.payout_accounts;
+CREATE POLICY "payout_accounts_delete_own"
+ON public.payout_accounts
   for delete to authenticated using ((select auth.uid()) = user_id);
 
 grant select, insert, update, delete on public.payout_accounts to authenticated;

@@ -1,7 +1,8 @@
 
 DROP POLICY IF EXISTS "Public reads branding" ON public.app_settings;
 
-CREATE OR REPLACE VIEW public.public_app_settings
+DROP VIEW IF EXISTS public.public_app_settings;
+CREATE VIEW public.public_app_settings
 WITH (security_invoker = true) AS
 SELECT id, site_name, site_url, referral_percent,
        tidio_public_key, sendpulse_chat_id, sendpulse_embed_html,
