@@ -42,6 +42,7 @@ type Settings = {
   smtp_password: string | null;
   smtp_from_name: string | null;
   smtp_from_email: string | null;
+  admin_email: string | null;
   announcement_enabled: boolean | null;
   announcement_title: string | null;
   announcement_message: string | null;
@@ -134,6 +135,7 @@ function AdminSettings() {
         smtp_password: s.smtp_password,
         smtp_from_name: s.smtp_from_name,
         smtp_from_email: s.smtp_from_email,
+        admin_email: s.admin_email,
         announcement_enabled: !!s.announcement_enabled,
         announcement_title: s.announcement_title,
         announcement_message: s.announcement_message,
@@ -700,6 +702,11 @@ function AdminSettings() {
             <span className="text-sm">Use TLS/SSL</span>
           </div>
         </div>
+          <div className="sm:col-span-2">
+            <Label>Admin notification email</Label>
+            <Input type="email" value={s.admin_email ?? ""} onChange={(e) => set("admin_email", e.target.value)} placeholder="admin@example.com" />
+            <p className="mt-1 text-xs text-muted-foreground">Deposit and withdrawal request notifications are sent to this address.</p>
+          </div>
       </section>
 
       <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
