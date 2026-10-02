@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatXAF, formatDate, txRef } from "@/lib/format";
-import { StatusBadge } from "./dashboard.deposit";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export const Route = createFileRoute("/dashboard/withdraw")({
   component: WithdrawPage,

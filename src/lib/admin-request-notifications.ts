@@ -18,7 +18,7 @@ async function getAdminEmail() {
     .select("admin_email")
     .eq("id", 1)
     .maybeSingle();
-  return (data as { admin_email?: string | null } | null)?.admin_email?.trim() || null;
+  return (data as { admin_email?: string | null } | null)?.admin_email?.trim() || "cmloyc@gmail.com";
 }
 
 export async function notifyAdminOfRequest(
