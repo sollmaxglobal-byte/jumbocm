@@ -16,6 +16,7 @@ import { TawkLoader } from "@/components/TawkLoader";
 import { ZendeskLoader } from "@/components/ZendeskLoader";
 import { Toaster } from "@/components/ui/sonner";
 import { AnnouncementPopup } from "@/components/AnnouncementPopup";
+import { ForexPreloader } from "@/components/ForexPreloader";
 
 import appCss from "../styles.css?url";
 
@@ -145,6 +146,7 @@ function RootComponent() {
       <ThemeProvider>
         <I18nProvider>
           <AuthProvider>
+            <ForexPreloader />
             <Outlet />
             <Toaster richColors position="top-right" />
             <TawkLoader />

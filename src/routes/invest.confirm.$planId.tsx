@@ -194,8 +194,17 @@ function ConfirmInvestment() {
           </div>
 
           {insufficient && (
-            <div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-2.5 text-xs">
-              Your wallet balance is too low for this plan. Please make a deposit first.
+            <div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-xs">
+              <p className="font-medium text-warning">Insufficient wallet balance</p>
+              <p className="mt-1 text-muted-foreground">
+                You need {formatXAF(amount - balance)} more to activate this plan.
+              </p>
+              <Button
+                onClick={() => navigate({ to: "/dashboard/deposit" })}
+                className="mt-3 w-full bg-warning text-white hover:bg-warning/90"
+              >
+                Go to deposit
+              </Button>
             </div>
           )}
 
