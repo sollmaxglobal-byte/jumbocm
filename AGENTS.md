@@ -11,6 +11,8 @@
 - The committed `.env` contains public Supabase credentials (URL + publishable key) — enough to boot and render pages.
 - `SUPABASE_SERVICE_ROLE_KEY` is required for admin/server-side operations (deposit settlement, push, email) but not for booting.
 - Remote Supabase is used for both auth and data; no local database service is needed.
+- The connected Supabase project is supplied by the platform secrets (`VITE_PUBLIC_SUPABASE_URL` / `SUPABASE_URL`). The committed `.env` still carries an older project's public URL/key purely as a fallback, so `src/integrations/supabase/client.ts` prefers `VITE_PUBLIC_SUPABASE_*` — browser and server then agree on the connected project. Server-side clients already read `process.env['SUPABASE_URL']` / `SUPABASE_SERVICE_ROLE_KEY`.
+- `supabase/migrations` contains re-baseline files (the 20260828085157/085242 batch and 20260829214657) that duplicate schema created by earlier migrations. They are now guarded with `IF NOT EXISTS` / `DROP ... IF EXISTS` / `ON CONFLICT`-style checks so `supabase db push --db-url "$POSTGRES_URL_NON_POOLING"` is safely re-runnable; keep new migrations idempotent in the same style.
 - `bunfig.toml` sets a 24h `minimumReleaseAge` supply-chain guard; `--frozen-lockfile` installs from the existing lockfile without issue.
 - Keep the direct React Router and router-plugin pins compatible with React Start when upgrading; mismatched releases can install duplicate router cores.
 - Reflected-XSS advisory GHSA-qx66-fv34-fjm8 is patched by `@tanstack/react-start@1.168.60` and its `@tanstack/start-server-core@1.169.39` dependency. Do not use Vercel's dangerous-deployment override instead of the patch.

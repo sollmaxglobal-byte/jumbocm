@@ -1,13 +1,25 @@
 
 -- ============ ENUM ============
-CREATE TYPE public.app_role AS ENUM ('admin', 'user');
-CREATE TYPE public.deposit_status AS ENUM ('pending', 'approved', 'rejected');
-CREATE TYPE public.withdrawal_status AS ENUM ('pending', 'approved', 'rejected', 'paid');
-CREATE TYPE public.investment_status AS ENUM ('active', 'completed', 'cancelled');
-CREATE TYPE public.payment_method_type AS ENUM ('mobile_money', 'bank_transfer', 'crypto');
-CREATE TYPE public.transaction_type AS ENUM ('deposit', 'investment', 'roi', 'withdrawal', 'adjustment');
+DO $$ BEGIN
+  CREATE TYPE public.app_role AS ENUM ('admin', 'user');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE TYPE public.deposit_status AS ENUM ('pending', 'approved', 'rejected');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE TYPE public.withdrawal_status AS ENUM ('pending', 'approved', 'rejected', 'paid');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE TYPE public.investment_status AS ENUM ('active', 'completed', 'cancelled');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE TYPE public.payment_method_type AS ENUM ('mobile_money', 'bank_transfer', 'crypto');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE TYPE public.transaction_type AS ENUM ('deposit', 'investment', 'roi', 'withdrawal', 'adjustment');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT,
   phone TEXT,
@@ -19,7 +31,7 @@ CREATE TABLE public.profiles (
 );
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   role public.app_role NOT NULL DEFAULT 'user',
@@ -38,7 +50,7 @@ AS $$
   );
 $$;
 
-CREATE TABLE public.plans (
+CREATE TABLE IF NOT EXISTS public.plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   description TEXT,
@@ -51,7 +63,7 @@ CREATE TABLE public.plans (
 );
 ALTER TABLE public.plans ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE public.payment_methods (
+CREATE TABLE IF NOT EXISTS public.payment_methods (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type public.payment_method_type NOT NULL,
   label TEXT NOT NULL,
@@ -63,7 +75,7 @@ CREATE TABLE public.payment_methods (
 );
 ALTER TABLE public.payment_methods ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE public.deposits (
+CREATE TABLE IF NOT EXISTS public.deposits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   amount NUMERIC(14,2) NOT NULL,
@@ -77,7 +89,7 @@ CREATE TABLE public.deposits (
 );
 ALTER TABLE public.deposits ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE public.investments (
+CREATE TABLE IF NOT EXISTS public.investments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   plan_id UUID NOT NULL REFERENCES public.plans(id),
@@ -92,7 +104,7 @@ CREATE TABLE public.investments (
 );
 ALTER TABLE public.investments ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE public.withdrawals (
+CREATE TABLE IF NOT EXISTS public.withdrawals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   amount NUMERIC(14,2) NOT NULL,
@@ -106,7 +118,7 @@ CREATE TABLE public.withdrawals (
 );
 ALTER TABLE public.withdrawals ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE public.transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   type public.transaction_type NOT NULL,
@@ -139,76 +151,91 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+DROP POLICY IF EXISTS "Users view own profile" ON public.profiles;
 CREATE POLICY "Users view own profile" ON public.profiles
   FOR SELECT TO authenticated USING (auth.uid() = id OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Users update own profile" ON public.profiles;
 CREATE POLICY "Users update own profile" ON public.profiles
   FOR UPDATE TO authenticated USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins update any profile" ON public.profiles;
 CREATE POLICY "Admins update any profile" ON public.profiles
   FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Users view own role" ON public.user_roles;
 CREATE POLICY "Users view own role" ON public.user_roles
   FOR SELECT TO authenticated USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins manage roles" ON public.user_roles;
 CREATE POLICY "Admins manage roles" ON public.user_roles
   FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'))
   WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Anyone authed reads active plans" ON public.plans;
 CREATE POLICY "Anyone authed reads active plans" ON public.plans
   FOR SELECT TO authenticated USING (active = true OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Public reads active plans" ON public.plans;
 CREATE POLICY "Public reads active plans" ON public.plans
   FOR SELECT TO anon USING (active = true);
+DROP POLICY IF EXISTS "Admins manage plans" ON public.plans;
 CREATE POLICY "Admins manage plans" ON public.plans
   FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'))
   WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Authed reads active methods" ON public.payment_methods;
 CREATE POLICY "Authed reads active methods" ON public.payment_methods
   FOR SELECT TO authenticated USING (active = true OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins manage methods" ON public.payment_methods;
 CREATE POLICY "Admins manage methods" ON public.payment_methods
   FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'))
   WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Users view own deposits" ON public.deposits;
 CREATE POLICY "Users view own deposits" ON public.deposits
   FOR SELECT TO authenticated USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Users create own deposits" ON public.deposits;
 CREATE POLICY "Users create own deposits" ON public.deposits
   FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid() AND status = 'pending');
+DROP POLICY IF EXISTS "Admins update deposits" ON public.deposits;
 CREATE POLICY "Admins update deposits" ON public.deposits
   FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Users view own investments" ON public.investments;
 CREATE POLICY "Users view own investments" ON public.investments
   FOR SELECT TO authenticated USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Users create own investments" ON public.investments;
 CREATE POLICY "Users create own investments" ON public.investments
   FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
+DROP POLICY IF EXISTS "Admins update investments" ON public.investments;
 CREATE POLICY "Admins update investments" ON public.investments
   FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Users view own withdrawals" ON public.withdrawals;
 CREATE POLICY "Users view own withdrawals" ON public.withdrawals
   FOR SELECT TO authenticated USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Users create own withdrawals" ON public.withdrawals;
 CREATE POLICY "Users create own withdrawals" ON public.withdrawals
   FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid() AND status = 'pending');
+DROP POLICY IF EXISTS "Admins update withdrawals" ON public.withdrawals;
 CREATE POLICY "Admins update withdrawals" ON public.withdrawals
   FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
+DROP POLICY IF EXISTS "Users view own transactions" ON public.transactions;
 CREATE POLICY "Users view own transactions" ON public.transactions
   FOR SELECT TO authenticated USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins insert transactions" ON public.transactions;
 CREATE POLICY "Admins insert transactions" ON public.transactions
   FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'admin') OR user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users upload own proofs" ON storage.objects;
 CREATE POLICY "Users upload own proofs" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'payment-proofs' AND (storage.foldername(name))[1] = auth.uid()::text);
+DROP POLICY IF EXISTS "Anyone view proofs" ON storage.objects;
 CREATE POLICY "Anyone view proofs" ON storage.objects
   FOR SELECT USING (bucket_id = 'payment-proofs');
 
-INSERT INTO public.plans (name, description, min_amount, max_amount, daily_roi_percent, duration_days) VALUES
-  ('Starter', 'Begin your journey with steady daily returns.', 5000, 100000, 2.5, 15),
-  ('Growth', 'Balanced plan for committed investors.', 100000, 1000000, 3.5, 25),
-  ('Prestige', 'Premium tier with the highest daily ROI.', 1000000, 50000000, 4.5, 40);
 
-INSERT INTO public.payment_methods (type, label, account_name, account_number, instructions) VALUES
-  ('mobile_money', 'MTN Mobile Money', 'CAMVCC LTD', '670000000', 'Send the exact amount and use your email as the reason. Then upload the SMS confirmation as proof.'),
-  ('mobile_money', 'Orange Money', 'CAMVCC LTD', '690000000', 'Send via Orange Money. Use your email as reference. Upload screenshot of confirmation.'),
-  ('bank_transfer', 'Afriland First Bank', 'CAMVCC LTD', '10005-00123456789-00', 'Wire transfer to the account above. Upload bank slip as proof.'),
-  ('crypto', 'USDT (TRC20)', 'Camvcc Wallet', 'TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'Send USDT on the TRON network. Upload the transaction hash screenshot.');
