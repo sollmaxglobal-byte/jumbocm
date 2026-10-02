@@ -44,6 +44,7 @@ import { Route as DashboardWithdrawRouteImport } from './routes/dashboard.withdr
 import { Route as DepositPendingIdRouteImport } from './routes/deposit-pending.$id'
 import { Route as ApiPublicKorapayWebhookRouteImport } from './routes/api/public/korapay-webhook'
 import { Route as ApiPublicMmSmsRouteImport } from './routes/api/public/mm-sms'
+import { Route as ApiPublicNowpaymentsWebhookRouteImport } from './routes/api/public/nowpayments-webhook'
 import { Route as ApiPublicProcessReceiptEmailsRouteImport } from './routes/api/public/process-receipt-emails'
 import { Route as ApiPublicWithdrawQueueRouteImport } from './routes/api/public/withdraw-queue'
 import { Route as ApiPublicWithdrawResultRouteImport } from './routes/api/public/withdraw-result'
@@ -226,6 +227,12 @@ const ApiPublicMmSmsRoute = ApiPublicMmSmsRouteImport.update({
   path: '/api/public/mm-sms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNowpaymentsWebhookRoute =
+  ApiPublicNowpaymentsWebhookRouteImport.update({
+    id: '/api/public/nowpayments-webhook',
+    path: '/api/public/nowpayments-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicProcessReceiptEmailsRoute =
   ApiPublicProcessReceiptEmailsRouteImport.update({
     id: '/api/public/process-receipt-emails',
@@ -294,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardIndexRoute
   '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
+  '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
   '/api/public/withdraw-result': typeof ApiPublicWithdrawResultRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
   '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
+  '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
   '/api/public/withdraw-result': typeof ApiPublicWithdrawResultRoute
@@ -379,6 +388,7 @@ export interface FileRoutesById {
   '/dashboard/': typeof DashboardIndexRoute
   '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
+  '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
   '/api/public/withdraw-result': typeof ApiPublicWithdrawResultRoute
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
+    | '/api/public/nowpayments-webhook'
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
     | '/api/public/withdraw-result'
@@ -465,6 +476,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
+    | '/api/public/nowpayments-webhook'
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
     | '/api/public/withdraw-result'
@@ -508,6 +520,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
+    | '/api/public/nowpayments-webhook'
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
     | '/api/public/withdraw-result'
@@ -534,6 +547,7 @@ export interface RootRouteChildren {
   DepositPendingIdRoute: typeof DepositPendingIdRoute
   ApiPublicKorapayWebhookRoute: typeof ApiPublicKorapayWebhookRoute
   ApiPublicMmSmsRoute: typeof ApiPublicMmSmsRoute
+  ApiPublicNowpaymentsWebhookRoute: typeof ApiPublicNowpaymentsWebhookRoute
   ApiPublicProcessReceiptEmailsRoute: typeof ApiPublicProcessReceiptEmailsRoute
   ApiPublicWithdrawQueueRoute: typeof ApiPublicWithdrawQueueRoute
   ApiPublicWithdrawResultRoute: typeof ApiPublicWithdrawResultRoute
@@ -788,6 +802,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMmSmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/nowpayments-webhook': {
+      id: '/api/public/nowpayments-webhook'
+      path: '/api/public/nowpayments-webhook'
+      fullPath: '/api/public/nowpayments-webhook'
+      preLoaderRoute: typeof ApiPublicNowpaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/process-receipt-emails': {
       id: '/api/public/process-receipt-emails'
       path: '/api/public/process-receipt-emails'
@@ -907,6 +928,7 @@ const rootRouteChildren: RootRouteChildren = {
   DepositPendingIdRoute: DepositPendingIdRoute,
   ApiPublicKorapayWebhookRoute: ApiPublicKorapayWebhookRoute,
   ApiPublicMmSmsRoute: ApiPublicMmSmsRoute,
+  ApiPublicNowpaymentsWebhookRoute: ApiPublicNowpaymentsWebhookRoute,
   ApiPublicProcessReceiptEmailsRoute: ApiPublicProcessReceiptEmailsRoute,
   ApiPublicWithdrawQueueRoute: ApiPublicWithdrawQueueRoute,
   ApiPublicWithdrawResultRoute: ApiPublicWithdrawResultRoute,
