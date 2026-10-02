@@ -1,4 +1,4 @@
-- Customer dashboard money summaries use USD as the primary display with XAF equivalents at an indicative 1 USD = 600 XAF rate, because account records remain denominated in XAF.
+- Customer dashboard money summaries show XAF as the primary figure with a small USD equivalent underneath at an indicative 1 USD = 600 XAF rate, because account records remain denominated in XAF. Use the shared `DualMoney` component (`src/components/DualMoney.tsx`) and the `XAF_PER_USD`/`formatUSD` helpers in `src/lib/format.ts` rather than re-declaring the rate or a local USD formatter.
 - Trading-bot status and profit figures must be derived from the customer's active investments and recorded profit transactions; never simulate activity or earnings.
 - Third-party chat widgets load only from validated public identifiers saved by an administrator, preventing arbitrary embed code execution.
 

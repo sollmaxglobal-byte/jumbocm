@@ -5,7 +5,7 @@ import { TrendingUp, Zap, Calendar, Wallet, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { formatXAF } from "@/lib/format";
+import { formatUSD, formatXAF } from "@/lib/format";
 
 export const Route = createFileRoute("/dashboard/invest")({
   component: InvestPage,
@@ -26,13 +26,7 @@ type Plan = {
   fixed_amount: number;
 };
 
-const XAF_PER_USD = 600;
 const POPULAR = "Growth Plan";
-
-function formatUSD(xaf: number) {
-  const amount = xaf / XAF_PER_USD;
-  return `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 
 function InvestPage() {
   const { user } = useAuth();
@@ -88,8 +82,8 @@ function InvestPage() {
         </div>
         <div className="rounded-xl border border-border bg-card px-3 py-1.5 text-right">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Wallet</div>
-          <div className="text-sm font-bold text-primary">{formatUSD(balance)}</div>
-          <div className="text-[10px] text-muted-foreground">{formatXAF(balance)}</div>
+          <div className="text-sm font-bold text-primary">{formatXAF(balance)}</div>
+          <div className="text-[10px] text-muted-foreground">≈ {formatUSD(balance)}</div>
         </div>
       </div>
 
@@ -132,22 +126,19 @@ function InvestPage() {
                 </div>
               </div>
 
-              {/* Profit display */}
-              <div className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold text-success">
-                  {p.profit_type === "fixed"
-                    ? formatUSD(p.fixed_daily_profit)
-                    : `${p.daily_roi_percent}%`}
-                </span>
-                <span className="text-xs font-medium text-muted-foreground">
-                  / day
-                </span>
-              </div>
-              {p.profit_type === "fixed" && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {formatXAF(p.fixed_daily_profit)} / day
+              {/* Profit display — XAF primary, small USD underneath */}
+              <div className="mt-3">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl font-bold text-success">
+                    {formatXAF(dailyProfit)}
+                  </span>
+                  <span className="text-xs font-medium text-muted-foreground">/ day</span>
+                </div>
+                <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                  ≈ {formatUSD(dailyProfit)} / day
+                  {p.profit_type === "percent" ? ` · ${p.daily_roi_percent}% ROI` : ""}
                 </p>
-              )}
+              </div>
 
               {/* Key stats row */}
               <div className="mt-4 grid grid-cols-3 gap-2">
@@ -161,7 +152,8 @@ function InvestPage() {
                   <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
                     <TrendingUp className="h-3 w-3" /> Total profit
                   </div>
-                  <div className="mt-0.5 text-sm font-semibold text-success">{formatUSD(totalProfit)}</div>
+                  <div className="mt-0.5 text-sm font-semibold text-success">{formatXAF(totalProfit)}</div>
+                  <div className="text-[9px] text-muted-foreground">≈ {formatUSD(totalProfit)}</div>
                 </div>
                 <div className="rounded-lg bg-secondary/60 px-2.5 py-2">
                   <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
