@@ -1,5 +1,5 @@
-// Server-only helpers for automatic MTN withdrawal payouts (MacroDroid + USSD).
-import { isMtnNumber, localDigits } from "@/lib/mm-network";
+// Server-only helpers for automatic MTN/Orange withdrawal payouts (Automate/MacroDroid + USSD).
+import { detectNetwork, isMtnNumber, localDigits } from "@/lib/mm-network";
 import { parseAmount } from "@/lib/mm-parse";
 
 async function admin() {
@@ -17,9 +17,10 @@ export type ClaimResult =
       amount: number;
       account_name: string;
       code: string;
+      provider: "mtn" | "orange";
     };
 
-/** Flag pending mobile-money withdrawals going to an MTN number as auto-payable. */
+/** Flag pending mobile-money withdrawals going to an MTN or Orange number as auto-payable. */
 export async function queueEligible(): Promise<number> {
   const db = await admin();
   const { data } = await db
@@ -31,7 +32,10 @@ export async function queueEligible(): Promise<number> {
     .limit(50);
 
   const ids = ((data ?? []) as Array<{ id: string; account_number: string }>)
-    .filter((w) => isMtnNumber(w.account_number))
+    .filter((w) => {
+      const net = detectNetwork(w.account_number);
+      return net === "mtn" || net === "orange";
+    })
     .map((w) => w.id);
 
   if (!ids.length) return 0;
@@ -45,7 +49,13 @@ export async function claimNext(): Promise<ClaimResult> {
   await queueEligible();
   const { data, error } = await db.rpc("claim_auto_withdrawal");
   if (error) return { claimed: false, reason: error.message };
-  return (data ?? { claimed: false, reason: "Nothing to pay" }) as ClaimResult;
+  const result = (data ?? { claimed: false, reason: "Nothing to pay" }) as ClaimResult;
+  // The RPC now returns provider; fall back to detecting it from the phone.
+  if (result.claimed && !(result as { provider?: string }).provider) {
+    (result as { provider: "mtn" | "orange" }).provider =
+      detectNetwork(result.phone) === "orange" ? "orange" : "mtn";
+  }
+  return result;
 }
 
 async function notifyPaid(userId: string, amount: number, id: string) {

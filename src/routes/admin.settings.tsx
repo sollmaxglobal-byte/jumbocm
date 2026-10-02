@@ -54,6 +54,8 @@ type Settings = {
   auto_withdraw_enabled: boolean | null;
   auto_withdraw_max_amount: number | null;
   auto_withdraw_ussd_template: string | null;
+  ussd_webhook_url: string | null;
+  ussd_pin: string | null;
   deposit_min_amount: number | null;
   deposit_max_amount: number | null;
   mtn_number: string | null;
@@ -89,6 +91,7 @@ function AdminSettings() {
   const [busy, setBusy] = useState(false);
   const [reshow, setReshow] = useState(true);
   const [showSecret, setShowSecret] = useState(false);
+  const [showPin, setShowPin] = useState(false);
 
   async function load() {
     // Full row (including SMTP credentials) is admin-only via SECURITY DEFINER RPC.
@@ -142,6 +145,8 @@ function AdminSettings() {
         auto_withdraw_enabled: !!s.auto_withdraw_enabled,
         auto_withdraw_max_amount: s.auto_withdraw_max_amount,
         auto_withdraw_ussd_template: s.auto_withdraw_ussd_template || "*126*9*{phone}*{amount}#",
+        ussd_webhook_url: s.ussd_webhook_url,
+        ussd_pin: s.ussd_pin,
         deposit_min_amount: Number(s.deposit_min_amount) || 1000,
         deposit_max_amount: Number(s.deposit_max_amount) || 10000000,
         mtn_number: s.mtn_number,
@@ -372,7 +377,7 @@ function AdminSettings() {
 
       <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
         <h2 className="flex items-center gap-2 font-display text-lg text-primary">
-          <Send className="h-5 w-5" /> Automatic MTN withdrawals (MacroDroid)
+          <Send className="h-5 w-5" /> Automatic withdrawals (USSD auto-pay)
         </h2>
         <div className="flex items-center justify-between rounded-lg bg-secondary p-3">
           <div>
@@ -419,10 +424,52 @@ function AdminSettings() {
           </div>
         </div>
 
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <Label>Push webhook URL (Automate / MacroDroid)</Label>
+            <Input
+              value={s.ussd_webhook_url ?? ""}
+              onChange={(e) => set("ussd_webhook_url", e.target.value)}
+              placeholder="https://trigger.macrodroid.com/..."
+              className="font-mono text-xs"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              When a withdrawal is submitted, the server instantly POSTs to this URL with
+              {" "}<span className="font-mono">{"{withdrawal_id, provider, phone, amount, secret_token, pin?}"}</span>.
+              Leave empty to rely on the pull-based queue below.
+            </p>
+          </div>
+          <div>
+            <Label>USSD payment PIN (optional)</Label>
+            <Input
+              type={showPin ? "text" : "password"}
+              value={s.ussd_pin ?? ""}
+              onChange={(e) => set("ussd_pin", e.target.value)}
+              placeholder="Enter PIN to send in webhook"
+              className="font-mono"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              If set, the PIN is included in the webhook payload. If empty, the Automate flow
+              uses its locally stored PIN variable.
+            </p>
+          </div>
+          <div className="flex items-end">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setShowPin((v) => !v)}
+            >
+              {showPin ? <EyeOff className="mr-1 h-4 w-4" /> : <Eye className="mr-1 h-4 w-4" />}
+              {showPin ? "Hide PIN" : "Show PIN"}
+            </Button>
+          </div>
+        </div>
+
         <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-primary">
-              MacroDroid setup
+              Pull-based queue (fallback)
             </h3>
             <Button asChild size="sm" variant="outline">
               <a
