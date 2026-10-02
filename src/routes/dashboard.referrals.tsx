@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Copy, Gift, Users } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Money } from "@/components/Money";
+import { DualMoney } from "@/components/DualMoney";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatUSD, formatXAF, XAF_PER_USD } from "@/lib/format";
 
 export const Route = createFileRoute("/dashboard/referrals")({
   head: () => ({
@@ -43,20 +45,43 @@ function ReferralsPage() {
   const [rows, setRows] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralEarnings, setReferralEarnings] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       setLoading(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error: err } = await (supabase as any).rpc("my_referrals");
+      const [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { data, error: err },
+        { data: profile },
+      ] = await Promise.all([
+        (supabase as any).rpc("my_referrals"),
+        supabase
+          .from("profiles")
+          .select("referral_code,referral_earnings")
+          .eq("id", user.id)
+          .maybeSingle(),
+      ]);
       if (err) setError(err.message);
       setRows((data as Referral[]) ?? []);
+      setReferralCode((profile as { referral_code: string | null } | null)?.referral_code ?? null);
+      setReferralEarnings(Number((profile as { referral_earnings: number | null } | null)?.referral_earnings ?? 0));
       setLoading(false);
     })();
   }, [user]);
 
   const active = rows.filter((r) => r.investment_status === "active").length;
+  const referralLink = referralCode && typeof window !== "undefined"
+    ? `${window.location.origin}/register?ref=${encodeURIComponent(referralCode)}`
+    : "";
+
+  const copyLink = async () => {
+    if (!referralLink) return;
+    await navigator.clipboard.writeText(referralLink);
+    toast.success("Referral link copied");
+  };
 
   return (
     <div className="space-y-5">
@@ -67,30 +92,69 @@ function ReferralsPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="font-display text-2xl text-primary md:text-3xl">My referrals</h1>
-          <p className="text-xs text-muted-foreground">Everyone who joined with your link.</p>
+          <h1 className="font-display text-2xl text-primary md:text-3xl">Refer & Earn</h1>
+          <p className="text-xs text-muted-foreground">Invite friends and earn commission on their investments.</p>
         </div>
       </div>
 
+      {/* Promotion banner with referral link */}
+      <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/80 p-5 text-primary-foreground shadow-sm">
+        <div className="flex items-start gap-3">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary-foreground/15">
+            <Gift className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-semibold">Earn commission on every referral</h2>
+            <p className="mt-1 text-xs text-primary-foreground/75">
+              Share your link — you earn a commission each time your referral starts an investment plan.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-primary-foreground/10 p-3">
+          <input
+            readOnly
+            value={referralLink || "Loading…"}
+            className="min-w-0 flex-1 truncate bg-transparent text-xs font-medium text-primary-foreground/90 outline-none"
+            aria-label="Your referral link"
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={copyLink}
+            disabled={!referralLink}
+            className="shrink-0 rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+          >
+            <Copy className="h-4 w-4" /> Copy
+          </Button>
+        </div>
+      </section>
+
+      {/* Stats: total referrals + amount earned */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
             <Users className="h-3 w-3" /> Total referrals
           </div>
           <div className="mt-1 font-display text-2xl font-bold uppercase tabular-nums text-primary">
-            {rows.length}
+            {loading ? "—" : rows.length}
           </div>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            With active plan
+            Commission earned
           </div>
-          <div className="mt-1 font-display text-2xl font-bold uppercase tabular-nums text-success">
-            {active}
+          <div className="mt-1.5">
+            <DualMoney
+              value={referralEarnings}
+              primary="usd"
+              primaryClassName="text-xl font-bold text-success"
+              usdClassName="text-[11px] text-muted-foreground"
+            />
           </div>
         </div>
       </div>
 
+      {/* Referral list */}
       {loading ? (
         <div className="text-sm text-muted-foreground">Loading…</div>
       ) : error ? (
@@ -99,7 +163,7 @@ function ReferralsPage() {
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          No referrals yet. Share your referral link from the dashboard to start earning.
+          No referrals yet. Share your referral link above to start earning.
         </div>
       ) : (
         <div className="space-y-3">

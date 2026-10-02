@@ -11,7 +11,6 @@ import {
   Plus,
   TrendingUp,
   Users,
-  WalletCards,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,7 +143,7 @@ function DashboardHome() {
         <section className="grid grid-cols-3 gap-3">
           <QuickAction to="/dashboard/deposit" label="Deposit" icon={Plus} primary />
           <QuickAction to="/dashboard/withdraw" label="Withdraw" icon={ArrowUpRight} />
-          <QuickAction to="/dashboard/wallet" label="Wallet" icon={WalletCards} />
+          <QuickAction to="/dashboard/referrals" label="Refer & Earn" icon={Gift} />
         </section>
 
         {/* Money summary */}
