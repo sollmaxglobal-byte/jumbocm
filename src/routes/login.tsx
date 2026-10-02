@@ -1,15 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Loader2, Lock, Mail } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { AuthShell } from "@/components/AuthShell";
+import { AuthShell, AuthField } from "@/components/AuthShell";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -73,46 +70,37 @@ function LoginPage() {
   }
 
   return (
-    <AuthShell>
-      <div className="mb-6">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-auth-accent">Sign in</p>
-        <h1 className="font-sans text-3xl font-semibold leading-tight text-foreground">Welcome back.</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Access your portfolio and automated trading activity.</p>
+    <AuthShell compact>
+      <div className="mb-7">
+        <span className="inline-flex items-center rounded-full border border-auth-accent/30 bg-auth-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-auth-accent">
+          Secure sign in
+        </span>
+        <h1 className="mt-4 text-3xl font-semibold leading-tight">Welcome back</h1>
+        <p className="mt-2 text-sm text-auth-muted">Sign in to manage your portfolio, deposits and payouts.</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">{t("auth.email")}</Label>
-          <div className="relative"><Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="h-12 rounded-xl bg-card pl-11 pr-4" id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" /></div>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">{t("auth.password")}</Label>
-            <Link to="/forgot-password" className="text-xs text-auth-accent hover:underline">
+        <AuthField id="email" name="email" type="email" label={t("auth.email")} icon={Mail} required autoComplete="email" placeholder="you@example.com" />
+        <div>
+          <AuthField id="password" name="password" type="password" label={t("auth.password")} icon={Lock} required autoComplete="current-password" placeholder="••••••••" />
+          <div className="mt-2 text-right">
+            <Link to="/forgot-password" className="text-xs font-medium text-auth-accent hover:underline">
               {t("auth.forgot")}
             </Link>
           </div>
-          <Input
-            className="h-12 rounded-xl bg-card px-4"
-            id="password"
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-          />
         </div>
-        <Button
+        <button
           type="submit"
           disabled={busy}
-          className="h-12 w-full rounded-xl bg-auth-accent font-semibold text-auth-accent-foreground hover:bg-auth-accent/90"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-auth-accent font-semibold text-auth-accent-foreground shadow-lg shadow-auth-accent/20 transition hover:bg-auth-accent/90 active:scale-[0.99] disabled:opacity-60"
         >
-          {busy ? t("common.pleaseWait") : <>{t("auth.signIn")} <ArrowRight className="h-4 w-4" /></>}
-        </Button>
+          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("common.pleaseWait")}</> : <>{t("auth.signIn")} <ArrowRight className="h-4 w-4" /></>}
+        </button>
       </form>
 
-      <div className="mt-6 border-t border-border pt-5 text-center text-sm text-muted-foreground">
+      <div className="mt-8 rounded-xl border border-auth-foreground/10 bg-auth-foreground/5 p-4 text-center text-sm text-auth-muted">
         {t("auth.noAccount")}{" "}
-        <Link to="/register" className="font-medium text-auth-accent underline underline-offset-4">
+        <Link to="/register" className="font-semibold text-auth-accent">
           {t("auth.registerLink")}
         </Link>
       </div>
