@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          nowpayments_enabled: boolean
+          nowpayments_api_key: string | null
+          nowpayments_ipn_secret: string | null
           announcement_enabled: boolean
           announcement_link: string | null
           announcement_link_label: string | null
@@ -56,6 +59,9 @@ export type Database = {
           zendesk_widget_key: string | null
         }
         Insert: {
+          nowpayments_enabled?: boolean
+          nowpayments_api_key?: string | null
+          nowpayments_ipn_secret?: string | null
           announcement_enabled?: boolean
           announcement_link?: string | null
           announcement_link_label?: string | null
@@ -96,6 +102,9 @@ export type Database = {
           zendesk_widget_key?: string | null
         }
         Update: {
+          nowpayments_enabled?: boolean
+          nowpayments_api_key?: string | null
+          nowpayments_ipn_secret?: string | null
           announcement_enabled?: boolean
           announcement_link?: string | null
           announcement_link_label?: string | null
@@ -832,6 +841,7 @@ export type Database = {
       }
       public_settings: {
         Row: {
+          nowpayments_enabled: boolean | null
           announcement_enabled: boolean | null
           announcement_link: string | null
           announcement_link_label: string | null
@@ -857,6 +867,7 @@ export type Database = {
           zendesk_widget_key: string | null
         }
         Insert: {
+          nowpayments_enabled?: boolean | null
           announcement_enabled?: boolean | null
           announcement_link?: string | null
           announcement_link_label?: string | null
@@ -882,6 +893,7 @@ export type Database = {
           zendesk_widget_key?: string | null
         }
         Update: {
+          nowpayments_enabled?: boolean | null
           announcement_enabled?: boolean | null
           announcement_link?: string | null
           announcement_link_label?: string | null
@@ -1052,6 +1064,10 @@ export type Database = {
       }
       set_transfer_pin: { Args: { _pin: string }; Returns: boolean }
       settle_gateway_deposit: {
+        Args: { _gateway_ref: string; _outcome: string; _reference: string }
+        Returns: Json
+      }
+      settle_nowpayments_deposit: {
         Args: { _gateway_ref: string; _outcome: string; _reference: string }
         Returns: Json
       }

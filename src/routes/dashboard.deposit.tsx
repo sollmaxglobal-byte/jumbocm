@@ -6,6 +6,7 @@ import { ArrowLeft, Check, Clock3, Copy, FileImage, Upload, X } from "lucide-rea
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
+import { startNowpaymentsDeposit } from "@/lib/nowpayments.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,9 +26,11 @@ type Settings = {
   deposit_min_amount?: number;
   deposit_max_amount?: number;
   korapay_enabled?: boolean;
+  nowpayments_enabled?: boolean;
 };
 
 const KORAPAY = "korapay";
+const NOWPAYMENTS = "nowpayments";
 
 const QUICK_AMOUNTS = [5000, 10000, 25000, 50000];
 const fallbackSettings = { deposit_min_amount: 1000, deposit_max_amount: 1000000 };
@@ -89,11 +92,15 @@ function DepositPage() {
   const [chargeId, setChargeId] = useState<string | null>(null);
   const startCharge = useServerFn(startKorapayDeposit);
   const checkCharge = useServerFn(checkKorapayDeposit);
+  const startCrypto = useServerFn(startNowpaymentsDeposit);
+  const [cryptoBusy, setCryptoBusy] = useState(false);
 
   const [activeMethods, setActiveMethods] = useState<Method[]>([]);
   const selectedMethod = activeMethods.find((m) => m.id === method);
   const instant = method === KORAPAY;
   const instantEnabled = Boolean(settings.korapay_enabled);
+  const crypto = method === NOWPAYMENTS;
+  const cryptoEnabled = Boolean(settings.nowpayments_enabled);
   const amountNumber = Number(amount);
   const minAmount = Number(settings.deposit_min_amount ?? fallbackSettings.deposit_min_amount);
   const maxAmount = Number(settings.deposit_max_amount ?? fallbackSettings.deposit_max_amount);
@@ -105,20 +112,33 @@ function DepositPage() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [{ data: settingsData }, { data: methodsData }] = await Promise.all([
-        supabase
-          .from("public_settings")
-          .select("deposit_min_amount, deposit_max_amount, korapay_enabled")
-          .eq("id", 1)
-          .maybeSingle(),
-        supabase
-          .from("payment_methods")
-          .select("id, label, account_name, account_number, instructions, active, scope")
-          .eq("active", true)
-          .in("scope", ["deposit", "both"])
-          .order("type"),
-      ]);
-      if (mounted && settingsData) setSettings(settingsData as Settings);
+      const [{ data: settingsData }, { data: methodsData }, { data: cryptoData }] =
+        await Promise.all([
+          supabase
+            .from("public_settings")
+            .select("deposit_min_amount, deposit_max_amount, korapay_enabled")
+            .eq("id", 1)
+            .maybeSingle(),
+          supabase
+            .from("payment_methods")
+            .select("id, label, account_name, account_number, instructions, active, scope")
+            .eq("active", true)
+            .in("scope", ["deposit", "both"])
+            .order("type"),
+          // Queried separately: the column only exists after the NOWPayments migration,
+          // so a failure here must not disable the other deposit methods.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (supabase as any)
+            .from("public_settings")
+            .select("nowpayments_enabled")
+            .eq("id", 1)
+            .maybeSingle(),
+        ]);
+      if (mounted && settingsData)
+        setSettings({
+          ...(settingsData as Settings),
+          nowpayments_enabled: Boolean(cryptoData?.nowpayments_enabled),
+        });
       if (mounted && methodsData)
         setActiveMethods(
           methodsData
@@ -225,6 +245,18 @@ function DepositPage() {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not start the payment.");
       setCharging(false);
+    }
+  }
+
+  async function payWithCrypto() {
+    if (cryptoBusy) return;
+    setCryptoBusy(true);
+    try {
+      const res = await startCrypto({ data: { amount: amountNumber } });
+      window.location.href = res.invoiceUrl;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not start the crypto payment.");
+      setCryptoBusy(false);
     }
   }
 
@@ -403,7 +435,43 @@ function DepositPage() {
               </motion.button>
             )}
 
-            {activeMethods.length === 0 && !instantEnabled ? (
+            {cryptoEnabled && (
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={() => setMethod(NOWPAYMENTS)}
+                className="relative flex items-center gap-4 rounded-2xl border-2 p-4 text-left"
+                style={{ borderColor: GOLD, background: crypto ? GOLD : "#141418" }}
+              >
+                <span
+                  className="flex h-11 w-14 shrink-0 items-center justify-center rounded-md text-[10px] font-black"
+                  style={{ background: crypto ? "#141418" : GOLD, color: crypto ? GOLD : "#141418" }}
+                >
+                  CRYPTO
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span
+                    className="truncate text-lg font-bold"
+                    style={{ color: crypto ? "#141418" : "#ffffff" }}
+                  >
+                    Pay with crypto
+                  </span>
+                  <span
+                    className="truncate text-sm"
+                    style={{ color: crypto ? "rgba(20,20,24,0.7)" : "#9a9aa2" }}
+                  >
+                    BTC, ETH, USDT & more • credited automatically
+                  </span>
+                </span>
+                {crypto && (
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#141418]/15">
+                    <Check className="size-4 text-[#141418]" />
+                  </span>
+                )}
+              </motion.button>
+            )}
+
+            {activeMethods.length === 0 && !instantEnabled && !cryptoEnabled ? (
               <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#3c3c47] p-8 text-center">
                 <Clock3 className="size-8 text-[#9a9aa2]" />
                 <p className="text-sm text-[#9a9aa2]">
@@ -487,6 +555,26 @@ function DepositPage() {
                 </p>
               </div>
             )}
+          </motion.div>
+        )}
+
+        {step === 3 && crypto && (
+          <motion.div
+            key="crypto"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            className="flex flex-col items-center gap-4 text-center"
+          >
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">Pay with crypto</h1>
+            <p className="text-base font-semibold" style={{ color: GOLD }}>
+              {money(amount)} FCFA
+            </p>
+            <p className="text-sm text-[#c8c8d0]">
+              You will be redirected to the secure NOWPayments checkout to pay in BTC, ETH, USDT or
+              any supported coin. Your wallet is credited automatically once the network confirms
+              the payment.
+            </p>
           </motion.div>
         )}
 
@@ -673,11 +761,18 @@ function DepositPage() {
             )}
             <Button
               onClick={
-                step === 3 && instant ? payInstantly : step < 4 ? next : submitProof
+                step === 3 && instant
+                  ? payInstantly
+                  : step === 3 && crypto
+                    ? payWithCrypto
+                    : step < 4
+                      ? next
+                      : submitProof
               }
               disabled={
-                (step === 2 && activeMethods.length === 0 && !instantEnabled) ||
+                (step === 2 && activeMethods.length === 0 && !instantEnabled && !cryptoEnabled) ||
                 (step === 3 && instant && charging) ||
+                (step === 3 && crypto && cryptoBusy) ||
                 (step === 4 && (!uploadedFile || submitting))
               }
               className="h-12 flex-1 rounded-xl text-base font-bold hover:opacity-90"
@@ -689,13 +784,17 @@ function DepositPage() {
                   : charging
                     ? "Starting…"
                     : "Pay now"
-                : step === 3
-                ? "I have paid"
-                : step === 4
-                  ? submitting
-                    ? "Submitting…"
-                    : "Submit proof"
-                  : "Continue"}
+                : step === 3 && crypto
+                  ? cryptoBusy
+                    ? "Redirecting…"
+                    : "Pay with crypto"
+                  : step === 3
+                    ? "I have paid"
+                    : step === 4
+                      ? submitting
+                        ? "Submitting…"
+                        : "Submit proof"
+                      : "Continue"}
             </Button>
           </div>
         </div>

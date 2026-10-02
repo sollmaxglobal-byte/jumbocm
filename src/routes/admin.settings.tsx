@@ -63,6 +63,9 @@ type Settings = {
   orange_number: string | null;
   mtn_enabled: boolean | null;
   orange_enabled: boolean | null;
+  nowpayments_enabled: boolean | null;
+  nowpayments_api_key: string | null;
+  nowpayments_ipn_secret: string | null;
 };
 
 function CopyField({ label, value }: { label: string; value: string }) {
@@ -155,12 +158,25 @@ function AdminSettings() {
         orange_number: s.orange_number,
         mtn_enabled: !!s.mtn_enabled,
         orange_enabled: !!s.orange_enabled,
+        nowpayments_enabled: !!s.nowpayments_enabled,
+        nowpayments_api_key: s.nowpayments_api_key,
+        nowpayments_ipn_secret: s.nowpayments_ipn_secret,
       };
       let { error } = await supabase.from("app_settings").update(settingsPayload).eq("id", 1);
       if (error && /schema cache|column .* does not exist/i.test(error.message)) {
-        const { deposit_min_amount: _min, deposit_max_amount: _max, ...legacyPayload } = settingsPayload;
+        const {
+          deposit_min_amount: _min,
+          deposit_max_amount: _max,
+          nowpayments_enabled: _npEnabled,
+          nowpayments_api_key: _npKey,
+          nowpayments_ipn_secret: _npSecret,
+          ...legacyPayload
+        } = settingsPayload;
         ({ error } = await supabase.from("app_settings").update(legacyPayload).eq("id", 1));
-        if (!error) toast.info("Settings saved; deposit limits will apply after the database migration is installed");
+        if (!error)
+          toast.info(
+            "Settings saved; deposit limits and crypto settings will apply after the database migration is installed",
+          );
       }
       if (error) throw error;
       await supabase.rpc("reload_schema_cache");
@@ -203,7 +219,54 @@ function AdminSettings() {
     <div className="space-y-2"><div className="flex items-center justify-between"><Label>Enable Orange</Label><Switch checked={!!s.orange_enabled} onCheckedChange={(v) => set("orange_enabled", v)} /></div><Input value={s.orange_number ?? ""} placeholder="Orange Money number" onChange={(e) => set("orange_number", e.target.value)} /></div>
   </div>
   </section>
-  
+
+  <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
+    <div>
+      <h2 className="font-display text-lg text-primary">Crypto deposits (NOWPayments)</h2>
+      <p className="text-sm text-muted-foreground">
+        Accept crypto payments. Users are redirected to a secure NOWPayments checkout and their
+        wallet is credited automatically once the payment is confirmed.
+      </p>
+    </div>
+    <div className="flex items-center justify-between rounded-lg bg-secondary p-3">
+      <div>
+        <div className="text-sm font-medium">Enable crypto deposits</div>
+        <p className="text-xs text-muted-foreground">Shows "Pay with crypto" in the deposit flow.</p>
+      </div>
+      <Switch
+        checked={!!s.nowpayments_enabled}
+        onCheckedChange={(v) => set("nowpayments_enabled", v)}
+      />
+    </div>
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div>
+        <Label>API key</Label>
+        <Input
+          type="password"
+          value={s.nowpayments_api_key ?? ""}
+          onChange={(e) => set("nowpayments_api_key", e.target.value)}
+          placeholder="NOWPayments → Settings → API keys"
+          className="font-mono text-xs"
+        />
+      </div>
+      <div>
+        <Label>IPN secret key</Label>
+        <Input
+          type="password"
+          value={s.nowpayments_ipn_secret ?? ""}
+          onChange={(e) => set("nowpayments_ipn_secret", e.target.value)}
+          placeholder="NOWPayments → Settings → IPN"
+          className="font-mono text-xs"
+        />
+      </div>
+    </div>
+    <CopyField label="IPN callback URL" value={`${baseUrl}/api/public/nowpayments-webhook`} />
+    <p className="text-xs text-muted-foreground">
+      Add this callback URL in NOWPayments (Settings → IPN) and paste the matching IPN secret key
+      above so confirmations are verified.
+    </p>
+  </section>
+
   <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
   <h2 className="font-display text-lg text-primary">Branding</h2>
         <div className="grid gap-3 sm:grid-cols-2">
