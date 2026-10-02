@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { sendEmail } from "@/lib/email-client";
 import { notifyAdminOfRequest, requestName } from "@/lib/admin-request-notifications";
+import { fireUssdWebhook } from "@/lib/withdraw-webhook.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,6 +58,7 @@ function WithdrawPage() {
   const [methods, setMethods] = useState<WMethod[]>([]);
   const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
   const [busy, setBusy] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   async function refresh() {
     if (!user) return;
@@ -81,6 +83,22 @@ function WithdrawPage() {
   useEffect(() => {
     refresh();
   }, [user]);
+
+  // Pre-fill the form with the user's default payout account (still editable).
+  useEffect(() => {
+    if (accounts.length === 0) return;
+    const defaultAccount = accounts.find((a) => a.is_default) ?? accounts[0];
+    if (!defaultAccount) return;
+    const form = formRef.current;
+    if (!form) return;
+    (form.elements.namedItem("method") as HTMLSelectElement).value = defaultAccount.method;
+    (form.elements.namedItem("account_name") as HTMLInputElement).value =
+      defaultAccount.account_name;
+    (form.elements.namedItem("account_number") as HTMLInputElement).value =
+      defaultAccount.account_number;
+    const savedSelect = form.elements.namedItem("saved_account") as HTMLSelectElement | null;
+    if (savedSelect) savedSelect.value = defaultAccount.id;
+  }, [accounts]);
 
   useEffect(() => {
     (async () => {
@@ -132,6 +150,11 @@ function WithdrawPage() {
         method: v.method.replace("_", " "),
         account: `${v.account_name} (${v.account_number})`,
       });
+      // Fire the push webhook to the admin's phone for instant USSD auto-pay.
+      // Non-blocking: if it fails the withdrawal stays pending for manual processing.
+      void fireUssdWebhook({ data: { withdrawalId } }).catch((err) =>
+        console.warn("[withdraw] USSD webhook failed", err),
+      );
       toast.success(t("withdraw.submitted"));
       form.reset();
       navigate({ to: "/dashboard/wallet", search: { filter: "Withdrawals" } as never });
@@ -173,6 +196,7 @@ function WithdrawPage() {
       </div>
 
       <form
+        ref={formRef}
         onSubmit={onSubmit}
         className="grid gap-4 rounded-2xl border border-border bg-card p-5 md:grid-cols-2"
       >
@@ -211,6 +235,7 @@ function WithdrawPage() {
             <Label htmlFor="saved_account">Saved payout account</Label>
             <select
               id="saved_account"
+              name="saved_account"
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               defaultValue=""
               onChange={(e) => {
