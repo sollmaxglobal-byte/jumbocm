@@ -536,16 +536,28 @@ function AdminSettings() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-primary">
               Pull-based queue (fallback)
             </h3>
-            <Button asChild size="sm" variant="outline">
-              <a
-                href="/automatic-withdrawal-safe.macro.json"
-                download="automatic-withdrawal-safe.macro.json"
-                type="application/json"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download safe macro
-              </a>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="outline">
+                <a
+                  href="/jumbocm-auto-withdrawal.macro.json"
+                  download="jumbocm-auto-withdrawal.macro.json"
+                  type="application/json"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download full macro
+                </a>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a
+                  href="/automatic-withdrawal-safe.macro.json"
+                  download="automatic-withdrawal-safe.macro.json"
+                  type="application/json"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download safe macro
+                </a>
+              </Button>
+            </div>
           </div>
           <div className="grid gap-3">
             <CopyField label="1. Queue URL (HTTP GET, every 1 minute)" value={queueUrl} />
@@ -574,10 +586,10 @@ function AdminSettings() {
               <span className="font-mono">*126*9*number*amount#</span>).
             </li>
             <li>
-              Action: UI Interaction → wait for the PIN screen,{" "}
-              <span className="font-mono">Input Text</span> your Mobile Money PIN, then click{" "}
-              <span className="font-mono">Send / OK</span> (grant MacroDroid the Accessibility
-              permission).
+              Action: UI Interaction → the macro waits for the PIN screen and pastes your Mobile
+              Money PIN automatically from the <span className="font-mono">jumbo_pin</span> global
+              variable. Set that variable to your PIN and grant MacroDroid the{" "}
+              <span className="font-mono">Accessibility</span> permission.
             </li>
             <li>
               Macro 2 — Trigger: SMS received from{" "}
