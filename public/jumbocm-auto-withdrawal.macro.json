@@ -495,7 +495,7 @@
       ],
       "m_constraintList": [],
       "m_category": "JumboCM",
-      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made mobile-money USSD code for the next pending payout, then types your Mobile Money PIN automatically from the jumbo_pin variable. Set jumbo_secret to the Header value shown in Admin > Settings, set jumbo_pin to your Mobile Money PIN, and grant MacroDroid the Accessibility permission.",
+      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made mobile-money USSD code for the next pending payout, then types your Mobile Money PIN automatically. Download this macro from Admin > Settings > Automatic withdrawals so your Site URL, webhook secret and PIN are already filled in, then grant MacroDroid the Accessibility permission.",
       "m_name": "JumboCM Auto Withdrawal (Queue)",
       "m_excludeLog": false,
       "m_isOrCondition": false,

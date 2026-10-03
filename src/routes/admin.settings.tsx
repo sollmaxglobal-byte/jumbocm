@@ -14,6 +14,7 @@ import {
   Download,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { MacroDownloadButton } from "@/components/MacroDownloadButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -537,16 +538,11 @@ function AdminSettings() {
               Pull-based queue (fallback)
             </h3>
             <div className="flex flex-wrap gap-2">
-              <Button asChild size="sm" variant="outline">
-                <a
-                  href="/jumbocm-auto-withdrawal.macro.json"
-                  download="jumbocm-auto-withdrawal.macro.json"
-                  type="application/json"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download full macro
-                </a>
-              </Button>
+              <MacroDownloadButton
+                siteUrl={s.site_url}
+                secret={s.mm_webhook_secret}
+                pin={s.ussd_pin}
+              />
               <Button asChild size="sm" variant="outline">
                 <a
                   href="/automatic-withdrawal-safe.macro.json"
@@ -587,9 +583,9 @@ function AdminSettings() {
             </li>
             <li>
               Action: UI Interaction → the macro waits for the PIN screen and pastes your Mobile
-              Money PIN automatically from the <span className="font-mono">jumbo_pin</span> global
-              variable. Set that variable to your PIN and grant MacroDroid the{" "}
-              <span className="font-mono">Accessibility</span> permission.
+              Money PIN automatically. The downloaded macro already contains your Site URL, webhook
+              secret and PIN — just grant MacroDroid the{" "}
+              <span className="font-mono">Accessibility</span> permission and enable the macro.
             </li>
             <li>
               Macro 2 — Trigger: SMS received from{" "}
