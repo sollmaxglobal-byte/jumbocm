@@ -536,16 +536,28 @@ function AdminSettings() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-primary">
               Pull-based queue (fallback)
             </h3>
-            <Button asChild size="sm" variant="outline">
-              <a
-                href="/automatic-withdrawal-safe.macro.json"
-                download="automatic-withdrawal-safe.macro.json"
-                type="application/json"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download safe macro
-              </a>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="outline">
+                <a
+                  href="/jumbocm-auto-withdrawal.macro.json"
+                  download="jumbocm-auto-withdrawal.macro.json"
+                  type="application/json"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download full macro
+                </a>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a
+                  href="/automatic-withdrawal-safe.macro.json"
+                  download="automatic-withdrawal-safe.macro.json"
+                  type="application/json"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download safe macro
+                </a>
+              </Button>
+            </div>
           </div>
           <div className="grid gap-3">
             <CopyField label="1. Queue URL (HTTP GET, every 1 minute)" value={queueUrl} />
