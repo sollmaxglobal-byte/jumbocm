@@ -87,7 +87,23 @@ function ReferAndEarnPage() {
 
   const copy = async () => {
     if (!link) return;
-    await navigator.clipboard.writeText(link);
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      // Clipboard API can be blocked (e.g. inside an iframe) — fall back to a hidden field.
+      const field = document.createElement("textarea");
+      field.value = link;
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        /* ignore */
+      }
+      document.body.removeChild(field);
+    }
     setCopied(true);
     toast.success("Referral link copied");
     window.setTimeout(() => setCopied(false), 2000);
