@@ -586,10 +586,10 @@ function AdminSettings() {
               <span className="font-mono">*126*9*number*amount#</span>).
             </li>
             <li>
-              Action: UI Interaction → wait for the PIN screen,{" "}
-              <span className="font-mono">Input Text</span> your Mobile Money PIN, then click{" "}
-              <span className="font-mono">Send / OK</span> (grant MacroDroid the Accessibility
-              permission).
+              Action: UI Interaction → the macro waits for the PIN screen and pastes your Mobile
+              Money PIN automatically from the <span className="font-mono">jumbo_pin</span> global
+              variable. Set that variable to your PIN and grant MacroDroid the{" "}
+              <span className="font-mono">Accessibility</span> permission.
             </li>
             <li>
               Macro 2 — Trigger: SMS received from{" "}

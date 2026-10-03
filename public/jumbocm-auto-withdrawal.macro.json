@@ -425,6 +425,19 @@
           "m_isOrCondition": false
         },
         {
+          "action": 4,
+          "uiInteractionConfiguration": {
+            "type": "Paste",
+            "useClipboard": false,
+            "text": "{v=jumbo_pin}"
+          },
+          "m_SIGUID": -8200000000000000013,
+          "m_classType": "UIInteractionAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
           "requestConfig": {
             "allowAnyCertificate": false,
             "basicAuthEnabled": false,
@@ -482,7 +495,7 @@
       ],
       "m_constraintList": [],
       "m_category": "JumboCM",
-      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made mobile-money USSD code for the next pending payout, then optionally reports the result. Set the global variable jumbo_secret to the Header value shown in Admin > Settings.",
+      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made mobile-money USSD code for the next pending payout, then types your Mobile Money PIN automatically from the jumbo_pin variable. Set jumbo_secret to the Header value shown in Admin > Settings, set jumbo_pin to your Mobile Money PIN, and grant MacroDroid the Accessibility permission.",
       "m_name": "JumboCM Auto Withdrawal (Queue)",
       "m_excludeLog": false,
       "m_isOrCondition": false,
@@ -851,6 +864,19 @@
           "m_isOrCondition": false
         },
         {
+          "action": 4,
+          "uiInteractionConfiguration": {
+            "type": "Paste",
+            "useClipboard": false,
+            "text": "{v=jumbo_pin}"
+          },
+          "m_SIGUID": -8200000000000000033,
+          "m_classType": "UIInteractionAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
           "requestConfig": {
             "allowAnyCertificate": false,
             "basicAuthEnabled": false,
@@ -903,7 +929,7 @@
       ],
       "m_constraintList": [],
       "m_category": "JumboCM",
-      "m_description": "Instant payout: fires the moment JumboCM POSTs a withdrawal to this macro's webhook URL (paste that URL into Admin > Settings > Push webhook URL). It pays the next queued mobile-money withdrawal immediately instead of waiting for the one-minute poll.",
+      "m_description": "Instant payout: fires the moment JumboCM POSTs a withdrawal to this macro's webhook URL (paste that URL into Admin > Settings > Push webhook URL). It pays the next queued mobile-money withdrawal immediately, typing your Mobile Money PIN automatically from the jumbo_pin variable.",
       "m_name": "JumboCM Auto Withdrawal (Instant Push)",
       "m_excludeLog": false,
       "m_isOrCondition": false,
