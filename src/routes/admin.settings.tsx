@@ -96,6 +96,9 @@ function AdminSettings() {
   const [reshow, setReshow] = useState(true);
   const [showSecret, setShowSecret] = useState(false);
   const [showPin, setShowPin] = useState(false);
+  const [phoneLog, setPhoneLog] = useState<
+    Array<{ withdrawal_id: string | null; step: string; detail: string | null; created_at: string }>
+  >([]);
 
   async function load() {
     // Full row (including SMTP credentials) is admin-only via SECURITY DEFINER RPC.
@@ -104,8 +107,21 @@ function AdminSettings() {
     const row = Array.isArray(data) ? data[0] : data;
     setS((row as Settings) ?? ({ id: 1 } as Settings));
   }
+
+  async function loadPhoneLog() {
+    // New table — not in the generated types yet.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("auto_withdraw_logs")
+      .select("withdrawal_id,step,detail,created_at")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (!error) setPhoneLog(data ?? []);
+  }
+
   useEffect(() => {
     load();
+    loadPhoneLog();
   }, []);
 
   async function save() {
