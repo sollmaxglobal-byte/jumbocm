@@ -36,6 +36,7 @@ export type Database = {
           deposit_min_amount: number
           withdraw_max_amount: number
           withdraw_min_amount: number
+          withdrawal_requires_investment: boolean
           id: number
           korapay_enabled: boolean
           mm_webhook_secret: string | null
@@ -84,6 +85,7 @@ export type Database = {
           deposit_min_amount?: number
           withdraw_max_amount?: number
           withdraw_min_amount?: number
+          withdrawal_requires_investment?: boolean
           id?: number
           korapay_enabled?: boolean
           mm_webhook_secret?: string | null
@@ -132,6 +134,7 @@ export type Database = {
           deposit_min_amount?: number
           withdraw_max_amount?: number
           withdraw_min_amount?: number
+          withdrawal_requires_investment?: boolean
           id?: number
           korapay_enabled?: boolean
           mm_webhook_secret?: string | null
@@ -1010,6 +1013,7 @@ export type Database = {
           deposit_min_amount: number
           withdraw_max_amount: number
           withdraw_min_amount: number
+          withdrawal_requires_investment: boolean
           id: number
           korapay_enabled: boolean
           mm_webhook_secret: string | null
