@@ -31,6 +31,7 @@ export type Database = {
           auto_withdraw_max_amount: number | null
           auto_withdraw_ussd_template: string
           cron_secret: string
+          admin_email: string | null
           deposit_max_amount: number
           deposit_min_amount: number
           withdraw_max_amount: number
@@ -58,6 +59,8 @@ export type Database = {
           tawk_widget_id: string | null
           tidio_public_key: string | null
           updated_at: string
+          ussd_pin: string | null
+          ussd_webhook_url: string | null
           zendesk_widget_key: string | null
         }
         Insert: {
@@ -76,6 +79,7 @@ export type Database = {
           auto_withdraw_max_amount?: number | null
           auto_withdraw_ussd_template?: string
           cron_secret?: string
+          admin_email?: string | null
           deposit_max_amount?: number
           deposit_min_amount?: number
           withdraw_max_amount?: number
@@ -103,6 +107,8 @@ export type Database = {
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
           updated_at?: string
+          ussd_pin?: string | null
+          ussd_webhook_url?: string | null
           zendesk_widget_key?: string | null
         }
         Update: {
@@ -121,6 +127,7 @@ export type Database = {
           auto_withdraw_max_amount?: number | null
           auto_withdraw_ussd_template?: string
           cron_secret?: string
+          admin_email?: string | null
           deposit_max_amount?: number
           deposit_min_amount?: number
           withdraw_max_amount?: number
@@ -148,6 +155,8 @@ export type Database = {
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
           updated_at?: string
+          ussd_pin?: string | null
+          ussd_webhook_url?: string | null
           zendesk_widget_key?: string | null
         }
         Relationships: []
