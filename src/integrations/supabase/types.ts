@@ -33,6 +33,8 @@ export type Database = {
           cron_secret: string
           deposit_max_amount: number
           deposit_min_amount: number
+          withdraw_max_amount: number
+          withdraw_min_amount: number
           id: number
           korapay_enabled: boolean
           mm_webhook_secret: string | null
@@ -76,6 +78,8 @@ export type Database = {
           cron_secret?: string
           deposit_max_amount?: number
           deposit_min_amount?: number
+          withdraw_max_amount?: number
+          withdraw_min_amount?: number
           id?: number
           korapay_enabled?: boolean
           mm_webhook_secret?: string | null
@@ -119,6 +123,8 @@ export type Database = {
           cron_secret?: string
           deposit_max_amount?: number
           deposit_min_amount?: number
+          withdraw_max_amount?: number
+          withdraw_min_amount?: number
           id?: number
           korapay_enabled?: boolean
           mm_webhook_secret?: string | null
@@ -850,6 +856,8 @@ export type Database = {
           announcement_version: number | null
           deposit_max_amount: number | null
           deposit_min_amount: number | null
+          withdraw_max_amount: number | null
+          withdraw_min_amount: number | null
           id: number | null
           korapay_enabled: boolean | null
           mtn_enabled: boolean | null
@@ -876,6 +884,8 @@ export type Database = {
           announcement_version?: number | null
           deposit_max_amount?: number | null
           deposit_min_amount?: number | null
+          withdraw_max_amount?: number | null
+          withdraw_min_amount?: number | null
           id?: number | null
           korapay_enabled?: boolean | null
           mtn_enabled?: boolean | null
@@ -902,6 +912,8 @@ export type Database = {
           announcement_version?: number | null
           deposit_max_amount?: number | null
           deposit_min_amount?: number | null
+          withdraw_max_amount?: number | null
+          withdraw_min_amount?: number | null
           id?: number | null
           korapay_enabled?: boolean | null
           mtn_enabled?: boolean | null
@@ -987,6 +999,8 @@ export type Database = {
           cron_secret: string
           deposit_max_amount: number
           deposit_min_amount: number
+          withdraw_max_amount: number
+          withdraw_min_amount: number
           id: number
           korapay_enabled: boolean
           mm_webhook_secret: string | null
