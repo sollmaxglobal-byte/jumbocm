@@ -23,7 +23,11 @@ export const Route = createFileRoute("/api/public/withdraw-result")({
 
         let payload: z.infer<typeof bodySchema>;
         try {
-          payload = bodySchema.parse(await request.json());
+          // MacroDroid inserts the raw screen text, so line breaks can arrive
+          // unescaped and make the JSON invalid. Escape them before parsing, the
+          // same way the SMS forwarder endpoint does.
+          const raw = (await request.text()).replace(/\r?\n/g, "\\n").replace(/\t/g, " ");
+          payload = bodySchema.parse(JSON.parse(raw));
         } catch {
           return new Response(JSON.stringify({ error: "Invalid payload" }), {
             status: 400,
@@ -67,8 +71,12 @@ export const Route = createFileRoute("/api/public/withdraw-result")({
                 headers: { "content-type": "application/json" },
               });
             }
-            const { tryConfirmWithdrawalFromSms } = await import("@/lib/withdraw-auto.server");
-            const matched = await tryConfirmWithdrawalFromSms(haystack);
+            const { confirmWithdrawalFromScreen, logStep } = await import(
+              "@/lib/withdraw-auto.server"
+            );
+            // Keep the raw screen text so an unrecognised result is diagnosable.
+            await logStep("", "screen", haystack.slice(0, 380));
+            const matched = await confirmWithdrawalFromScreen(payload.code, payload.text);
             return Response.json({ ok: !!matched, id: matched });
           }
 
