@@ -8,6 +8,7 @@
 
 - Automatic withdrawals: the phone's MacroDroid macro polls the **production** site (`site_url`, e.g. jumbocm.vercel.app), not this preview, so server-route changes only reach the phone after they are merged and deployed; database migrations take effect immediately because the database is shared. Never run `select claim_auto_withdrawal()` to check the function: calling it claims (dispatches) a real payout. Inspect the function with `pg_get_functiondef` instead.
 - To apply migrations with psql, strip the surrounding quotes and the `supa=` query parameter from `POSTGRES_URL_NON_POOLING` first, because psql rejects them with "invalid connection option".
+- The MTN USSD code is `*126*9*{phone}*{amount}#` — destination number before amount (migration `20261004120000_phone_first_ussd_sms_approval.sql`); the amount-first form is rejected by the MTN menu. A payout is only approved when MTN's confirmation SMS reaches `/api/public/mm-sms` (`tryConfirmWithdrawalFromSms`), so the macro's `withdraw-result` action stays disabled and `claim_auto_withdrawal` leaves the withdrawal `dispatched`.
 
 ## Dev environment (Base44)
 

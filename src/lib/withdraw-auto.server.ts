@@ -136,7 +136,7 @@ export async function failWithdrawal(id: string, note?: string | null) {
 }
 
 const SUCCESS_HINT =
-  /(successful|success|effectu[ée]|r[ée]ussi|transferred|transf[ée]r|envoy[ée]|sent to|confirm)/i;
+  /(successful|success|succ[èe]s|effectu[ée]|r[ée]ussi|transferred|transf[ée]r|envoy[ée]|sent to|confirm)/i;
 const FAILURE_HINT = /(insufficient|insuffisant|failed|[ée]chou|not enough|cannot|impossible)/i;
 
 /**
