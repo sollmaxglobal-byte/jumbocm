@@ -61,6 +61,7 @@ type Settings = {
   deposit_max_amount: number | null;
   withdraw_min_amount: number | null;
   withdraw_max_amount: number | null;
+  withdrawal_requires_investment: boolean | null;
   mtn_number: string | null;
   orange_number: string | null;
   mtn_enabled: boolean | null;
@@ -105,7 +106,14 @@ function AdminSettings() {
   async function load() {
     // Full row (including SMTP credentials) is admin-only via SECURITY DEFINER RPC.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (supabase as any).rpc("get_app_settings_admin");
+    const { data, error } = await (supabase as any).rpc("get_app_settings_admin");
+    if (error) {
+      // Surface a real failure instead of silently showing default values, which
+      // makes saved settings (e.g. withdrawal limits) look like they disappeared.
+      toast.error(`Could not load settings: ${error.message}`);
+      setS({ id: 1 } as Settings);
+      return;
+    }
     const row = Array.isArray(data) ? data[0] : data;
     setS((row as Settings) ?? ({ id: 1 } as Settings));
   }
@@ -174,6 +182,7 @@ function AdminSettings() {
         deposit_max_amount: Number(s.deposit_max_amount) || 10000000,
         withdraw_min_amount: Number(s.withdraw_min_amount) || 250,
         withdraw_max_amount: Number(s.withdraw_max_amount) || 50000000,
+        withdrawal_requires_investment: s.withdrawal_requires_investment ?? true,
         mtn_number: s.mtn_number,
         orange_number: s.orange_number,
         mtn_enabled: !!s.mtn_enabled,
@@ -189,6 +198,7 @@ function AdminSettings() {
           deposit_max_amount: _max,
           withdraw_min_amount: _wmin,
           withdraw_max_amount: _wmax,
+          withdrawal_requires_investment: _wri,
           nowpayments_enabled: _npEnabled,
           nowpayments_api_key: _npKey,
           nowpayments_ipn_secret: _npSecret,
@@ -702,9 +712,10 @@ function AdminSettings() {
               When enabled, users without an active plan cannot submit withdrawals.
             </p>
           </div>
-  <p className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-    Active-investment withdrawal enforcement is temporarily unavailable until the database migration is applied.
-  </p>
+          <Switch
+            checked={s.withdrawal_requires_investment ?? true}
+            onCheckedChange={(v) => set("withdrawal_requires_investment", v)}
+          />
         </div>
         <p className="text-xs text-muted-foreground">
           Use the Users page to disable withdrawals for an individual account.
