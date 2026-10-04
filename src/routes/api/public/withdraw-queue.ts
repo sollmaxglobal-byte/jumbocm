@@ -1,13 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
- * MacroDroid polls this endpoint. It returns the next MTN withdrawal to pay,
- * with the ready-to-dial USSD code, or {"claimed":false} when there is nothing.
+ * MacroDroid polls this endpoint.
+ *
+ * Default (no query param): JSON `{claimed, code, ...}` / `{claimed:false}`.
+ * `?mode=check` — plain text `true`/`false`, does NOT claim anything.
+ * `?mode=code`  — plain text: the ready-to-dial USSD code, or `NONE`.
+ *
+ * The phone macro uses `?mode=check` first (so it can branch on a plain string
+ * instead of MacroDroid's unreliable JSON dictionary magic text), then `?mode=code`.
  */
 async function handle(request: Request) {
   const { secretMatches } = await import("@/lib/deposit-verify.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { claimNext } = await import("@/lib/withdraw-auto.server");
+  const { claimNext, hasEligible } = await import("@/lib/withdraw-auto.server");
+  const mode = new URL(request.url).searchParams.get("mode");
 
   let bodySecret: string | null = null;
   if (request.method === "POST") {
@@ -40,7 +47,18 @@ async function handle(request: Request) {
   }
 
   try {
+    if (mode === "check") {
+      const ok = await hasEligible();
+      return new Response(ok ? "true" : "false", {
+        headers: { "content-type": "text/plain" },
+      });
+    }
     const result = await claimNext();
+    if (mode === "code") {
+      return new Response(result.claimed ? result.code : "NONE", {
+        headers: { "content-type": "text/plain" },
+      });
+    }
     return Response.json(result);
   } catch (err) {
     console.error("[withdraw-queue] failed", err);
