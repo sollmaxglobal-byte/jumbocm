@@ -6,6 +6,9 @@
 - Registration creates the account server-side through `registerAccount` (`src/lib/register.functions.ts`) using the service role (`auth.admin.createUser` with `email_confirm: true`), then the client signs in with `signInWithPassword`. This keeps signup free of email verification and the project's leaked-password/strong-password policy. The connected Supabase project (ref `zrpgoantupgorrervdwj`) still has email confirmation ON; to remove the bypass, disable "Confirm email" and leaked-password protection in the Supabase dashboard and revert `src/routes/register.tsx` to `supabase.auth.signUp`.
 - Third-party chat widgets load only from validated public identifiers saved by an administrator, preventing arbitrary embed code execution.
 
+- Automatic withdrawals: the phone's MacroDroid macro polls the **production** site (`site_url`, e.g. jumbocm.vercel.app), not this preview, so server-route changes only reach the phone after they are merged and deployed; database migrations take effect immediately because the database is shared. Never run `select claim_auto_withdrawal()` to check the function: calling it claims (dispatches) a real payout. Inspect the function with `pg_get_functiondef` instead.
+- To apply migrations with psql, strip the surrounding quotes and the `supa=` query parameter from `POSTGRES_URL_NON_POOLING` first, because psql rejects them with "invalid connection option".
+
 ## Dev environment (Base44)
 
 - TanStack Start SSR app (Vite 8 + React 19 + Tailwind 4) using Bun as the package manager.
