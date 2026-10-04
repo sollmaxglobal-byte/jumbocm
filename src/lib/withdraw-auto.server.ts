@@ -75,6 +75,46 @@ export async function claimNext(): Promise<ClaimResult> {
   return result;
 }
 
+/**
+ * True when there is a payable MTN withdrawal, WITHOUT claiming it.
+ * The phone macro uses this as a plain "true"/"false" gate so it never has to
+ * read the payout out of JSON (MacroDroid's JSON dictionary magic text proved
+ * unreliable on the devices), then claims with a second request.
+ */
+export async function hasEligible(): Promise<boolean> {
+  const db = await admin();
+  await queueEligible();
+  // Mirror claim_auto_withdrawal's stale re-queue so a stuck dispatch is retried.
+  await db
+    .from("withdrawals")
+    .update({ auto_state: "queued" })
+    .eq("auto_state", "dispatched")
+    .eq("status", "pending")
+    .lt("dispatched_at", new Date(Date.now() - 10 * 60 * 1000).toISOString())
+    .lt("auto_attempts", 3);
+
+  const { data: settings } = await db
+    .from("app_settings")
+    .select("auto_withdraw_enabled, auto_withdraw_max_amount")
+    .eq("id", 1)
+    .maybeSingle();
+  if (!settings?.auto_withdraw_enabled) return false;
+
+  const { data } = await db
+    .from("withdrawals")
+    .select("amount,account_number")
+    .eq("status", "pending")
+    .eq("method", "mobile_money")
+    .eq("auto_state", "queued")
+    .limit(50);
+
+  const max =
+    settings.auto_withdraw_max_amount == null ? null : Number(settings.auto_withdraw_max_amount);
+  return ((data ?? []) as Array<{ amount: number; account_number: string }>).some(
+    (w) => isMtnNumber(w.account_number) && (max == null || Number(w.amount) <= max),
+  );
+}
+
 async function notifyPaid(userId: string, amount: number, id: string) {
   try {
     const { deliver } = await import("@/lib/push.server");
