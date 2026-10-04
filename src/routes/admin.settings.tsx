@@ -188,6 +188,39 @@ function AdminSettings() {
     }
   }
 
+  async function downloadMacro() {
+    const secret = s?.mm_webhook_secret?.trim() ?? "";
+    if (secret.length < 24) {
+      toast.error("Save a webhook secret (at least 24 characters) before downloading the macro");
+      return;
+    }
+    try {
+      const res = await fetch("/jumbocm-auto-withdrawal.macro.json");
+      const macro = (await res.json()) as {
+        variables?: Array<{ m_name?: string; m_stringValue?: string }>;
+      };
+      const site = (s?.site_url || "https://jumbocm.vercel.app").replace(/\/$/, "");
+      const vars = macro.variables ?? [];
+      const fill = (name: string, value: string) => {
+        const v = vars.find((x) => x.m_name === name);
+        if (v) v.m_stringValue = value;
+      };
+      fill("jumbo_site", site);
+      fill("jumbo_secret", secret);
+      fill("jumbo_pin", s?.ussd_pin ?? "");
+      const blob = new Blob([JSON.stringify(macro, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "jumbocm-auto-withdrawal.macro.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Macro downloaded with your secret and PIN built in");
+    } catch {
+      toast.error("Could not build the macro file");
+    }
+  }
+
   if (!s) return <div className="text-muted-foreground">Loading…</div>;
 
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setS({ ...s, [k]: v });
@@ -537,15 +570,9 @@ function AdminSettings() {
               Pull-based queue (fallback)
             </h3>
             <div className="flex flex-wrap gap-2">
-              <Button asChild size="sm" variant="outline">
-                <a
-                  href="/jumbocm-auto-withdrawal.macro.json"
-                  download="jumbocm-auto-withdrawal.macro.json"
-                  type="application/json"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download full macro
-                </a>
+              <Button type="button" size="sm" variant="outline" onClick={downloadMacro}>
+                <Download className="mr-2 h-4 w-4" />
+                Download full macro
               </Button>
               <Button asChild size="sm" variant="outline">
                 <a
@@ -560,9 +587,11 @@ function AdminSettings() {
             </div>
           </div>
           <div className="grid gap-3">
-            <CopyField label="1. Queue URL (HTTP GET, every 1 minute)" value={queueUrl} />
-            <CopyField label="Header name" value="x-mm-secret" />
-            <CopyField label="Header value" value={s.mm_webhook_secret ?? ""} />
+            <CopyField label="1. Queue URL (HTTP POST, every 1 minute)" value={queueUrl} />
+            <CopyField
+              label="Queue JSON body"
+              value={`{"secret":"${s.mm_webhook_secret ?? ""}"}`}
+            />
             <CopyField label="2. Result URL (HTTP POST)" value={resultUrl} />
             <CopyField label="Result JSON body" value={'{"id":"{lv=wid}","status":"success"}'} />
           </div>
@@ -571,8 +600,9 @@ function AdminSettings() {
               Macro 1 — Trigger: <span className="font-mono">Regular Interval, 1 minute</span>.
             </li>
             <li>
-              Action: <span className="font-mono">HTTP Request → GET</span> the Queue URL with the
-              header above, save response to variable <span className="font-mono">resp</span>.
+              Action: <span className="font-mono">HTTP Request → POST</span> the Queue URL with the
+              JSON body above (content type <span className="font-mono">application/json</span>),
+              save response to variable <span className="font-mono">resp</span>.
             </li>
             <li>
               Action: JSON parse <span className="font-mono">resp</span> → store{" "}
