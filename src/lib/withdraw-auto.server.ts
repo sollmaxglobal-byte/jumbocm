@@ -175,9 +175,21 @@ export async function failWithdrawal(id: string, note?: string | null) {
   return { ok: !error, reason: error?.message ?? "" };
 }
 
+// Incoming-SMS wording (fallback path). Kept conservative so an unrelated deposit
+// SMS mentioning the same number/amount can never close a payout.
 const SUCCESS_HINT =
-  /(successful|success|succ[èe]s|effectu[ée]|r[ée]ussi|transferred|transf[ée]r|envoy[ée]|sent to|confirm)/i;
+  /(successful|success|succ[èe]s|effectu[ée]|r[ée]ussi|transferred|transf[ée]r|envoy[ée]|sent to)/i;
 const FAILURE_HINT = /(insufficient|insuffisant|failed|[ée]chou|not enough|cannot|impossible)/i;
+
+// On-screen USSD result wording (primary path). The screen is the authoritative
+// result shown right after the PIN, so it may be read a little more liberally —
+// but a PIN/confirmation prompt must never be mistaken for success.
+const SCREEN_SUCCESS_HINT =
+  /(successful|success|succ[èe]s|effectu[ée]|r[ée]ussi|transf[ée]r|transfer|envoy[ée]|sent|valid[ée]|d[ée]bit[ée])/i;
+const SCREEN_FAILURE_HINT =
+  /(insufficient|insuffisant|failed|[ée]chou|not enough|cannot|impossible|incorrect|invalide|invalid|annul|cancel|expir|erreur|refus|reject)/i;
+const PIN_PROMPT =
+  /(entrez|saisissez|composez|confirmez|veuillez entrer|code\s*pin|pin\s*code|tapez)/i;
 
 /**
  * When MTN confirms an outgoing transfer by SMS, close the matching dispatched
@@ -220,6 +232,65 @@ export async function tryConfirmWithdrawalFromSms(rawText: string): Promise<stri
 
     const ref = text.match(/\b[A-Z0-9]{8,}\b/)?.[0] ?? null;
     await completeWithdrawal(w.id, ref);
+    return w.id;
+  }
+  return null;
+}
+
+/**
+ * Resolve a dispatched withdrawal from the phone's on-screen USSD result.
+ *
+ * The dialled code (`*126*9*{phone}*{amount}#`) identifies the payout exactly, so
+ * the match never depends on the fuzzy screen text; the screen text only decides
+ * success vs failure. When the screen is unreadable the payout is flagged for
+ * manual review instead of being left `dispatched` — otherwise the 10-minute
+ * re-queue would dial it a second time and double-pay a transfer that may already
+ * have gone through.
+ */
+export async function confirmWithdrawalFromScreen(
+  code: string | null | undefined,
+  screenText: string | null | undefined,
+): Promise<string | null> {
+  const haystack = [code, screenText].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+  if (!haystack) return null;
+
+  const db = await admin();
+  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { data } = await db
+    .from("withdrawals")
+    .select("id,amount,account_number,auto_state,status,dispatched_at")
+    .eq("status", "pending")
+    .eq("auto_state", "dispatched")
+    .gte("dispatched_at", since)
+    .order("dispatched_at", { ascending: false })
+    .limit(20);
+
+  const rows = (data ?? []) as Array<{ id: string; amount: number; account_number: string }>;
+  if (!rows.length) return null;
+
+  const digitsInText = haystack.replace(/[^\d]/g, "");
+  const amounts = (haystack.match(/[\d][\d\s.,]{2,}/g) ?? [])
+    .map((a) => parseAmount(a))
+    .filter((a): a is number => a !== null);
+
+  for (const w of rows) {
+    const phone = localDigits(w.account_number);
+    const amount = Math.trunc(Number(w.amount));
+    if (!phone || !digitsInText.includes(phone)) continue;
+    if (!amounts.includes(amount)) continue;
+
+    if (SCREEN_FAILURE_HINT.test(haystack)) {
+      await failWithdrawal(w.id, "Operator reported a failure — approve manually");
+      return w.id;
+    }
+    if (SCREEN_SUCCESS_HINT.test(haystack) && !PIN_PROMPT.test(haystack)) {
+      const ref = haystack.match(/\b[A-Z0-9]{8,}\b/)?.[0] ?? null;
+      await completeWithdrawal(w.id, ref);
+      return w.id;
+    }
+    // Matched a real payout but the screen text was unreadable/ambiguous: stop the
+    // retry loop so the transfer is never dialled (and paid) a second time.
+    await failWithdrawal(w.id, "USSD result unreadable — review the payout manually");
     return w.id;
   }
   return null;
