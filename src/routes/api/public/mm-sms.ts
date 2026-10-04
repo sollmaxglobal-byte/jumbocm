@@ -24,7 +24,9 @@ export const Route = createFileRoute("/api/public/mm-sms")({
 
         let payload: z.infer<typeof bodySchema>;
         try {
-          payload = bodySchema.parse(await request.json());
+          // MacroDroid inserts the raw SMS text, so line breaks can arrive unescaped.
+          const raw = (await request.text()).replace(/\r?\n/g, "\\n").replace(/\t/g, " ");
+          payload = bodySchema.parse(JSON.parse(raw));
         } catch {
           return new Response(JSON.stringify({ error: "Invalid payload" }), {
             status: 400,

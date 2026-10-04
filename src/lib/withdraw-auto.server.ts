@@ -1,5 +1,5 @@
 // Server-only helpers for automatic MTN/Orange withdrawal payouts (Automate/MacroDroid + USSD).
-import { detectNetwork, isMtnNumber, localDigits } from "@/lib/mm-network";
+import { isMtnNumber, localDigits } from "@/lib/mm-network";
 import { parseAmount } from "@/lib/mm-parse";
 
 async function admin() {
@@ -20,7 +20,7 @@ export type ClaimResult =
       provider: "mtn" | "orange";
     };
 
-/** Flag pending mobile-money withdrawals going to an MTN or Orange number as auto-payable. */
+/** Flag pending mobile-money withdrawals going to an MTN number as auto-payable (MTN only). */
 export async function queueEligible(): Promise<number> {
   const db = await admin();
   const { data } = await db
@@ -32,10 +32,7 @@ export async function queueEligible(): Promise<number> {
     .limit(50);
 
   const ids = ((data ?? []) as Array<{ id: string; account_number: string }>)
-    .filter((w) => {
-      const net = detectNetwork(w.account_number);
-      return net === "mtn" || net === "orange";
-    })
+    .filter((w) => isMtnNumber(w.account_number))
     .map((w) => w.id);
 
   if (!ids.length) return 0;
@@ -50,10 +47,10 @@ export async function claimNext(): Promise<ClaimResult> {
   const { data, error } = await db.rpc("claim_auto_withdrawal");
   if (error) return { claimed: false, reason: error.message };
   const result = (data ?? { claimed: false, reason: "Nothing to pay" }) as ClaimResult;
-  // The RPC now returns provider; fall back to detecting it from the phone.
-  if (result.claimed && !(result as { provider?: string }).provider) {
-    (result as { provider: "mtn" | "orange" }).provider =
-      detectNetwork(result.phone) === "orange" ? "orange" : "mtn";
+  // Safety net: never hand a non-MTN number to the phone.
+  if (result.claimed && !isMtnNumber(result.phone)) {
+    await failWithdrawal(result.id, "Not an MTN number — approve manually");
+    return { claimed: false, reason: "Only MTN Mobile Money is paid automatically" };
   }
   return result;
 }

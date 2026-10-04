@@ -17,7 +17,12 @@
   },
   "variables": [
     {
-      "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+      "dictionary": {
+        "entries": [],
+        "isArray": false,
+        "variableType": 4,
+        "type": "Dictionary"
+      },
       "isActionBlockWorkingVar": false,
       "isLocalVar": false,
       "isSecure": false,
@@ -31,7 +36,12 @@
       "supportsOutput": true
     },
     {
-      "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+      "dictionary": {
+        "entries": [],
+        "isArray": false,
+        "variableType": 4,
+        "type": "Dictionary"
+      },
       "isActionBlockWorkingVar": false,
       "isLocalVar": false,
       "isSecure": false,
@@ -45,7 +55,12 @@
       "supportsOutput": true
     },
     {
-      "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+      "dictionary": {
+        "entries": [],
+        "isArray": false,
+        "variableType": 4,
+        "type": "Dictionary"
+      },
       "isActionBlockWorkingVar": false,
       "isLocalVar": false,
       "isSecure": false,
@@ -76,7 +91,12 @@
       "lastEditedTimestamp": 0,
       "localVariables": [
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -90,7 +110,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -104,7 +129,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -118,7 +148,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -132,7 +167,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -158,13 +198,13 @@
             "contentBodyFileDisplayName": "",
             "contentBodyFileUri": "",
             "contentBodySource": 0,
-            "contentBodyText": "",
-            "contentType": "",
+            "contentBodyText": "{\"secret\":\"{v=jumbo_secret}\"}",
+            "contentType": "application/json",
             "followRedirects": true,
-            "headerParams": [{ "name": "x-mm-secret", "value": "{v=jumbo_secret}" }],
+            "headerParams": [],
             "queryParams": [],
             "requestTimeOutSeconds": 15,
-            "requestType": 0,
+            "requestType": 1,
             "responseVariableName": "resp",
             "saveResponseFileName": "",
             "saveResponseFolderPathDisplayName": "",
@@ -182,7 +222,12 @@
         },
         {
           "m_inputStringVariable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -196,7 +241,12 @@
             "supportsOutput": true
           },
           "m_outputDictionaryVariable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -217,7 +267,9 @@
           "m_isOrCondition": false
         },
         {
-          "booleanDictionaryKeys": { "keys": [] },
+          "booleanDictionaryKeys": {
+            "keys": []
+          },
           "dictionaryKeys": [],
           "dictionaryOrArrayType": -1,
           "existingManualKeyType": 0,
@@ -244,7 +296,12 @@
           "m_userPromptShowCancel": true,
           "m_userPromptStopAfterCancel": true,
           "m_variable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -264,7 +321,9 @@
           "m_isOrCondition": false
         },
         {
-          "booleanDictionaryKeys": { "keys": [] },
+          "booleanDictionaryKeys": {
+            "keys": []
+          },
           "dictionaryKeys": [],
           "dictionaryOrArrayType": -1,
           "existingManualKeyType": 0,
@@ -291,7 +350,12 @@
           "m_userPromptShowCancel": true,
           "m_userPromptStopAfterCancel": true,
           "m_variable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -311,7 +375,9 @@
           "m_isOrCondition": false
         },
         {
-          "booleanDictionaryKeys": { "keys": [] },
+          "booleanDictionaryKeys": {
+            "keys": []
+          },
           "dictionaryKeys": [],
           "dictionaryOrArrayType": -1,
           "existingManualKeyType": 0,
@@ -338,7 +404,12 @@
           "m_userPromptShowCancel": true,
           "m_userPromptStopAfterCancel": true,
           "m_variable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -363,7 +434,9 @@
           "m_constraintList": [
             {
               "checkCase": false,
-              "dictionaryKeys": { "keys": [] },
+              "dictionaryKeys": {
+                "keys": []
+              },
               "dictionaryType": 1,
               "enableRegex": false,
               "m_booleanValue": false,
@@ -377,7 +450,12 @@
               "m_stringEqual": true,
               "m_stringValue": "true",
               "m_variable": {
-                "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+                "dictionary": {
+                  "entries": [],
+                  "isArray": false,
+                  "variableType": 4,
+                  "type": "Dictionary"
+                },
                 "isActionBlockWorkingVar": false,
                 "isLocalVar": true,
                 "isSecure": false,
@@ -495,7 +573,7 @@
       ],
       "m_constraintList": [],
       "m_category": "JumboCM",
-      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made mobile-money USSD code for the next pending payout, then types your Mobile Money PIN automatically from the jumbo_pin variable. Set jumbo_secret to the Header value shown in Admin > Settings, set jumbo_pin to your Mobile Money PIN, and grant MacroDroid the Accessibility permission.",
+      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made MTN Mobile Money USSD code (*126*9*amount*phone#) for the next pending payout, then types your Mobile Money PIN automatically from the jumbo_pin variable. Set jumbo_secret to the Header value shown in Admin > Settings, set jumbo_pin to your Mobile Money PIN, and grant MacroDroid the Accessibility permission.",
       "m_name": "JumboCM Auto Withdrawal (Queue)",
       "m_excludeLog": false,
       "m_isOrCondition": false,
@@ -515,7 +593,12 @@
       "lastEditedTimestamp": 0,
       "localVariables": [
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -529,7 +612,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -543,7 +631,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -557,7 +650,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -571,7 +669,12 @@
           "supportsOutput": true
         },
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -597,13 +700,13 @@
             "contentBodyFileDisplayName": "",
             "contentBodyFileUri": "",
             "contentBodySource": 0,
-            "contentBodyText": "",
-            "contentType": "",
+            "contentBodyText": "{\"secret\":\"{v=jumbo_secret}\"}",
+            "contentType": "application/json",
             "followRedirects": true,
-            "headerParams": [{ "name": "x-mm-secret", "value": "{v=jumbo_secret}" }],
+            "headerParams": [],
             "queryParams": [],
             "requestTimeOutSeconds": 15,
-            "requestType": 0,
+            "requestType": 1,
             "responseVariableName": "resp",
             "saveResponseFileName": "",
             "saveResponseFolderPathDisplayName": "",
@@ -621,7 +724,12 @@
         },
         {
           "m_inputStringVariable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -635,7 +743,12 @@
             "supportsOutput": true
           },
           "m_outputDictionaryVariable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -656,7 +769,9 @@
           "m_isOrCondition": false
         },
         {
-          "booleanDictionaryKeys": { "keys": [] },
+          "booleanDictionaryKeys": {
+            "keys": []
+          },
           "dictionaryKeys": [],
           "dictionaryOrArrayType": -1,
           "existingManualKeyType": 0,
@@ -683,7 +798,12 @@
           "m_userPromptShowCancel": true,
           "m_userPromptStopAfterCancel": true,
           "m_variable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -703,7 +823,9 @@
           "m_isOrCondition": false
         },
         {
-          "booleanDictionaryKeys": { "keys": [] },
+          "booleanDictionaryKeys": {
+            "keys": []
+          },
           "dictionaryKeys": [],
           "dictionaryOrArrayType": -1,
           "existingManualKeyType": 0,
@@ -730,7 +852,12 @@
           "m_userPromptShowCancel": true,
           "m_userPromptStopAfterCancel": true,
           "m_variable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -750,7 +877,9 @@
           "m_isOrCondition": false
         },
         {
-          "booleanDictionaryKeys": { "keys": [] },
+          "booleanDictionaryKeys": {
+            "keys": []
+          },
           "dictionaryKeys": [],
           "dictionaryOrArrayType": -1,
           "existingManualKeyType": 0,
@@ -777,7 +906,12 @@
           "m_userPromptShowCancel": true,
           "m_userPromptStopAfterCancel": true,
           "m_variable": {
-            "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+            "dictionary": {
+              "entries": [],
+              "isArray": false,
+              "variableType": 4,
+              "type": "Dictionary"
+            },
             "isActionBlockWorkingVar": false,
             "isLocalVar": true,
             "isSecure": false,
@@ -802,7 +936,9 @@
           "m_constraintList": [
             {
               "checkCase": false,
-              "dictionaryKeys": { "keys": [] },
+              "dictionaryKeys": {
+                "keys": []
+              },
               "dictionaryType": 1,
               "enableRegex": false,
               "m_booleanValue": false,
@@ -816,7 +952,12 @@
               "m_stringEqual": true,
               "m_stringValue": "true",
               "m_variable": {
-                "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+                "dictionary": {
+                  "entries": [],
+                  "isArray": false,
+                  "variableType": 4,
+                  "type": "Dictionary"
+                },
                 "isActionBlockWorkingVar": false,
                 "isLocalVar": true,
                 "isSecure": false,
@@ -949,7 +1090,12 @@
       "lastEditedTimestamp": 0,
       "localVariables": [
         {
-          "dictionary": { "entries": [], "isArray": false, "variableType": 4, "type": "Dictionary" },
+          "dictionary": {
+            "entries": [],
+            "isArray": false,
+            "variableType": 4,
+            "type": "Dictionary"
+          },
           "isActionBlockWorkingVar": false,
           "isLocalVar": true,
           "isSecure": false,
@@ -975,7 +1121,7 @@
             "contentBodyFileDisplayName": "",
             "contentBodyFileUri": "",
             "contentBodySource": 0,
-            "contentBodyText": "{\"text\":\"{sms_message}\",\"sender\":\"{sms_sender}\",\"secret\":\"{v=jumbo_secret}\"}",
+            "contentBodyText": "{\"text\":\"[sms_message]\",\"sender\":\"[sms_number]\",\"secret\":\"{v=jumbo_secret}\"}",
             "contentType": "application/json",
             "followRedirects": true,
             "headerParams": [],
@@ -1004,7 +1150,13 @@
           "m_isOrCondition": false,
           "m_isDisabled": false,
           "fakeIcon": 0,
-          "m_smsFromList": [{ "m_id": "-2", "m_lookupKey": "-2", "m_name": "[Any Number]" }],
+          "m_smsFromList": [
+            {
+              "m_id": "-2",
+              "m_lookupKey": "-2",
+              "m_name": "[Any Number]"
+            }
+          ],
           "m_groupIdList": [],
           "m_groupNameList": [],
           "m_smsContent": "",
