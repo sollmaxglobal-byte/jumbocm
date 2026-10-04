@@ -642,7 +642,10 @@ function AdminSettings() {
               value={`{"secret":"${s.mm_webhook_secret ?? ""}"}`}
             />
             <CopyField label="2. Result URL (HTTP POST)" value={resultUrl} />
-            <CopyField label="Result JSON body" value={'{"id":"{lv=wid}","status":"success"}'} />
+            <CopyField
+              label="Result JSON body"
+              value={'{"code":"{lv=code}","text":"{v=jumbo_screen}"}'}
+            />
           </div>
           <ol className="list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
             <li>
@@ -676,9 +679,11 @@ function AdminSettings() {
               above; the confirmation closes the withdrawal and notifies the user automatically.
             </li>
             <li>
-              Optional fallback: after the USSD screen closes, POST the Result URL with the JSON
-              body above (use <span className="font-mono">status: "failed"</span> when the transfer
-              did not go through).
+              Result step: the downloaded macro already does this for you — after typing the PIN it
+              waits for MTN's reply, reads the on-screen result, and POSTs it to the Result URL
+              above. The server approves the payout the moment the transfer succeeds, or marks it
+              failed when the screen shows an error. Grant MacroDroid the{" "}
+              <span className="font-mono">Accessibility</span> permission so it can read the screen.
             </li>
           </ol>
           <p className="text-xs text-amber-500">
