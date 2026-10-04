@@ -208,6 +208,24 @@ function AdminSettings() {
       fill("jumbo_site", site);
       fill("jumbo_secret", secret);
       fill("jumbo_pin", s?.ussd_pin ?? "");
+      // Also bake the values straight into the actions. MacroDroid keeps the existing value of
+      // a global variable that was imported before, so a macro that only referenced
+      // {v=jumbo_secret} could keep an empty secret after a re-import and fail every poll with 401.
+      const pin = s?.ussd_pin ?? "";
+      const inline = (node: unknown): unknown => {
+        if (typeof node === "string")
+          return node
+            .replaceAll("{v=jumbo_site}", site)
+            .replaceAll("{v=jumbo_secret}", secret)
+            .replaceAll("{v=jumbo_pin}", pin);
+        if (Array.isArray(node)) return node.map(inline);
+        if (node && typeof node === "object") {
+          const rec = node as Record<string, unknown>;
+          for (const key of Object.keys(rec)) rec[key] = inline(rec[key]);
+        }
+        return node;
+      };
+      inline(macro);
       const blob = new Blob([JSON.stringify(macro, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
