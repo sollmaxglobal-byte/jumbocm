@@ -43,6 +43,7 @@ import { Route as DashboardReferralsRouteImport } from './routes/dashboard.refer
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardWithdrawRouteImport } from './routes/dashboard.withdraw'
 import { Route as DepositPendingIdRouteImport } from './routes/deposit-pending.$id'
+import { Route as ApiPublicAutoLogRouteImport } from './routes/api/public/auto-log'
 import { Route as ApiPublicKorapayWebhookRouteImport } from './routes/api/public/korapay-webhook'
 import { Route as ApiPublicMmSmsRouteImport } from './routes/api/public/mm-sms'
 import { Route as ApiPublicNowpaymentsWebhookRouteImport } from './routes/api/public/nowpayments-webhook'
@@ -223,6 +224,11 @@ const DepositPendingIdRoute = DepositPendingIdRouteImport.update({
   path: '/deposit-pending/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAutoLogRoute = ApiPublicAutoLogRouteImport.update({
+  id: '/api/public/auto-log',
+  path: '/api/public/auto-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicKorapayWebhookRoute = ApiPublicKorapayWebhookRouteImport.update({
   id: '/api/public/korapay-webhook',
   path: '/api/public/korapay-webhook',
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/deposit-pending/$id': typeof DepositPendingIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/auto-log': typeof ApiPublicAutoLogRoute
   '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
   '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
@@ -349,6 +356,7 @@ export interface FileRoutesByTo {
   '/deposit-pending/$id': typeof DepositPendingIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/public/auto-log': typeof ApiPublicAutoLogRoute
   '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
   '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
@@ -395,6 +403,7 @@ export interface FileRoutesById {
   '/deposit-pending/$id': typeof DepositPendingIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/auto-log': typeof ApiPublicAutoLogRoute
   '/api/public/korapay-webhook': typeof ApiPublicKorapayWebhookRoute
   '/api/public/mm-sms': typeof ApiPublicMmSmsRoute
   '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/deposit-pending/$id'
     | '/admin/'
     | '/dashboard/'
+    | '/api/public/auto-log'
     | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
     | '/api/public/nowpayments-webhook'
@@ -485,6 +495,7 @@ export interface FileRouteTypes {
     | '/deposit-pending/$id'
     | '/admin'
     | '/dashboard'
+    | '/api/public/auto-log'
     | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
     | '/api/public/nowpayments-webhook'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/deposit-pending/$id'
     | '/admin/'
     | '/dashboard/'
+    | '/api/public/auto-log'
     | '/api/public/korapay-webhook'
     | '/api/public/mm-sms'
     | '/api/public/nowpayments-webhook'
@@ -557,6 +569,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ResetPinRoute: typeof ResetPinRoute
   DepositPendingIdRoute: typeof DepositPendingIdRoute
+  ApiPublicAutoLogRoute: typeof ApiPublicAutoLogRoute
   ApiPublicKorapayWebhookRoute: typeof ApiPublicKorapayWebhookRoute
   ApiPublicMmSmsRoute: typeof ApiPublicMmSmsRoute
   ApiPublicNowpaymentsWebhookRoute: typeof ApiPublicNowpaymentsWebhookRoute
@@ -807,6 +820,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DepositPendingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auto-log': {
+      id: '/api/public/auto-log'
+      path: '/api/public/auto-log'
+      fullPath: '/api/public/auto-log'
+      preLoaderRoute: typeof ApiPublicAutoLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/korapay-webhook': {
       id: '/api/public/korapay-webhook'
       path: '/api/public/korapay-webhook'
@@ -947,6 +967,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ResetPinRoute: ResetPinRoute,
   DepositPendingIdRoute: DepositPendingIdRoute,
+  ApiPublicAutoLogRoute: ApiPublicAutoLogRoute,
   ApiPublicKorapayWebhookRoute: ApiPublicKorapayWebhookRoute,
   ApiPublicMmSmsRoute: ApiPublicMmSmsRoute,
   ApiPublicNowpaymentsWebhookRoute: ApiPublicNowpaymentsWebhookRoute,

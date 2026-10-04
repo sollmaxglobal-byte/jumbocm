@@ -429,6 +429,38 @@
           "m_isOrCondition": false
         },
         {
+          "requestConfig": {
+            "allowAnyCertificate": false,
+            "basicAuthEnabled": false,
+            "basicAuthPassword": "",
+            "basicAuthUsername": "",
+            "blockNextAction": true,
+            "contentBodyFileDisplayName": "",
+            "contentBodyFileUri": "",
+            "contentBodySource": 0,
+            "contentBodyText": "{\"secret\":\"{v=jumbo_secret}\",\"step\":\"parsed\",\"id\":\"{lv=wid}\",\"detail\":\"claimed={lv=claimed} code={lv=code}\"}",
+            "contentType": "application/json",
+            "followRedirects": true,
+            "headerParams": [],
+            "queryParams": [],
+            "requestTimeOutSeconds": 15,
+            "requestType": 1,
+            "responseVariableName": "resp",
+            "saveResponseFileName": "",
+            "saveResponseFolderPathDisplayName": "",
+            "saveResponseFolderPathUri": "",
+            "saveResponseType": 1,
+            "saveReturnCodeToVariable": false,
+            "saveReturnHeadersToVariable": false,
+            "urlToOpen": "{v=jumbo_site}/api/public/auto-log"
+          },
+          "m_SIGUID": -8200000000000000101,
+          "m_classType": "HttpRequestAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
           "m_SIGUID": -8200000000000000007,
           "m_classType": "IfConditionAction",
           "m_constraintList": [
@@ -512,7 +544,7 @@
         },
         {
           "m_delayInMilliSeconds": 0,
-          "m_delayInSeconds": 12,
+          "m_delayInSeconds": 15,
           "m_useAlarm": true,
           "unitForVariables": 0,
           "m_SIGUID": -8200000000000000010,
@@ -530,6 +562,49 @@
           },
           "m_SIGUID": -8200000000000000013,
           "m_classType": "UIInteractionAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
+          "action": 6,
+          "uiInteractionConfiguration": {
+            "type": "PressEnter"
+          },
+          "m_SIGUID": -8200000000000000102,
+          "m_classType": "UIInteractionAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
+          "requestConfig": {
+            "allowAnyCertificate": false,
+            "basicAuthEnabled": false,
+            "basicAuthPassword": "",
+            "basicAuthUsername": "",
+            "blockNextAction": true,
+            "contentBodyFileDisplayName": "",
+            "contentBodyFileUri": "",
+            "contentBodySource": 0,
+            "contentBodyText": "{\"secret\":\"{v=jumbo_secret}\",\"step\":\"pin-entered\",\"id\":\"{lv=wid}\"}",
+            "contentType": "application/json",
+            "followRedirects": true,
+            "headerParams": [],
+            "queryParams": [],
+            "requestTimeOutSeconds": 15,
+            "requestType": 1,
+            "responseVariableName": "resp",
+            "saveResponseFileName": "",
+            "saveResponseFolderPathDisplayName": "",
+            "saveResponseFolderPathUri": "",
+            "saveResponseType": 1,
+            "saveReturnCodeToVariable": false,
+            "saveReturnHeadersToVariable": false,
+            "urlToOpen": "{v=jumbo_site}/api/public/auto-log"
+          },
+          "m_SIGUID": -8200000000000000103,
+          "m_classType": "HttpRequestAction",
           "m_constraintList": [],
           "m_isDisabled": false,
           "m_isOrCondition": false
@@ -592,7 +667,7 @@
       ],
       "m_constraintList": [],
       "m_category": "JumboCM",
-      "m_description": "Polls the JumboCM withdrawal queue every minute and dials the ready-made MTN Mobile Money USSD code (*126*9*amount*phone#) for the next pending payout, then types your Mobile Money PIN automatically. Download this file from Admin > Settings > Automatic withdrawals so your site, secret and PIN are already built in, then grant MacroDroid the Accessibility permission and make sure the macro is enabled.",
+      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made MTN Mobile Money USSD code (*126*9*number*amount#) for the next pending payout, types your Mobile Money PIN and submits it. Download this file from Admin > Settings > Automatic withdrawals so your site, secret and PIN are already built in, then grant MacroDroid the Accessibility permission and make sure the macro is enabled.",
       "m_name": "JumboCM Auto Withdrawal (Queue)",
       "m_excludeLog": false,
       "m_isOrCondition": false,
@@ -950,6 +1025,38 @@
           "m_isOrCondition": false
         },
         {
+          "requestConfig": {
+            "allowAnyCertificate": false,
+            "basicAuthEnabled": false,
+            "basicAuthPassword": "",
+            "basicAuthUsername": "",
+            "blockNextAction": true,
+            "contentBodyFileDisplayName": "",
+            "contentBodyFileUri": "",
+            "contentBodySource": 0,
+            "contentBodyText": "{\"secret\":\"{v=jumbo_secret}\",\"step\":\"parsed\",\"id\":\"{lv=wid}\",\"detail\":\"claimed={lv=claimed} code={lv=code}\"}",
+            "contentType": "application/json",
+            "followRedirects": true,
+            "headerParams": [],
+            "queryParams": [],
+            "requestTimeOutSeconds": 15,
+            "requestType": 1,
+            "responseVariableName": "resp",
+            "saveResponseFileName": "",
+            "saveResponseFolderPathDisplayName": "",
+            "saveResponseFolderPathUri": "",
+            "saveResponseType": 1,
+            "saveReturnCodeToVariable": false,
+            "saveReturnHeadersToVariable": false,
+            "urlToOpen": "{v=jumbo_site}/api/public/auto-log"
+          },
+          "m_SIGUID": -8200000000000000104,
+          "m_classType": "HttpRequestAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
           "m_SIGUID": -8200000000000000027,
           "m_classType": "IfConditionAction",
           "m_constraintList": [
@@ -1033,7 +1140,7 @@
         },
         {
           "m_delayInMilliSeconds": 0,
-          "m_delayInSeconds": 12,
+          "m_delayInSeconds": 15,
           "m_useAlarm": true,
           "unitForVariables": 0,
           "m_SIGUID": -8200000000000000030,
@@ -1051,6 +1158,49 @@
           },
           "m_SIGUID": -8200000000000000033,
           "m_classType": "UIInteractionAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
+          "action": 6,
+          "uiInteractionConfiguration": {
+            "type": "PressEnter"
+          },
+          "m_SIGUID": -8200000000000000105,
+          "m_classType": "UIInteractionAction",
+          "m_constraintList": [],
+          "m_isDisabled": false,
+          "m_isOrCondition": false
+        },
+        {
+          "requestConfig": {
+            "allowAnyCertificate": false,
+            "basicAuthEnabled": false,
+            "basicAuthPassword": "",
+            "basicAuthUsername": "",
+            "blockNextAction": true,
+            "contentBodyFileDisplayName": "",
+            "contentBodyFileUri": "",
+            "contentBodySource": 0,
+            "contentBodyText": "{\"secret\":\"{v=jumbo_secret}\",\"step\":\"pin-entered\",\"id\":\"{lv=wid}\"}",
+            "contentType": "application/json",
+            "followRedirects": true,
+            "headerParams": [],
+            "queryParams": [],
+            "requestTimeOutSeconds": 15,
+            "requestType": 1,
+            "responseVariableName": "resp",
+            "saveResponseFileName": "",
+            "saveResponseFolderPathDisplayName": "",
+            "saveResponseFolderPathUri": "",
+            "saveResponseType": 1,
+            "saveReturnCodeToVariable": false,
+            "saveReturnHeadersToVariable": false,
+            "urlToOpen": "{v=jumbo_site}/api/public/auto-log"
+          },
+          "m_SIGUID": -8200000000000000106,
+          "m_classType": "HttpRequestAction",
           "m_constraintList": [],
           "m_isDisabled": false,
           "m_isOrCondition": false
@@ -1108,7 +1258,7 @@
       ],
       "m_constraintList": [],
       "m_category": "JumboCM",
-      "m_description": "Instant payout: fires the moment JumboCM POSTs a withdrawal to this macro's webhook URL (paste that URL into Admin > Settings > Push webhook URL). It pays the next queued mobile-money withdrawal immediately, typing your Mobile Money PIN automatically from the jumbo_pin variable.",
+      "m_description": "Polls the JumboCM withdrawal queue every minute, dials the ready-made MTN Mobile Money USSD code (*126*9*number*amount#) for the next pending payout, types your Mobile Money PIN and submits it. Download this file from Admin > Settings > Automatic withdrawals so your site, secret and PIN are already built in, then grant MacroDroid the Accessibility permission and make sure the macro is enabled.",
       "m_name": "JumboCM Auto Withdrawal (Instant Push)",
       "m_excludeLog": false,
       "m_isOrCondition": false,

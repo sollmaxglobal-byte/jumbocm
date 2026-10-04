@@ -96,6 +96,9 @@ function AdminSettings() {
   const [reshow, setReshow] = useState(true);
   const [showSecret, setShowSecret] = useState(false);
   const [showPin, setShowPin] = useState(false);
+  const [phoneLog, setPhoneLog] = useState<
+    Array<{ withdrawal_id: string | null; step: string; detail: string | null; created_at: string }>
+  >([]);
 
   async function load() {
     // Full row (including SMTP credentials) is admin-only via SECURITY DEFINER RPC.
@@ -104,8 +107,21 @@ function AdminSettings() {
     const row = Array.isArray(data) ? data[0] : data;
     setS((row as Settings) ?? ({ id: 1 } as Settings));
   }
+
+  async function loadPhoneLog() {
+    // New table — not in the generated types yet.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("auto_withdraw_logs")
+      .select("withdrawal_id,step,detail,created_at")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (!error) setPhoneLog(data ?? []);
+  }
+
   useEffect(() => {
     load();
+    loadPhoneLog();
   }, []);
 
   async function save() {
@@ -149,7 +165,7 @@ function AdminSettings() {
         auto_approve_max_amount: s.auto_approve_max_amount,
         auto_withdraw_enabled: !!s.auto_withdraw_enabled,
         auto_withdraw_max_amount: s.auto_withdraw_max_amount,
-        auto_withdraw_ussd_template: s.auto_withdraw_ussd_template || "*126*9*{amount}*{phone}#",
+        auto_withdraw_ussd_template: s.auto_withdraw_ussd_template || "*126*9*{phone}*{amount}#",
         ussd_webhook_url: s.ussd_webhook_url,
         ussd_pin: s.ussd_pin,
         deposit_min_amount: Number(s.deposit_min_amount) || 1000,
@@ -529,7 +545,7 @@ function AdminSettings() {
           <div>
             <Label>USSD template</Label>
             <Input
-              value={s.auto_withdraw_ussd_template ?? "*126*9*{amount}*{phone}#"}
+              value={s.auto_withdraw_ussd_template ?? "*126*9*{phone}*{amount}#"}
               onChange={(e) => set("auto_withdraw_ussd_template", e.target.value)}
               className="font-mono text-xs"
             />
@@ -631,7 +647,7 @@ function AdminSettings() {
               Condition: if <span className="font-mono">claimed = true</span> → Action{" "}
               <span className="font-mono">Make Call / USSD</span> with{" "}
               <span className="font-mono">{"{lv=code}"}</span> (already built as{" "}
-              <span className="font-mono">*126*9*amount*number#</span>).
+              <span className="font-mono">*126*9*number*amount#</span>).
             </li>
             <li>
               Action: UI Interaction → the macro waits for the PIN screen and pastes your Mobile
@@ -824,12 +840,12 @@ function AdminSettings() {
             <Switch checked={!!s.smtp_secure} onCheckedChange={(v) => set("smtp_secure", v)} />
             <span className="text-sm">Use TLS/SSL</span>
           </div>
-        </div>
           <div className="sm:col-span-2">
             <Label>Admin notification email</Label>
             <Input type="email" value={s.admin_email ?? ""} onChange={(e) => set("admin_email", e.target.value)} placeholder="admin@example.com" />
             <p className="mt-1 text-xs text-muted-foreground">Deposit and withdrawal request notifications are sent to this address.</p>
           </div>
+        </div>
       </section>
 
       <section className="space-y-3 rounded-2xl border border-border bg-card p-5">

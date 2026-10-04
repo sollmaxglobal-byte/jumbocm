@@ -40,15 +40,35 @@ export async function queueEligible(): Promise<number> {
   return ids.length;
 }
 
+/** Record how far the phone macro got, so a stalled payout is diagnosable. */
+export async function logStep(withdrawalId: string, step: string, detail?: string | null) {
+  try {
+    const db = await admin();
+    await db.rpc("log_auto_withdraw_step", {
+      _withdrawal_id: withdrawalId ?? "",
+      _step: step,
+      _detail: detail ?? null,
+    });
+  } catch (err) {
+    console.error("[auto-withdraw] log failed", err);
+  }
+}
+
 /** Claim the next payable withdrawal and return the USSD code to dial. */
 export async function claimNext(): Promise<ClaimResult> {
   const db = await admin();
   await queueEligible();
   const { data, error } = await db.rpc("claim_auto_withdrawal");
   if (error) return { claimed: false, reason: error.message };
-  const result = (data ?? { claimed: false, reason: "Nothing to pay" }) as ClaimResult;
+  // The RPC returns `claimed` as the text 'true'/'false' (older installs return a
+  // JSON boolean), so normalise both before treating the rest as a real payout.
+  const raw = (data ?? {}) as Record<string, unknown>;
+  if (!(raw["claimed"] === true || raw["claimed"] === "true")) {
+    return { claimed: false, reason: (raw["reason"] as string) || "Nothing to pay" };
+  }
+  const result = raw as unknown as Extract<ClaimResult, { claimed: true }>;
   // Safety net: never hand a non-MTN number to the phone.
-  if (result.claimed && !isMtnNumber(result.phone)) {
+  if (!isMtnNumber(result.phone)) {
     await failWithdrawal(result.id, "Not an MTN number — approve manually");
     return { claimed: false, reason: "Only MTN Mobile Money is paid automatically" };
   }
@@ -116,7 +136,7 @@ export async function failWithdrawal(id: string, note?: string | null) {
 }
 
 const SUCCESS_HINT =
-  /(successful|success|effectu[ée]|r[ée]ussi|transferred|transf[ée]r|envoy[ée]|sent to|confirm)/i;
+  /(successful|success|succ[èe]s|effectu[ée]|r[ée]ussi|transferred|transf[ée]r|envoy[ée]|sent to|confirm)/i;
 const FAILURE_HINT = /(insufficient|insuffisant|failed|[ée]chou|not enough|cannot|impossible)/i;
 
 /**
