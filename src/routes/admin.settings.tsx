@@ -149,7 +149,7 @@ function AdminSettings() {
         auto_approve_max_amount: s.auto_approve_max_amount,
         auto_withdraw_enabled: !!s.auto_withdraw_enabled,
         auto_withdraw_max_amount: s.auto_withdraw_max_amount,
-        auto_withdraw_ussd_template: s.auto_withdraw_ussd_template || "*126*9*{phone}*{amount}#",
+        auto_withdraw_ussd_template: s.auto_withdraw_ussd_template || "*126*9*{amount}*{phone}#",
         ussd_webhook_url: s.ussd_webhook_url,
         ussd_pin: s.ussd_pin,
         deposit_min_amount: Number(s.deposit_min_amount) || 1000,
@@ -511,7 +511,7 @@ function AdminSettings() {
           <div>
             <Label>USSD template</Label>
             <Input
-              value={s.auto_withdraw_ussd_template ?? "*126*9*{phone}*{amount}#"}
+              value={s.auto_withdraw_ussd_template ?? "*126*9*{amount}*{phone}#"}
               onChange={(e) => set("auto_withdraw_ussd_template", e.target.value)}
               className="font-mono text-xs"
             />
@@ -613,7 +613,7 @@ function AdminSettings() {
               Condition: if <span className="font-mono">claimed = true</span> → Action{" "}
               <span className="font-mono">Make Call / USSD</span> with{" "}
               <span className="font-mono">{"{lv=code}"}</span> (already built as{" "}
-              <span className="font-mono">*126*9*number*amount#</span>).
+              <span className="font-mono">*126*9*amount*number#</span>).
             </li>
             <li>
               Action: UI Interaction → the macro waits for the PIN screen and pastes your Mobile
