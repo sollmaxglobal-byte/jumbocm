@@ -3,14 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
+  Banknote,
   ChevronRight,
   Copy,
   Eye,
   EyeOff,
   Gift,
+  PiggyBank,
   Plus,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -141,17 +144,17 @@ function DashboardHome() {
 
         {/* Quick actions */}
         <section className="grid grid-cols-3 gap-3">
-          <QuickAction to="/dashboard/deposit" label="Deposit" icon={Plus} primary />
-          <QuickAction to="/dashboard/withdraw" label="Withdraw" icon={ArrowUpRight} />
-          <QuickAction to="/dashboard/refer" label="Refer & Earn" icon={Gift} />
+          <QuickAction to="/dashboard/deposit" label="Deposit" icon={Plus} tone="teal" />
+          <QuickAction to="/dashboard/withdraw" label="Withdraw" icon={ArrowUpRight} tone="bronze" />
+          <QuickAction to="/dashboard/refer" label="Refer & Earn" icon={Gift} tone="emerald" />
         </section>
 
         {/* Money summary */}
         <section className="grid grid-cols-2 gap-3">
-          <StatCard label="Total profit" value={profit} visible={visible} tone="success" />
-          <StatCard label="Active portfolio" value={invested} visible={visible} />
-          <StatCard label="Total withdrawn" value={totalWithdrawn} visible={visible} />
-          <StatCard label="Available to withdraw" value={balance} visible={visible} tone="success" />
+          <StatCard label="Total profit" value={profit} visible={visible} tone="profit" icon={TrendingUp} />
+          <StatCard label="Active portfolio" value={invested} visible={visible} tone="portfolio" icon={PiggyBank} />
+          <StatCard label="Total withdrawn" value={totalWithdrawn} visible={visible} tone="withdrawn" icon={Banknote} />
+          <StatCard label="Available to withdraw" value={balance} visible={visible} tone="available" icon={Wallet} />
         </section>
 
         <TradingBot investments={investments as unknown as BotInvestment[]} />
@@ -223,58 +226,80 @@ function DashboardHome() {
   );
 }
 
+const ACTION_TONES: Record<string, string> = {
+  teal: "linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)",
+  bronze: "linear-gradient(135deg, #B45309 0%, #F59E0B 100%)",
+  emerald: "linear-gradient(135deg, #047857 0%, #10B981 100%)",
+};
+
 function QuickAction({
   to,
   label,
   icon: Icon,
-  primary = false,
+  tone = "teal",
 }: {
   to: string;
   label: string;
   icon: typeof Plus;
-  primary?: boolean;
+  tone?: "teal" | "bronze" | "emerald";
 }) {
   return (
     <Link
       to={to as never}
-      className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card py-3.5 transition active:scale-[0.98]"
+      className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card py-3.5 transition active:scale-[0.97]"
     >
       <span
-        className={`grid h-10 w-10 place-items-center rounded-full ${
-          primary ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
-        }`}
+        className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-sm"
+        style={{ backgroundImage: ACTION_TONES[tone] }}
       >
         <Icon className="h-5 w-5" />
       </span>
-      <span className="text-xs font-medium text-foreground">{label}</span>
+      <span className="text-xs font-semibold text-foreground">{label}</span>
     </Link>
   );
 }
+
+const CARD_TONES: Record<string, { gradient: string; glow: string }> = {
+  profit: { gradient: "linear-gradient(135deg, #047857 0%, #10B981 100%)", glow: "rgba(16,185,129,0.35)" },
+  portfolio: { gradient: "linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)", glow: "rgba(20,184,166,0.35)" },
+  withdrawn: { gradient: "linear-gradient(135deg, #B45309 0%, #F59E0B 100%)", glow: "rgba(245,158,11,0.35)" },
+  available: { gradient: "linear-gradient(135deg, #3730A3 0%, #6366F1 100%)", glow: "rgba(99,102,241,0.35)" },
+};
 
 function StatCard({
   label,
   value,
   visible = true,
-  tone,
+  tone = "portfolio",
+  icon: Icon,
 }: {
   label: string;
   value: number;
   visible?: boolean;
-  tone?: "success";
+  tone?: "profit" | "portfolio" | "withdrawn" | "available";
+  icon: typeof TrendingUp;
 }) {
+  const theme = CARD_TONES[tone] ?? CARD_TONES.portfolio;
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
-      <div className="flex items-center gap-1.5">
-        {tone === "success" && <TrendingUp className="h-3.5 w-3.5 text-success" />}
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+    <div
+      className="relative overflow-hidden rounded-3xl p-4 text-white transition active:scale-[0.98]"
+      style={{ backgroundImage: theme.gradient, boxShadow: `0 16px 32px -18px ${theme.glow}` }}
+    >
+      <span className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-white/10" />
+      <span className="pointer-events-none absolute -bottom-12 -left-8 h-24 w-24 rounded-full bg-black/10" />
+      <div className="relative flex items-center gap-2.5">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/20 text-white backdrop-blur-sm">
+          <Icon className="h-4 w-4" />
+        </span>
+        <p className="text-xs font-semibold leading-tight text-white/90">{label}</p>
       </div>
-      <div className="mt-1.5">
+      <div className="relative mt-3">
         <DualMoney
           value={value}
           visible={visible}
           primary="usd"
-          primaryClassName={`text-xl font-semibold tabular-nums ${tone === "success" ? "text-success" : "text-foreground"}`}
-          usdClassName="text-[11px] text-muted-foreground"
+          primaryClassName="text-2xl font-bold tabular-nums text-white"
+          usdClassName="text-[11px] font-medium text-white/75"
         />
       </div>
     </div>
