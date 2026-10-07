@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Clock } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatXAF, formatDate, txRef } from "@/lib/format";
+import { DualMoney } from "@/components/DualMoney";
 import { StatusBadge } from "@/components/StatusBadge";
 
 export const Route = createFileRoute("/dashboard/withdraw")({
@@ -187,26 +189,61 @@ function WithdrawPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl text-primary md:text-4xl">{t("withdraw.title")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("withdraw.subtitle")}</p>
-        </div>
-        <div className="rounded-xl border border-border bg-card px-4 py-2 text-right">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            {t("withdraw.available")}
-          </div>
-          <div className="font-display text-xl text-primary">{formatXAF(balance)}</div>
-        </div>
-      </div>
+    <div className="mx-auto max-w-2xl space-y-5">
+      <header>
+        <h1 className="font-display text-3xl text-primary md:text-4xl">{t("withdraw.title")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("withdraw.subtitle")}</p>
+      </header>
 
-      <div className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-          ⏱
+      {/* Available to withdraw — above the form */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#14213D] via-[#1c2e57] to-[#3157D5] p-5 text-white shadow-[0_26px_60px_-32px_rgba(20,33,61,0.95)]">
+        <span
+          className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl"
+          aria-hidden
+        />
+        <span
+          className="pointer-events-none absolute -bottom-16 -left-8 h-44 w-44 rounded-full bg-[#25A889]/25 blur-3xl"
+          aria-hidden
+        />
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
+              {t("withdraw.available")}
+            </p>
+            <div className="mt-2">
+              <DualMoney
+                value={balance}
+                primary="usd"
+                primaryClassName="text-4xl font-bold leading-none tabular-nums text-white"
+                usdClassName="mt-1.5 text-sm font-medium text-white/70"
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const form = formRef.current;
+              if (!form) return;
+              const input = form.elements.namedItem("amount") as HTMLInputElement | null;
+              if (input) input.value = String(Math.floor(balance));
+            }}
+            className="shrink-0 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 active:scale-95"
+          >
+            Max
+          </button>
+        </div>
+        <div className="relative mt-5 flex items-center justify-between border-t border-white/15 pt-3 text-[11px] text-white/65">
+          <span>Minimum {formatXAF(limits.min)}</span>
+          <span>Maximum {formatXAF(limits.max)}</span>
+        </div>
+      </section>
+
+      <div className="flex items-center gap-3 rounded-2xl border border-[#3157D5]/25 bg-[#3157D5]/5 px-4 py-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#3157D5]/15 text-[#3157D5]">
+          <Clock className="h-4 w-4" />
         </span>
         <div>
-          <div className="font-medium text-primary">
+          <div className="text-sm font-semibold text-[#14213D] dark:text-foreground">
             Estimated processing time: up to 10 minutes
           </div>
           <div className="text-xs text-muted-foreground">
@@ -218,86 +255,107 @@ function WithdrawPage() {
       <form
         ref={formRef}
         onSubmit={onSubmit}
-        className="grid gap-4 rounded-2xl border border-border bg-card p-5 md:grid-cols-2"
+        className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm"
       >
-        <div>
-          <Label htmlFor="amount">{t("common.amount")}</Label>
-          <Input id="amount" name="amount" type="number" min={limits.min} max={limits.max} step={1} required />
-          <p className="mt-1 text-xs text-muted-foreground">
-            Minimum withdrawal: {formatXAF(limits.min)} — maximum {formatXAF(limits.max)}.
-          </p>
+        <div className="flex items-center gap-2.5 border-b border-border px-5 py-4">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-[#14213D] text-white">
+            <ArrowUpRight className="h-4 w-4" />
+          </span>
+          <h2 className="font-display text-lg text-primary">Withdrawal details</h2>
         </div>
-        <div>
-          <Label htmlFor="method">{t("common.method")}</Label>
-          <select
-            id="method"
-            name="method"
-            required
-            className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-          >
-            {methods.length > 0 ? (
-              methods.map((m) => (
-                <option key={m.id} value={m.type}>
-                  {m.label}
-                </option>
-              ))
-            ) : (
-              <>
-                <option value="mobile_money">{t("withdraw.method.mobile")}</option>
-                <option value="bank_transfer">{t("withdraw.method.bank")}</option>
-                <option value="crypto">{t("withdraw.method.crypto")}</option>
-              </>
-            )}
-          </select>
-        </div>
-        {accounts.length > 0 && (
-          <div className="md:col-span-2">
-            <Label htmlFor="saved_account">Saved payout account</Label>
+        <div className="grid gap-4 p-5 md:grid-cols-2">
+          <div>
+            <Label htmlFor="amount">{t("common.amount")}</Label>
+            <div className="relative mt-1">
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                min={limits.min}
+                max={limits.max}
+                step={1}
+                required
+                className="pr-14 text-lg font-semibold"
+              />
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-semibold text-muted-foreground">
+                XAF
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Minimum withdrawal: {formatXAF(limits.min)} — maximum {formatXAF(limits.max)}.
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="method">{t("common.method")}</Label>
             <select
-              id="saved_account"
-              name="saved_account"
+              id="method"
+              name="method"
+              required
               className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              defaultValue=""
-              onChange={(e) => {
-                const account = accounts.find((item) => item.id === e.target.value);
-                if (!account) return;
-                const form = e.currentTarget.form;
-                if (!form) return;
-                (form.elements.namedItem("method") as HTMLSelectElement).value = account.method;
-                (form.elements.namedItem("account_name") as HTMLInputElement).value =
-                  account.account_name;
-                (form.elements.namedItem("account_number") as HTMLInputElement).value =
-                  account.account_number;
-              }}
             >
-              <option value="">Choose a saved account</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.account_name} · {account.account_number}
-                </option>
-              ))}
+              {methods.length > 0 ? (
+                methods.map((m) => (
+                  <option key={m.id} value={m.type}>
+                    {m.label}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value="mobile_money">{t("withdraw.method.mobile")}</option>
+                  <option value="bank_transfer">{t("withdraw.method.bank")}</option>
+                  <option value="crypto">{t("withdraw.method.crypto")}</option>
+                </>
+              )}
             </select>
           </div>
-        )}
-        <div>
-          <Label htmlFor="account_name">{t("withdraw.accountName")}</Label>
-          <Input id="account_name" name="account_name" required maxLength={120} />
-        </div>
-        <div>
-          <Label htmlFor="account_number">{t("withdraw.accountNumber")}</Label>
-          <Input id="account_number" name="account_number" required maxLength={120} />
-        </div>
-        <div className="md:col-span-2">
-          <Button
-            type="submit"
-            disabled={busy}
-            className="w-full bg-primary text-primary-foreground hover:opacity-90 md:w-auto"
-          >
-            {busy ? t("deposit.submitting") : t("withdraw.submit")}
-          </Button>
+          {accounts.length > 0 && (
+            <div className="md:col-span-2">
+              <Label htmlFor="saved_account">Saved payout account</Label>
+              <select
+                id="saved_account"
+                name="saved_account"
+                className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                defaultValue=""
+                onChange={(e) => {
+                  const account = accounts.find((item) => item.id === e.target.value);
+                  if (!account) return;
+                  const form = e.currentTarget.form;
+                  if (!form) return;
+                  (form.elements.namedItem("method") as HTMLSelectElement).value = account.method;
+                  (form.elements.namedItem("account_name") as HTMLInputElement).value =
+                    account.account_name;
+                  (form.elements.namedItem("account_number") as HTMLInputElement).value =
+                    account.account_number;
+                }}
+              >
+                <option value="">Choose a saved account</option>
+                {accounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.account_name} · {account.account_number}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div>
+            <Label htmlFor="account_name">{t("withdraw.accountName")}</Label>
+            <Input id="account_name" name="account_name" required maxLength={120} />
+          </div>
+          <div>
+            <Label htmlFor="account_number">{t("withdraw.accountNumber")}</Label>
+            <Input id="account_number" name="account_number" required maxLength={120} />
+          </div>
+          <div className="md:col-span-2">
+            <Button
+              type="submit"
+              disabled={busy}
+              className="h-11 w-full rounded-xl bg-[#14213D] text-white hover:bg-[#1c2e57] md:w-auto md:px-8"
+            >
+              {busy ? t("deposit.submitting") : t("withdraw.submit")}
+            </Button>
+          </div>
         </div>
       </form>
-
 
       <div>
         <h2 className="mb-3 font-display text-xl text-primary">{t("withdraw.recent")}</h2>
