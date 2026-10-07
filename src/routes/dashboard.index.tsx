@@ -8,9 +8,11 @@ import {
   Eye,
   EyeOff,
   Gift,
+  Layers,
   Plus,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,27 +68,53 @@ function DashboardHome() {
     if (!user) return;
     void (async () => {
       const [{ data: p }, { data: inv }, { count }, { data: wd }] = await Promise.all([
-        supabase.from("profiles").select("full_name,balance,referral_code,referral_earnings").eq("id", user.id).maybeSingle(),
-        supabase.from("investments").select("id,amount,total_earned,start_date,end_date,is_paused,plans(name)").eq("user_id", user.id).eq("status", "active").order("end_date"),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("referred_by", user.id),
-        supabase.from("withdrawals").select("amount,status").eq("user_id", user.id).in("status", ["approved", "paid"]),
+        supabase
+          .from("profiles")
+          .select("full_name,balance,referral_code,referral_earnings")
+          .eq("id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("investments")
+          .select("id,amount,total_earned,start_date,end_date,is_paused,plans(name)")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .order("end_date"),
+        supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("referred_by", user.id),
+        supabase
+          .from("withdrawals")
+          .select("amount,status")
+          .eq("user_id", user.id)
+          .in("status", ["approved", "paid"]),
       ]);
       setProfile(p as Profile | null);
       setInvestments((inv as unknown as ActiveInvestment[]) ?? []);
       setReferralCount(count ?? 0);
       setTotalWithdrawn(
-        ((wd as { amount: number }[] | null) ?? []).reduce((sum, item) => sum + Number(item.amount), 0),
+        ((wd as { amount: number }[] | null) ?? []).reduce(
+          (sum, item) => sum + Number(item.amount),
+          0,
+        ),
       );
     })();
   }, [user]);
 
   const balance = Number(profile?.balance ?? 0);
-  const profit = useMemo(() => investments.reduce((sum, item) => sum + Number(item.total_earned), 0), [investments]);
-  const invested = useMemo(() => investments.reduce((sum, item) => sum + Number(item.amount), 0), [investments]);
+  const profit = useMemo(
+    () => investments.reduce((sum, item) => sum + Number(item.total_earned), 0),
+    [investments],
+  );
+  const invested = useMemo(
+    () => investments.reduce((sum, item) => sum + Number(item.amount), 0),
+    [investments],
+  );
   const firstName = (profile?.full_name ?? t("home.investor")).split(" ")[0];
-  const referralLink = profile?.referral_code && typeof window !== "undefined"
-    ? `${window.location.origin}/register?ref=${encodeURIComponent(profile.referral_code)}`
-    : "";
+  const referralLink =
+    profile?.referral_code && typeof window !== "undefined"
+      ? `${window.location.origin}/register?ref=${encodeURIComponent(profile.referral_code)}`
+      : "";
 
   const copyReferral = async () => {
     if (!referralLink) return;
@@ -113,14 +141,22 @@ function DashboardHome() {
         </header>
 
         {/* Balance — USD primary, XAF underneath */}
-        <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-sm">
-          <div className="flex items-start justify-between gap-4">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#14213D] via-[#1c2e57] to-[#3157D5] p-5 text-white shadow-[0_24px_60px_-30px_rgba(20,33,61,0.9)]">
+          <span
+            className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl"
+            aria-hidden
+          />
+          <span
+            className="pointer-events-none absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-[#25A889]/25 blur-3xl"
+            aria-hidden
+          />
+          <div className="relative flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs font-medium text-primary-foreground/70">Total available balance</p>
-              <p className="mt-2.5 text-4xl font-semibold leading-none tabular-nums sm:text-[42px]">
+              <p className="text-xs font-medium text-white/70">Total available balance</p>
+              <p className="mt-2.5 text-4xl font-bold leading-none tabular-nums sm:text-[42px]">
                 {visible ? formatUSD(balance) : "••••••"}
               </p>
-              <p className="mt-2 text-sm font-medium text-primary-foreground/75">
+              <p className="mt-2 text-sm font-medium text-white/75">
                 {visible ? formatXAF(balance) : "Balance hidden"}
               </p>
             </div>
@@ -128,14 +164,14 @@ function DashboardHome() {
               type="button"
               onClick={() => setVisible((value) => !value)}
               aria-label={visible ? "Hide balance" : "Show balance"}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-primary-foreground/80 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white"
             >
               {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <div className="mt-5 flex items-center justify-between border-t border-primary-foreground/15 pt-3 text-[11px] text-primary-foreground/70">
+          <div className="relative mt-5 flex items-center justify-between border-t border-white/15 pt-3 text-[11px] text-white/70">
             <span>Indicative rate</span>
-            <span className="font-medium text-primary-foreground/90">1 USD = {formatXAF(XAF_PER_USD)}</span>
+            <span className="font-medium text-white/90">1 USD = {formatXAF(XAF_PER_USD)}</span>
           </div>
         </section>
 
@@ -148,10 +184,35 @@ function DashboardHome() {
 
         {/* Money summary */}
         <section className="grid grid-cols-2 gap-3">
-          <StatCard label="Total profit" value={profit} visible={visible} tone="success" />
-          <StatCard label="Active portfolio" value={invested} visible={visible} />
-          <StatCard label="Total withdrawn" value={totalWithdrawn} visible={visible} />
-          <StatCard label="Available to withdraw" value={balance} visible={visible} tone="success" />
+          <StatCard
+            label="Total profit"
+            value={profit}
+            visible={visible}
+            accent="#25A889"
+            icon={TrendingUp}
+            valueClassName="text-[#25A889]"
+          />
+          <StatCard
+            label="Active portfolio"
+            value={invested}
+            visible={visible}
+            accent="#3157D5"
+            icon={Layers}
+          />
+          <StatCard
+            label="Total withdrawn"
+            value={totalWithdrawn}
+            visible={visible}
+            accent="#C9922E"
+            icon={ArrowUpRight}
+          />
+          <StatCard
+            label="Available to withdraw"
+            value={balance}
+            visible={visible}
+            accent="#14213D"
+            icon={Wallet}
+          />
         </section>
 
         <TradingBot investments={investments as unknown as BotInvestment[]} />
@@ -194,7 +255,9 @@ function DashboardHome() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-sm font-semibold text-foreground">Invite and earn</h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{referralCount} total referrals</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {referralCount} total referrals
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -208,7 +271,9 @@ function DashboardHome() {
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-sm">
                 <span className="text-muted-foreground">Commission earned</span>
-                <strong className="text-foreground">{formatXAF(Number(profile?.referral_earnings ?? 0))}</strong>
+                <strong className="text-foreground">
+                  {formatXAF(Number(profile?.referral_earnings ?? 0))}
+                </strong>
               </div>
               <Button asChild variant="link" className="mt-1 h-auto p-0 text-primary">
                 <Link to="/dashboard/referrals">
@@ -255,29 +320,59 @@ function StatCard({
   label,
   value,
   visible = true,
-  tone,
+  accent = "#3157D5",
+  icon: Icon,
+  valueClassName = "text-[#14213D]",
 }: {
   label: string;
   value: number;
   visible?: boolean;
-  tone?: "success";
+  accent?: string;
+  icon?: typeof TrendingUp;
+  valueClassName?: string;
 }) {
   return (
-    <div className="exec-card relative overflow-hidden rounded-2xl border border-[#14213D]/10 bg-[#F7F5EF] p-4 shadow-[0_14px_34px_-22px_rgba(20,33,61,0.65)]">
-      <span className="absolute inset-y-0 left-0 w-1 bg-[#3157D5]" aria-hidden />
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden" aria-hidden>
-        <span className="exec-card-sweep block h-full w-1/2 bg-gradient-to-r from-transparent via-[#3157D5] to-transparent" />
+    <div
+      className="exec-card relative overflow-hidden rounded-2xl border border-[#14213D]/10 bg-[#F7F5EF] p-4 shadow-[0_16px_36px_-24px_rgba(20,33,61,0.7)]"
+      style={{
+        backgroundImage: `radial-gradient(120% 95% at 100% 0%, ${accent}1f 0%, transparent 58%)`,
+      }}
+    >
+      <span
+        className="absolute inset-y-0 left-0 w-1"
+        style={{ backgroundColor: accent }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden"
+        aria-hidden
+      >
+        <span
+          className="exec-card-sweep block h-full w-1/2"
+          style={{
+            backgroundImage: `linear-gradient(to right, transparent, ${accent}, transparent)`,
+          }}
+        />
       </span>
-      <div className="flex items-center gap-1.5 pl-1.5">
-        {tone === "success" && <TrendingUp className="h-3.5 w-3.5 text-[#25A889]" />}
-        <p className="text-xs font-semibold tracking-tight text-[#14213D]/70">{label}</p>
+      <div className="flex items-start justify-between gap-2 pl-1.5">
+        <p className="pt-1 text-[11px] font-semibold uppercase tracking-wide text-[#14213D]/60">
+          {label}
+        </p>
+        {Icon && (
+          <span
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-xl"
+            style={{ backgroundColor: `${accent}1a`, color: accent }}
+          >
+            <Icon className="h-4 w-4" />
+          </span>
+        )}
       </div>
-      <div className="mt-1.5 pl-1.5">
+      <div className="mt-2.5 pl-1.5">
         <DualMoney
           value={value}
           visible={visible}
           primary="usd"
-          primaryClassName={`text-xl font-bold tabular-nums ${tone === "success" ? "text-[#25A889]" : "text-[#14213D]"}`}
+          primaryClassName={`text-[22px] font-bold leading-none tabular-nums ${valueClassName}`}
           usdClassName="text-[11px] font-medium text-[#14213D]/55"
         />
       </div>
@@ -285,10 +380,19 @@ function StatCard({
   );
 }
 
-function InvestmentRow({ investment, visible = true }: { investment: ActiveInvestment; visible?: boolean }) {
+function InvestmentRow({
+  investment,
+  visible = true,
+}: {
+  investment: ActiveInvestment;
+  visible?: boolean;
+}) {
   const start = new Date(investment.start_date).getTime();
   const end = new Date(investment.end_date).getTime();
-  const progress = Math.max(0, Math.min(100, ((Date.now() - start) / Math.max(1, end - start)) * 100));
+  const progress = Math.max(
+    0,
+    Math.min(100, ((Date.now() - start) / Math.max(1, end - start)) * 100),
+  );
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
@@ -296,7 +400,9 @@ function InvestmentRow({ investment, visible = true }: { investment: ActiveInves
           <p className="truncate text-sm font-semibold text-card-foreground">
             {investment.plans?.name ?? "Investment plan"}
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Ends {formatDate(investment.end_date)}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Ends {formatDate(investment.end_date)}
+          </p>
         </div>
         <div className="text-right">
           <DualMoney
