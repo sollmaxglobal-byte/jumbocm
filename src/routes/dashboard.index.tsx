@@ -52,7 +52,14 @@ type ActiveInvestment = {
   start_date: string;
   end_date: string;
   is_paused: boolean;
-  plans: { name: string } | null;
+  plans: { name: string; payout_frequency: string | null } | null;
+};
+
+const PAYOUT_LABELS: Record<string, string> = {
+  daily: "Profit paid daily",
+  weekly: "Profit paid weekly",
+  monthly: "Profit paid monthly",
+  end_of_term: "Profit paid at end of term",
 };
 
 function DashboardHome() {
@@ -75,7 +82,7 @@ function DashboardHome() {
           .maybeSingle(),
         supabase
           .from("investments")
-          .select("id,amount,total_earned,start_date,end_date,is_paused,plans(name)")
+          .select("id,amount,total_earned,start_date,end_date,is_paused,plans(name,payout_frequency)")
           .eq("user_id", user.id)
           .eq("status", "active")
           .order("end_date"),
@@ -386,6 +393,10 @@ function InvestmentRow({
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Ends {formatDate(investment.end_date)}
+          </p>
+          <p className="mt-0.5 text-[11px] font-medium text-primary">
+            {PAYOUT_LABELS[investment.plans?.payout_frequency ?? "daily"] ??
+              "Profit paid automatically"}
           </p>
         </div>
         <div className="text-right">
