@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatXAF, txRef } from "@/lib/format";
 import { toast } from "sonner";
+import { clearPendingInvestment, getPendingInvestment } from "@/lib/pending-investment";
 
 export const Route = createFileRoute("/deposit-pending/$id")({
   component: PendingDepositPage,
@@ -222,6 +223,8 @@ function PendingDepositPage() {
   const [method, setMethod] = useState<PaymentMethod | null>(null);
   const [whatsappLink, setWhatsappLink] = useState("");
   const [elapsed, setElapsed] = useState(0);
+  const [autoActivate, setAutoActivate] = useState<"idle" | "activating" | "done" | "error">("idle");
+  const autoActivatedRef = useRef(false);
   const startRef = useRef<number>(Date.now());
 
   useEffect(() => {
@@ -281,12 +284,45 @@ function PendingDepositPage() {
   }, [elapsed, deposit, navigate]);
 
   useEffect(() => {
+    if (deposit?.status !== "approved" || autoActivatedRef.current) return;
+    const intent = getPendingInvestment();
+    if (!intent || intent.depositId !== id) return;
+    // Clear before calling so a reload can never activate the same plan twice.
+    autoActivatedRef.current = true;
+    clearPendingInvestment();
+    setAutoActivate("activating");
+    void (async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any).rpc("activate_investment_v2", {
+        _plan_id: intent.planId,
+        _amount: intent.amount,
+      });
+      if (error) {
+        setAutoActivate("error");
+        toast.error(
+          "Deposit received — we couldn't auto-activate your plan. Open Plans to activate it.",
+        );
+        return;
+      }
+      setAutoActivate("done");
+      toast.success("Your investment plan is now active.");
+    })();
+  }, [deposit?.status, id]);
+
+  useEffect(() => {
+    if (deposit?.status !== "rejected") return;
+    const intent = getPendingInvestment();
+    if (intent && intent.depositId === id) clearPendingInvestment();
+  }, [deposit?.status, id]);
+
+  useEffect(() => {
     if (deposit?.status !== "approved") return;
+    if (autoActivate === "activating") return;
     const t = setTimeout(() => {
       navigate({ to: "/dashboard/wallet", search: { filter: "Deposits" } as never });
     }, REDIRECT_AFTER_APPROVAL_MS);
     return () => clearTimeout(t);
-  }, [deposit?.status, navigate]);
+  }, [deposit?.status, autoActivate, navigate]);
 
   if (loading || !deposit) {
     return (
@@ -378,6 +414,25 @@ function PendingDepositPage() {
             <MethodBadge method={method} />
           </div>
         </div>
+
+        {autoActivate !== "idle" && (
+          <div className="flex items-center gap-2.5 rounded-xl border border-[#2a2a30] bg-[#17171c] px-3 py-2.5 text-left">
+            {autoActivate === "done" ? (
+              <Check className="h-5 w-5 shrink-0 text-green-500" />
+            ) : autoActivate === "error" ? (
+              <XCircle className="h-5 w-5 shrink-0 text-red-500" />
+            ) : (
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#f6c85a]" />
+            )}
+            <span className="text-xs text-[#c8c8d0]">
+              {autoActivate === "done"
+                ? "Your investment plan is now active."
+                : autoActivate === "error"
+                  ? "Your plan couldn't be activated automatically. Open Plans to activate it."
+                  : "Activating your investment plan…"}
+            </span>
+          </div>
+        )}
 
         {/* Vertical timeline */}
         <div>

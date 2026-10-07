@@ -148,13 +148,13 @@ function DashboardHome() {
         </header>
 
         {/* Balance — USD primary, XAF underneath */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B3B45] via-[#0E5C63] to-[#0F8C7A] p-5 text-white shadow-[0_24px_60px_-30px_rgba(11,59,69,0.85)]">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0E1B36] via-[#1C2E57] to-[#3157D5] p-5 text-white shadow-[0_24px_60px_-30px_rgba(14,27,54,0.95)]">
           <span
             className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl"
             aria-hidden
           />
           <span
-            className="pointer-events-none absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-[#7BE3C4]/25 blur-3xl"
+            className="pointer-events-none absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-[#7C9BFF]/25 blur-3xl"
             aria-hidden
           />
           <div className="relative flex items-start justify-between gap-4">
@@ -203,21 +203,21 @@ function DashboardHome() {
             label="Active portfolio"
             value={invested}
             visible={visible}
-            accent="#4F46E5"
+            accent="#3157D5"
             icon={Layers}
           />
           <StatCard
             label="Total withdrawn"
             value={totalWithdrawn}
             visible={visible}
-            accent="#D97706"
+            accent="#C2410C"
             icon={ArrowUpRight}
           />
           <StatCard
             label="Available to withdraw"
             value={balance}
             visible={visible}
-            accent="#0E7490"
+            accent="#14213D"
             icon={Wallet}
           />
         </section>
@@ -340,13 +340,18 @@ function StatCard({
 }) {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-4 shadow-[0_14px_34px_-26px_rgba(15,42,52,0.55)]"
+      className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-4 pl-5 shadow-[0_16px_38px_-26px_rgba(14,27,54,0.65)]"
       style={{
         backgroundImage: `linear-gradient(150deg, ${accent}1c 0%, ${accent}0a 45%, transparent 78%)`,
       }}
     >
+      <span
+        className="absolute inset-y-0 left-0 w-1.5"
+        style={{ backgroundColor: accent }}
+        aria-hidden
+      />
       <div className="flex items-start justify-between gap-2">
-        <p className="pt-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        <p className="pt-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#14213D] dark:text-muted-foreground">
           {label}
         </p>
         {Icon && (

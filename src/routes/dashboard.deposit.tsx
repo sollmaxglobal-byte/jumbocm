@@ -2,16 +2,25 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { ArrowLeft, Check, Clock3, Copy, FileImage, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
 import { startNowpaymentsDeposit } from "@/lib/nowpayments.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { setPendingInvestment } from "@/lib/pending-investment";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export const Route = createFileRoute("/dashboard/deposit")({ component: DepositPage });
+export const Route = createFileRoute("/dashboard/deposit")({
+  component: DepositPage,
+  validateSearch: z.object({
+    // Prefilled from the investment flow: the plan's full amount and the plan to activate.
+    amount: z.coerce.number().optional(),
+    plan: z.string().optional(),
+  }),
+});
 
 type MethodId = string;
 type Method = {
@@ -76,7 +85,11 @@ function MethodLogo({ name }: { name: string }) {
 function DepositPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("");
+  const { amount: amountParam, plan: planId } = Route.useSearch();
+  const [amount, setAmount] = useState(() =>
+    amountParam ? String(Math.round(amountParam)) : "",
+  );
+  const [planName, setPlanName] = useState("");
   const [method, setMethod] = useState<MethodId | null>(null);
   const [reference] = useState(makeReference);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -160,6 +173,14 @@ function DepositPage() {
   }, []);
 
   useEffect(() => {
+    if (!planId) return;
+    void (async () => {
+      const { data } = await supabase.from("plans").select("name").eq("id", planId).maybeSingle();
+      if (data?.name) setPlanName(data.name);
+    })();
+  }, [planId]);
+
+  useEffect(() => {
     if (step === 2 && activeMethods.length === 1 && !settings.korapay_enabled)
       setMethod(activeMethods[0].id);
   }, [step, activeMethods, settings.korapay_enabled]);
@@ -237,6 +258,8 @@ function DepositPage() {
     try {
       const res = await startCharge({ data: { amount: amountNumber, phone } });
       setChargeId(res.depositId);
+      if (planId)
+        setPendingInvestment({ planId, amount: amountNumber, depositId: res.depositId });
       if (res.status === "success") {
         navigate({ to: "/deposit-pending/$id", params: { id: res.depositId } });
       } else {
@@ -286,6 +309,8 @@ function DepositPage() {
         .single();
       if (error) throw error;
       if (!createdDeposit) throw new Error("Deposit was created without an ID.");
+      if (planId)
+        setPendingInvestment({ planId, amount: amountNumber, depositId: createdDeposit.id });
       toast.success("Proof uploaded successfully");
       navigate({ to: "/deposit-pending/$id", params: { id: createdDeposit.id } });
     } catch (error) {
@@ -334,6 +359,12 @@ function DepositPage() {
             <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
               How much do you want to deposit?
             </h1>
+            {planId && (
+              <div className="rounded-xl border border-[#7f6731] bg-[#1d1a12] px-3 py-2 text-left text-xs text-[#c8c8d0]">
+                Funding <span className="font-bold text-[#f6c85a]">{planName || "your plan"}</span>{" "}
+                — it activates automatically once your deposit is confirmed.
+              </div>
+            )}
 
 
             <div className="flex flex-col items-center gap-3">
