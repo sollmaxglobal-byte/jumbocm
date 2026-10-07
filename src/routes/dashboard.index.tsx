@@ -141,13 +141,13 @@ function DashboardHome() {
         </header>
 
         {/* Balance — USD primary, XAF underneath */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#14213D] via-[#1c2e57] to-[#3157D5] p-5 text-white shadow-[0_24px_60px_-30px_rgba(20,33,61,0.9)]">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B3B45] via-[#0E5C63] to-[#0F8C7A] p-5 text-white shadow-[0_24px_60px_-30px_rgba(11,59,69,0.85)]">
           <span
             className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl"
             aria-hidden
           />
           <span
-            className="pointer-events-none absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-[#25A889]/25 blur-3xl"
+            className="pointer-events-none absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-[#7BE3C4]/25 blur-3xl"
             aria-hidden
           />
           <div className="relative flex items-start justify-between gap-4">
@@ -188,29 +188,29 @@ function DashboardHome() {
             label="Total profit"
             value={profit}
             visible={visible}
-            accent="#25A889"
+            accent="#0F9D6E"
             icon={TrendingUp}
-            valueClassName="text-[#25A889]"
+            valueClassName="text-[#0B7A56]"
           />
           <StatCard
             label="Active portfolio"
             value={invested}
             visible={visible}
-            accent="#3157D5"
+            accent="#4F46E5"
             icon={Layers}
           />
           <StatCard
             label="Total withdrawn"
             value={totalWithdrawn}
             visible={visible}
-            accent="#C9922E"
+            accent="#D97706"
             icon={ArrowUpRight}
           />
           <StatCard
             label="Available to withdraw"
             value={balance}
             visible={visible}
-            accent="#14213D"
+            accent="#0E7490"
             icon={Wallet}
           />
         </section>
@@ -320,9 +320,9 @@ function StatCard({
   label,
   value,
   visible = true,
-  accent = "#3157D5",
+  accent = "#0E7490",
   icon: Icon,
-  valueClassName = "text-[#14213D]",
+  valueClassName = "text-foreground",
 }: {
   label: string;
   value: number;
@@ -333,47 +333,31 @@ function StatCard({
 }) {
   return (
     <div
-      className="exec-card relative overflow-hidden rounded-2xl border border-[#14213D]/10 bg-[#F7F5EF] p-4 shadow-[0_16px_36px_-24px_rgba(20,33,61,0.7)]"
+      className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-4 shadow-[0_14px_34px_-26px_rgba(15,42,52,0.55)]"
       style={{
-        backgroundImage: `radial-gradient(120% 95% at 100% 0%, ${accent}1f 0%, transparent 58%)`,
+        backgroundImage: `linear-gradient(150deg, ${accent}1c 0%, ${accent}0a 45%, transparent 78%)`,
       }}
     >
-      <span
-        className="absolute inset-y-0 left-0 w-1"
-        style={{ backgroundColor: accent }}
-        aria-hidden
-      />
-      <span
-        className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden"
-        aria-hidden
-      >
-        <span
-          className="exec-card-sweep block h-full w-1/2"
-          style={{
-            backgroundImage: `linear-gradient(to right, transparent, ${accent}, transparent)`,
-          }}
-        />
-      </span>
-      <div className="flex items-start justify-between gap-2 pl-1.5">
-        <p className="pt-1 text-[11px] font-semibold uppercase tracking-wide text-[#14213D]/60">
+      <div className="flex items-start justify-between gap-2">
+        <p className="pt-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
           {label}
         </p>
         {Icon && (
           <span
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-xl"
-            style={{ backgroundColor: `${accent}1a`, color: accent }}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white shadow-sm"
+            style={{ backgroundColor: accent }}
           >
             <Icon className="h-4 w-4" />
           </span>
         )}
       </div>
-      <div className="mt-2.5 pl-1.5">
+      <div className="mt-3">
         <DualMoney
           value={value}
           visible={visible}
           primary="usd"
           primaryClassName={`text-[22px] font-bold leading-none tabular-nums ${valueClassName}`}
-          usdClassName="text-[11px] font-medium text-[#14213D]/55"
+          usdClassName="text-[11px] font-medium text-muted-foreground"
         />
       </div>
     </div>
