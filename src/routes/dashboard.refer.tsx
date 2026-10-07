@@ -19,6 +19,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { DualMoney } from "@/components/DualMoney";
+import { ReferralNetwork } from "@/components/referral/ReferralNetwork";
+import { useMyReferrals } from "@/hooks/useMyReferrals";
 
 export const Route = createFileRoute("/dashboard/refer")({
   head: () => ({
@@ -26,7 +28,8 @@ export const Route = createFileRoute("/dashboard/refer")({
       { title: "Refer & Earn — JumboCM" },
       {
         name: "description",
-        content: "Share your JumboCM referral link and earn commission on every friend who invests.",
+        content:
+          "Share your JumboCM referral link and earn commission on every friend who invests.",
       },
       { property: "og:title", content: "Refer & Earn — JumboCM" },
       {
@@ -46,13 +49,18 @@ type Profile = {
 };
 
 const STEPS = [
-  { icon: Share2, title: "Share your link", text: "Send your personal link to friends and family." },
+  {
+    icon: Share2,
+    title: "Share your link",
+    text: "Send your personal link to friends and family.",
+  },
   { icon: UserPlus, title: "They join", text: "Your friend creates an account with your link." },
   { icon: Wallet, title: "You earn", text: "Get commission every time they invest." },
 ];
 
 function ReferAndEarnPage() {
   const { user } = useAuth();
+  const { rows, loading: networkLoading, error: networkError } = useMyReferrals();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [referralCount, setReferralCount] = useState(0);
   const [percent, setPercent] = useState(5);
@@ -72,7 +80,10 @@ function ReferAndEarnPage() {
           .select("referral_code,referral_earnings")
           .eq("id", user.id)
           .maybeSingle(),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("referred_by", user.id),
+        supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("referred_by", user.id),
         supabase.from("public_settings").select("referral_percent").eq("id", 1).maybeSingle(),
       ]);
       setProfile(p as Profile | null);
@@ -84,6 +95,7 @@ function ReferAndEarnPage() {
   const code = profile?.referral_code ?? "";
   const link = code ? `${origin}/register?ref=${encodeURIComponent(code)}` : "";
   const earned = Number(profile?.referral_earnings ?? 0);
+  const activeCount = rows.filter((r) => r.investment_status === "active").length;
 
   const copy = async () => {
     if (!link) return;
@@ -115,7 +127,7 @@ function ReferAndEarnPage() {
       try {
         await navigator.share({
           title: "Join JumboCM",
-          text: `Join me on JumboCM and start investing. Use my referral link:`,
+          text: "Join me on JumboCM and start investing. Use my referral link:",
           url: link,
         });
         return;
@@ -150,41 +162,62 @@ function ReferAndEarnPage() {
           </div>
         </header>
 
-        {/* Promotion banner */}
+        {/* Earnings hero */}
         <section
           className="relative overflow-hidden rounded-3xl p-5 text-primary-foreground shadow-sm"
           style={{ background: "var(--gradient-hero)" }}
         >
-          <div className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[var(--gold)] opacity-30 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-white opacity-10 blur-2xl" />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full bg-[var(--gold)] opacity-30 blur-2xl"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <div className="pointer-events-none absolute -bottom-20 -left-12 h-48 w-48 rounded-full bg-white opacity-10 blur-2xl" />
+
           <div className="relative">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" /> {percent}% commission
             </span>
-            <h2 className="mt-3 text-2xl font-bold leading-tight">
-              Earn {percent}% on every friend you invite
-            </h2>
-            <p className="mt-2 max-w-sm text-sm text-primary-foreground/85">
-              Share your referral link. When your friends join and invest, you earn commission straight
-              into your account.
+
+            <p className="mt-4 text-xs font-medium text-primary-foreground/75">
+              Total commission earned
             </p>
-            <div className="mt-4 flex items-center gap-2 text-xs font-medium text-primary-foreground/85">
-              <Gift className="h-4 w-4" />
-              Unlimited referrals — the more you invite, the more you earn.
+            <div className="mt-1.5">
+              <DualMoney
+                value={earned}
+                primary="usd"
+                primaryClassName="text-4xl font-bold leading-none tabular-nums"
+                usdClassName="text-sm font-medium text-primary-foreground/75"
+              />
+            </div>
+
+            <div className="mt-5 flex items-center gap-4 border-t border-white/15 pt-3 text-xs text-primary-foreground/85">
+              <span className="flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5" /> {referralCount}{" "}
+                {referralCount === 1 ? "friend" : "friends"}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <TrendingUp className="h-3.5 w-3.5" /> {activeCount} active
+              </span>
+              <span className="ml-auto flex items-center gap-1.5">
+                <Gift className="h-3.5 w-3.5" /> Unlimited
+              </span>
             </div>
           </div>
         </section>
 
-        {/* Referral link */}
+        {/* Invite link */}
         <section className="rounded-3xl border border-border bg-card p-5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Share2 className="h-3.5 w-3.5 text-primary" /> Your referral link
+            <Share2 className="h-3.5 w-3.5 text-primary" /> Your invite link
           </div>
           <div className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 px-3.5 py-3">
             <p className="break-all font-mono text-[13px] font-medium text-foreground">
               {link || "Your link will appear here once your account is ready."}
             </p>
           </div>
+
           <div className="mt-3 grid grid-cols-2 gap-2.5">
             <Button onClick={copy} disabled={!link} className="rounded-xl">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -213,29 +246,10 @@ function ReferAndEarnPage() {
         </section>
 
         {/* Stats */}
-        <section className="grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Users className="h-3.5 w-3.5" /> Total referrals
-            </div>
-            <p className="mt-1.5 text-2xl font-semibold tabular-nums text-foreground">{referralCount}</p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              {referralCount === 1 ? "friend joined" : "friends joined"}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <TrendingUp className="h-3.5 w-3.5 text-success" /> Total earned
-            </div>
-            <div className="mt-1.5">
-              <DualMoney
-                value={earned}
-                primary="usd"
-                primaryClassName="text-xl font-semibold tabular-nums text-success"
-                usdClassName="text-[11px] text-muted-foreground"
-              />
-            </div>
-          </div>
+        <section className="grid grid-cols-3 gap-3">
+          <StatTile icon={Users} label="Invited" value={String(referralCount)} />
+          <StatTile icon={TrendingUp} label="Active" value={String(activeCount)} tone="success" />
+          <StatTile icon={Gift} label="Rate" value={`${percent}%`} />
         </section>
 
         {/* How it works */}
@@ -258,23 +272,46 @@ function ReferAndEarnPage() {
           </div>
         </section>
 
-        {/* View referrals */}
-        <Link
-          to="/dashboard/referrals"
-          className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition active:scale-[0.99]"
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-              <Users className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-foreground">My referrals</p>
-              <p className="text-xs text-muted-foreground">See who joined with your link</p>
-            </div>
+        {/* Referral network */}
+        <section className="space-y-3">
+          <div className="flex items-end justify-between">
+            <h2 className="text-sm font-semibold text-foreground">Your referral network</h2>
+            <Link
+              to="/dashboard/referrals"
+              className="flex items-center gap-0.5 text-xs font-medium text-primary"
+            >
+              View all <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-        </Link>
+          <ReferralNetwork rows={rows.slice(0, 3)} loading={networkLoading} error={networkError} />
+        </section>
       </div>
     </motion.div>
+  );
+}
+
+function StatTile({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: typeof Users;
+  label: string;
+  value: string;
+  tone?: "success";
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-3.5 text-center">
+      <span
+        className={`mx-auto grid h-9 w-9 place-items-center rounded-full ${
+          tone === "success" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"
+        }`}
+      >
+        <Icon className="h-4 w-4" />
+      </span>
+      <p className="mt-2 text-lg font-bold tabular-nums text-foreground">{value}</p>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+    </div>
   );
 }

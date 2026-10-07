@@ -263,18 +263,22 @@ function StatCard({
   tone?: "success";
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
-      <div className="flex items-center gap-1.5">
-        {tone === "success" && <TrendingUp className="h-3.5 w-3.5 text-success" />}
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+    <div className="exec-card relative overflow-hidden rounded-2xl border border-[#14213D]/10 bg-[#F7F5EF] p-4 shadow-[0_14px_34px_-22px_rgba(20,33,61,0.65)]">
+      <span className="absolute inset-y-0 left-0 w-1 bg-[#3157D5]" aria-hidden />
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden" aria-hidden>
+        <span className="exec-card-sweep block h-full w-1/2 bg-gradient-to-r from-transparent via-[#3157D5] to-transparent" />
+      </span>
+      <div className="flex items-center gap-1.5 pl-1.5">
+        {tone === "success" && <TrendingUp className="h-3.5 w-3.5 text-[#25A889]" />}
+        <p className="text-xs font-semibold tracking-tight text-[#14213D]/70">{label}</p>
       </div>
-      <div className="mt-1.5">
+      <div className="mt-1.5 pl-1.5">
         <DualMoney
           value={value}
           visible={visible}
           primary="usd"
-          primaryClassName={`text-xl font-semibold tabular-nums ${tone === "success" ? "text-success" : "text-foreground"}`}
-          usdClassName="text-[11px] text-muted-foreground"
+          primaryClassName={`text-xl font-bold tabular-nums ${tone === "success" ? "text-[#25A889]" : "text-[#14213D]"}`}
+          usdClassName="text-[11px] font-medium text-[#14213D]/55"
         />
       </div>
     </div>
