@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
 import { startNowpaymentsDeposit } from "@/lib/nowpayments.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { NumericKeypad } from "@/components/NumericKeypad";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -44,6 +45,12 @@ function money(value: string | number) {
 }
 function shortMoney(value: number) {
   return value >= 1000 ? `${value / 1000}k` : String(value);
+}
+/** Groups a half-typed amount, keeping a trailing "." while the customer types. */
+function typedMoney(value: string) {
+  const [whole, decimals] = value.split(".");
+  const grouped = Number(whole || "0").toLocaleString("en-US");
+  return value.includes(".") ? `${grouped}.${decimals ?? ""}` : grouped;
 }
 function makeReference() {
   return `JCM-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
@@ -209,6 +216,24 @@ function DepositPage() {
     toast.success("Copied to clipboard");
   }
 
+  // The amount is typed on the on-screen keypad only, so the device keyboard never opens.
+  function pressKey(key: string) {
+    setAmount((prev) => {
+      if (key === ".") {
+        if (prev.includes(".")) return prev;
+        return prev ? `${prev}.` : "0.";
+      }
+      const [whole, decimals] = prev.split(".");
+      if (decimals !== undefined && decimals.length >= 2) return prev;
+      if (decimals === undefined && whole.length >= 10) return prev;
+      return `${prev}${key}`;
+    });
+  }
+
+  function pressDelete() {
+    setAmount((prev) => prev.slice(0, -1));
+  }
+
   function next() {
     if (step === 1) {
       if (!amount || amountNumber < minAmount || amountNumber > maxAmount) {
@@ -321,7 +346,7 @@ function DepositPage() {
         ))}
         <span className="h-1.5 flex-1 rounded-full bg-[#2c2c33]" />
       </div>
-      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden py-3">
+      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto py-3">
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div
@@ -329,36 +354,35 @@ function DepositPage() {
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-5"
+            className="flex flex-col gap-4"
           >
-            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
+            <h1 className="text-[24px] font-extrabold leading-[1.1] tracking-tight">
               How much do you want to deposit?
             </h1>
 
-
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col gap-2">
               <div
-                className="flex w-full items-center justify-center rounded-2xl border-2 px-4 py-4"
+                className="flex w-full items-center justify-between gap-2 rounded-2xl border-2 px-4 py-3"
                 style={{ borderColor: GOLD, background: "#141418" }}
               >
-                <Input
-                  id="deposit-amount"
-                  value={amount ? money(amount) : ""}
-                  onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
-                  placeholder="0"
-                  inputMode="numeric"
+                {/* Plain text, not an input: tapping it can never open the device keyboard. */}
+                <span
+                  role="textbox"
+                  aria-readonly="true"
                   aria-label="Amount in FCFA"
-                  className="h-auto w-full border-0 bg-transparent p-0 text-center text-[30px] font-extrabold tracking-tight shadow-none focus-visible:ring-0"
-                  style={{ color: GOLD }}
-                />
-                <span className="pl-2 text-[26px] font-extrabold" style={{ color: GOLD }}>
+                  className="min-w-0 flex-1 truncate text-[28px] font-extrabold tracking-tight"
+                  style={{ color: amount ? GOLD : "rgba(246,200,90,0.4)" }}
+                >
+                  {amount ? typedMoney(amount) : "0"}
+                </span>
+                <span className="shrink-0 text-[24px] font-extrabold" style={{ color: GOLD }}>
                   FCFA
                 </span>
               </div>
-              <p className="text-sm text-[#9a9aa2]">
+              <p className="text-center text-sm text-[#9a9aa2]">
                 Min {money(minAmount)} • Max {money(maxAmount)}
               </p>
-              {amountError && <p className="text-sm text-destructive">{amountError}</p>}
+              {amountError && <p className="text-center text-sm text-destructive">{amountError}</p>}
             </div>
 
             <div className="grid grid-cols-4 gap-2">
@@ -369,7 +393,7 @@ function DepositPage() {
                     key={value}
                     type="button"
                     onClick={() => setAmount(String(value))}
-                    className="rounded-xl border-2 py-3 text-base font-bold transition"
+                    className="rounded-xl border-2 py-2.5 text-base font-bold transition"
                     style={{
                       borderColor: GOLD,
                       background: active ? GOLD : "transparent",
@@ -381,6 +405,8 @@ function DepositPage() {
                 );
               })}
             </div>
+
+            <NumericKeypad onKey={pressKey} onDelete={pressDelete} accent={GOLD} ink="#141418" />
           </motion.div>
         )}
 
