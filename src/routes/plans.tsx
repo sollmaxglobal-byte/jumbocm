@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Money } from "@/components/Money";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 type Plan = {
@@ -38,13 +39,17 @@ export const Route = createFileRoute("/plans")({
 
 function PlansPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    supabase
-      .from("plans")
-      .select("*")
-      .eq("active", true)
-      .order("min_amount", { ascending: true })
-      .then(({ data }) => setPlans((data as Plan[]) ?? []));
+    void (async () => {
+      const { data } = await supabase
+        .from("plans")
+        .select("*")
+        .eq("active", true)
+        .order("min_amount", { ascending: true });
+      setPlans((data as Plan[]) ?? []);
+      setLoading(false);
+    })();
   }, []);
 
   return (
@@ -92,6 +97,26 @@ function PlansPage() {
       {/* Plans */}
       <section className="mx-auto -mt-10 max-w-6xl px-4 pb-16 md:-mt-14 md:pb-24">
         <div className="grid gap-4 md:grid-cols-3 md:gap-6">
+          {loading &&
+            [0, 1, 2].map((i) => (
+              <div key={i} className="rounded-3xl border border-border bg-card p-6">
+                <Skeleton className="h-7 w-24" />
+                <Skeleton className="mt-3 h-3 w-full" />
+                <Skeleton className="mt-2 h-3 w-2/3" />
+                <Skeleton className="mt-6 h-10 w-28" />
+                <Skeleton className="mt-5 h-16 w-full rounded-2xl" />
+                <Skeleton className="mt-4 h-3 w-3/4" />
+                <Skeleton className="mt-2 h-3 w-2/3" />
+                <Skeleton className="mt-6 h-11 w-full rounded-xl" />
+              </div>
+            ))}
+
+          {!loading && plans.length === 0 && (
+            <p className="col-span-full rounded-3xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
+              No plans are available right now. Please check back shortly.
+            </p>
+          )}
+
           {plans.map((p, i) => {
             const featured = i === 1;
             const totalReturn = p.daily_roi_percent * p.duration_days;
