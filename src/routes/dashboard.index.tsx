@@ -417,6 +417,11 @@ function InvestmentRow({
         <span>{investment.is_paused ? "Paused" : "In progress"}</span>
         <span>{Math.round(progress)}%</span>
       </div>
+      <Button asChild variant="outline" size="sm" className="mt-3 w-full rounded-xl">
+        <Link to="/dashboard/upgrade/$investmentId" params={{ investmentId: investment.id }}>
+          Upgrade plan
+        </Link>
+      </Button>
     </div>
   );
 }

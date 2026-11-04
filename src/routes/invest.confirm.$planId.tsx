@@ -2,13 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, ShieldCheck, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { formatXAF } from "@/lib/format";
+import { formatUSD, formatXAF } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { dailyProfitFor, payoutLabel, type Plan } from "@/components/invest/planMath";
 
 const searchSchema = z.object({ amount: z.coerce.number().optional() });
 
@@ -29,21 +29,6 @@ export const Route = createFileRoute("/invest/confirm/$planId")({
   }),
   component: ConfirmInvestment,
 });
-
-type Plan = {
-  id: string;
-  name: string;
-  description: string | null;
-  min_amount: number;
-  max_amount: number;
-  daily_roi_percent: number;
-  duration_days: number;
-  profit_type: "percent" | "fixed";
-  fixed_daily_profit: number;
-  payout_frequency: string;
-  amount_type: "range" | "fixed";
-  fixed_amount: number;
-};
 
 function ConfirmInvestment() {
   const { planId } = Route.useParams();
@@ -90,12 +75,9 @@ function ConfirmInvestment() {
       : Number(amountInput ?? plan.min_amount)
     : 0;
 
-  const dailyProfit = plan
-    ? plan.profit_type === "fixed"
-      ? Number(plan.fixed_daily_profit)
-      : (amount * Number(plan.daily_roi_percent)) / 100
-    : 0;
+  const dailyProfit = plan ? dailyProfitFor(plan, amount) : 0;
   const totalProfit = plan ? dailyProfit * plan.duration_days : 0;
+  const totalReturn = amount + totalProfit;
 
   async function confirm() {
     if (!plan) return;
@@ -141,86 +123,153 @@ function ConfirmInvestment() {
   const insufficient = amount > balance;
 
   return (
-    <div className="min-h-screen bg-background px-4 py-10">
-      <div className="mx-auto w-full max-w-md">
-        <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-            <ShieldCheck className="h-6 w-6 text-primary" />
-          </div>
-          <h1 className="mt-3 font-display text-2xl text-primary">Confirm your investment</h1>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Review the details below before activating.
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#06333B] via-[#0B4E57] to-[#127A6E] px-4 pb-16 pt-5 text-white">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-12 -top-14 h-40 w-40 rounded-full bg-white/10 blur-3xl"
+        />
+        <div className="relative mx-auto w-full max-w-md">
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/dashboard/invest" })}
+            className="inline-flex items-center gap-1 text-xs font-medium text-white/70 transition hover:text-white"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" /> Back to plans
+          </button>
+          <p className="mt-4 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
+            Step 3 of 3 · Review
+          </p>
+          <h1 className="mt-1.5 font-display text-[26px] leading-tight">Confirm your investment</h1>
+          <p className="mt-1 text-[11px] text-white/70">
+            Check the details below, then activate your plan.
           </p>
         </div>
+      </div>
 
-        <div className="mt-6 rounded-2xl border border-border bg-card p-5">
-          <div className="font-display text-xl text-primary">{plan.name}</div>
-          {plan.description && (
-            <div className="text-xs text-muted-foreground">{plan.description}</div>
-          )}
+      <div className="mx-auto -mt-10 w-full max-w-md px-4 pb-10">
+        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+          <div className="flex items-center gap-3 bg-primary/[0.06] px-4 py-3.5">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground">
+              <ShieldCheck className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">{plan.name}</p>
+              {plan.description && (
+                <p className="line-clamp-1 text-[11px] text-muted-foreground">{plan.description}</p>
+              )}
+            </div>
+          </div>
 
           {plan.amount_type !== "fixed" && (
-            <div className="mt-4">
-              <Label htmlFor="amount">Amount to invest (XAF)</Label>
-              <Input
-                id="amount"
-                type="number"
-                step={500}
-                min={plan.min_amount}
-                max={plan.max_amount}
-                value={amountInput ?? plan.min_amount}
-                onChange={(e) => setAmountInput(Number(e.target.value))}
-              />
-              <div className="mt-1 text-xs text-muted-foreground">
-                Min {formatXAF(plan.min_amount)} · Max {formatXAF(plan.max_amount)}
+            <div className="border-b border-border px-4 py-4">
+              <label htmlFor="amount" className="block text-xs font-medium text-muted-foreground">
+                Amount to invest
+              </label>
+              <div className="mt-2 rounded-2xl border border-border bg-secondary/40 px-4 py-3 transition focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15">
+                <div className="flex items-center gap-2">
+                  <input
+                    id="amount"
+                    type="number"
+                    inputMode="numeric"
+                    step={500}
+                    min={plan.min_amount}
+                    max={plan.max_amount}
+                    value={amountInput ?? plan.min_amount}
+                    onChange={(e) => setAmountInput(Number(e.target.value))}
+                    className="w-full min-w-0 bg-transparent text-2xl font-bold tabular-nums text-foreground outline-none"
+                  />
+                  <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    XAF
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[11px] tabular-nums text-muted-foreground">
+                  ≈ {formatUSD(amount)}
+                </p>
+              </div>
+              <div className="mt-1.5 flex justify-between text-[10px] text-muted-foreground">
+                <span>Min {formatXAF(plan.min_amount)}</span>
+                <span>Max {formatXAF(plan.max_amount)}</span>
               </div>
             </div>
           )}
 
-          <div className="mt-4 space-y-2 text-sm">
+          <div className="space-y-2.5 px-4 py-4 text-[13px]">
             <Row label="Amount" value={formatXAF(amount)} />
             <Row label="Daily profit" value={formatXAF(dailyProfit)} accent />
             <Row label="Duration" value={`${plan.duration_days} days`} />
-            <Row label="Payout" value={(plan.payout_frequency ?? "daily").replace("_", " ")} />
+            <Row label="Payout" value={payoutLabel(plan.payout_frequency)} />
             <Row
               label={`Total profit (${plan.duration_days} days)`}
               value={formatXAF(totalProfit)}
               accent
             />
-            <div className="flex justify-between border-t border-border pt-2">
-              <span className="text-muted-foreground">Wallet balance</span>
-              <span className="font-bold uppercase tabular-nums">{formatXAF(balance)}</span>
+            <div className="border-t border-dashed border-border pt-3">
+              <div className="flex items-end justify-between">
+                <span className="text-xs text-muted-foreground">Total back</span>
+                <div className="text-right">
+                  <p className="text-xl font-bold leading-none tabular-nums text-foreground">
+                    {formatUSD(totalReturn)}
+                  </p>
+                  <p className="mt-1 text-[10px] tabular-nums text-muted-foreground">
+                    ≈ {formatXAF(totalReturn)}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {insufficient && (
-            <div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-xs">
-              <p className="font-medium text-warning">Insufficient wallet balance</p>
-              <p className="mt-1 text-muted-foreground">
-                You need {formatXAF(amount - balance)} more to activate this plan.
-              </p>
-              <Button
-                onClick={() => navigate({ to: "/dashboard/deposit" })}
-                className="mt-3 w-full bg-warning text-white hover:bg-warning/90"
-              >
-                Go to deposit
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center justify-between border-t border-border px-4 py-3">
+            <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+              <Wallet className="h-3.5 w-3.5" /> Wallet balance
+            </span>
+            <span
+              className={cn(
+                "text-xs font-semibold tabular-nums",
+                insufficient ? "text-warning" : "text-foreground",
+              )}
+            >
+              {formatXAF(balance)}
+            </span>
+          </div>
+        </div>
 
-          <Button
-            onClick={confirm}
-            disabled={busy || insufficient || outOfRange}
-            className="mt-5 w-full bg-primary text-primary-foreground hover:opacity-90"
-          >
-            {busy ? "Processing…" : "Confirm investment"}
-          </Button>
+        {insufficient && (
+          <div className="mt-3 rounded-2xl border border-warning/40 bg-warning/10 p-4 text-xs">
+            <p className="font-semibold text-warning">Insufficient wallet balance</p>
+            <p className="mt-1 text-muted-foreground">
+              You need {formatXAF(amount - balance)} more to activate this plan.
+            </p>
+            <Button
+              onClick={() => navigate({ to: "/dashboard/deposit" })}
+              className="mt-3 w-full rounded-xl bg-warning text-white hover:bg-warning/90"
+            >
+              Go to deposit
+            </Button>
+          </div>
+        )}
+
+        <div className="mt-4 flex gap-2">
           <Button
             variant="outline"
-            className="mt-2 w-full"
+            className="h-12 rounded-2xl px-4"
             onClick={() => navigate({ to: "/dashboard/invest" })}
           >
             Cancel
+          </Button>
+          <Button
+            onClick={confirm}
+            disabled={busy || insufficient || outOfRange}
+            className="h-12 flex-1 rounded-2xl text-sm font-semibold"
+          >
+            {busy ? (
+              <>
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Processing…
+              </>
+            ) : (
+              "Confirm investment"
+            )}
           </Button>
         </div>
       </div>
@@ -230,9 +279,14 @@ function ConfirmInvestment() {
 
 function Row({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex items-center justify-between gap-3">
       <span className="text-muted-foreground">{label}</span>
-      <span className={`font-bold uppercase tabular-nums ${accent ? "text-success" : ""}`}>
+      <span
+        className={cn(
+          "text-right font-semibold tabular-nums",
+          accent ? "text-success" : "text-foreground",
+        )}
+      >
         {value}
       </span>
     </div>

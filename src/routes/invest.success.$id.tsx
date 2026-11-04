@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Loader2, Copy } from "lucide-react";
+import { CalendarClock, CheckCircle2, Copy, Loader2, Sparkles, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { formatXAF } from "@/lib/format";
+import { formatUSD, formatXAF, txRef } from "@/lib/format";
 
 export const Route = createFileRoute("/invest/success/$id")({
   head: () => ({
@@ -75,48 +75,98 @@ function InvestSuccess() {
     );
   }
 
-  const ref = (d?.tx_id ?? id).replace(/-/g, "").slice(0, 12).toUpperCase();
+  const ref = txRef(d?.tx_id ?? id);
 
   return (
-    <div className="min-h-screen bg-background px-4 py-10">
-      <div className="mx-auto w-full max-w-md text-center">
-        <div className="mx-auto flex h-16 w-16 animate-in zoom-in items-center justify-center rounded-full bg-success/15">
-          <CheckCircle2 className="h-9 w-9 text-success" />
-        </div>
-        <h1 className="mt-4 font-display text-2xl text-primary">
-          Investment plan purchased successfully
-        </h1>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Your plan is now active and profit will be credited automatically.
-        </p>
-
-        {d && (
-          <div className="mt-6 space-y-2 rounded-2xl border border-border bg-card p-5 text-left text-sm">
-            <Row label="Plan" value={d.plan_name} />
-            <Row label="Amount invested" value={formatXAF(d.amount)} />
-            <Row label="Duration" value={`${d.duration_days} days`} />
-            <Row label="Start" value={new Date(d.start_date).toLocaleString()} />
-            <Row label="Maturity" value={new Date(d.end_date).toLocaleString()} />
-            <div className="flex items-center justify-between border-t border-border pt-2">
-              <span className="text-muted-foreground">Transaction ID</span>
-              <button
-                className="flex items-center gap-1 font-bold uppercase tabular-nums text-primary"
-                onClick={() => {
-                  navigator.clipboard.writeText(ref);
-                  toast.success("Transaction ID copied");
-                }}
-              >
-                #{ref} <Copy className="h-3.5 w-3.5" />
-              </button>
-            </div>
+    <div className="min-h-screen bg-background">
+      {/* Celebration header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#06333B] via-[#0B4E57] to-[#127A6E] px-4 pb-20 pt-10 text-center text-white">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full bg-[#7BE3C4]/25 blur-3xl"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-20 -left-14 h-48 w-48 rounded-full bg-white/10 blur-3xl"
+        />
+        <div className="relative mx-auto w-full max-w-md">
+          <div className="mx-auto flex h-16 w-16 animate-in zoom-in items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur">
+            <CheckCircle2 className="h-9 w-9 text-[#C9F158]" />
           </div>
+          <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/80">
+            <Sparkles className="h-3 w-3" /> Plan active
+          </span>
+          <h1 className="mt-2 font-display text-[26px] leading-tight">
+            Investment purchased successfully
+          </h1>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-white/70">
+            Your plan is now active and profit will be credited automatically.
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto -mt-12 w-full max-w-md px-4 pb-10">
+        {d && (
+          <>
+            {/* Headline figures */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                <p className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <TrendingUp className="h-3 w-3" /> Invested
+                </p>
+                <p className="mt-1 text-lg font-bold leading-none tabular-nums text-foreground">
+                  {formatUSD(d.amount)}
+                </p>
+                <p className="mt-1 text-[10px] tabular-nums text-muted-foreground">
+                  {formatXAF(d.amount)}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border bg-card px-4 py-3">
+                <p className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <CalendarClock className="h-3 w-3" /> Matures
+                </p>
+                <p className="mt-1 text-lg font-bold leading-none tabular-nums text-foreground">
+                  {d.duration_days}d
+                </p>
+                <p className="mt-1 text-[10px] tabular-nums text-muted-foreground">
+                  {new Date(d.end_date).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+
+            {/* Receipt */}
+            <div className="mt-3 overflow-hidden rounded-3xl border border-border bg-card">
+              <div className="space-y-2.5 px-4 py-4 text-[13px]">
+                <Row label="Plan" value={d.plan_name} />
+                <Row label="Duration" value={`${d.duration_days} days`} />
+                <Row label="Start" value={new Date(d.start_date).toLocaleString()} />
+                <Row label="Maturity" value={new Date(d.end_date).toLocaleString()} />
+                <div className="flex items-center justify-between gap-3 border-t border-dashed border-border pt-3">
+                  <span className="text-muted-foreground">Transaction ID</span>
+                  <button
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold uppercase tabular-nums text-primary transition hover:bg-primary/15"
+                    onClick={() => {
+                      navigator.clipboard.writeText(ref);
+                      toast.success("Transaction ID copied");
+                    }}
+                  >
+                    #{ref} <Copy className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
-        <div className="mt-6 space-y-2">
-          <Button asChild className="w-full bg-primary text-primary-foreground hover:opacity-90">
+        <div className="mt-4 space-y-2">
+          <Button asChild className="h-12 w-full rounded-2xl text-sm font-semibold">
             <Link to="/dashboard">Go to dashboard</Link>
           </Button>
-          <Button asChild variant="outline" className="w-full">
+          <Button
+            asChild
+            variant="outline"
+            className="h-12 w-full rounded-2xl text-sm font-semibold"
+          >
             <Link to="/dashboard/invest">View more plans</Link>
           </Button>
         </div>
@@ -127,9 +177,9 @@ function InvestSuccess() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-3">
+    <div className="flex items-start justify-between gap-3">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-bold uppercase tabular-nums">{value}</span>
+      <span className="text-right font-semibold tabular-nums text-foreground">{value}</span>
     </div>
   );
 }

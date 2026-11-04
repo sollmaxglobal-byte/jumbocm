@@ -1,55 +1,29 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Calendar,
-  Check,
   ChevronLeft,
+  ChevronRight,
+  Clock,
   Loader2,
   ShieldCheck,
   Sparkles,
-  TrendingUp,
   Wallet,
-  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { DualMoney } from "@/components/DualMoney";
 import { formatUSD, formatXAF } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { PlanOption } from "./PlanOption";
+import { StepRail } from "./StepRail";
+import { dailyProfitFor, payoutLabel, type Plan } from "./planMath";
 
-export type Plan = {
-  id: string;
-  name: string;
-  description: string | null;
-  min_amount: number;
-  max_amount: number;
-  daily_roi_percent: number;
-  duration_days: number;
-  profit_type: "percent" | "fixed";
-  fixed_daily_profit: number;
-  payout_frequency: "daily" | "weekly" | "monthly" | "end_of_term";
-  amount_type: "range" | "fixed";
-  fixed_amount: number;
-};
-
-const POPULAR = "Growth Plan";
-const STEP_LABELS = ["Choose a plan", "Set amount", "Review"];
-
-function payoutLabel(freq: string | undefined) {
-  return (freq ?? "daily").replace("_", " ");
-}
-
-function dailyProfitFor(plan: Plan, amount: number) {
-  return plan.profit_type === "fixed"
-    ? Number(plan.fixed_daily_profit)
-    : (amount * Number(plan.daily_roi_percent)) / 100;
-}
+const STEP_LABELS = ["Choose plan", "Set amount", "Review"];
 
 /** Guided, three-step investment flow: pick a plan, set the amount, review and confirm. */
 export function InvestmentWizard() {
@@ -120,140 +94,101 @@ export function InvestmentWizard() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5 pb-4">
-      {/* Intro */}
-      <header className="flex items-end justify-between gap-4">
-        <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
-            <Sparkles className="h-3 w-3" /> Guided investing
-          </span>
-          <h1 className="mt-2 font-display text-2xl text-primary md:text-3xl">Grow your money</h1>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Three quick steps — no jargon, no guesswork.
-          </p>
-        </div>
-        <div className="rounded-xl border border-border bg-card px-3 py-1.5 text-right">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Wallet</div>
-          <div className="text-sm font-bold text-primary">{formatXAF(balance)}</div>
-          <div className="text-[10px] text-muted-foreground">≈ {formatUSD(balance)}</div>
-        </div>
-      </header>
-
-      {/* Progress */}
-      <div className="flex items-center gap-2">
-        {STEP_LABELS.map((label, i) => (
-          <div key={label} className="flex flex-1 flex-col gap-1.5">
-            <div
-              className={cn(
-                "h-1 rounded-full transition-colors",
-                i <= step ? "bg-primary" : "bg-border",
-              )}
-            />
-            <span
-              className={cn(
-                "text-[10px] font-medium",
-                i <= step ? "text-primary" : "text-muted-foreground",
-              )}
-            >
-              {i + 1}. {label}
-            </span>
-          </div>
-        ))}
+    <div className="mx-auto max-w-2xl space-y-4 pb-6">
+      {/* Back out of the flow */}
+      <div className="flex items-center justify-between text-xs">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1 font-medium text-muted-foreground transition hover:text-primary"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" /> Dashboard
+        </Link>
+        <Link
+          to="/dashboard/wallet"
+          className="inline-flex items-center gap-1 font-medium text-muted-foreground transition hover:text-primary"
+        >
+          <Wallet className="h-3.5 w-3.5" /> Wallet
+        </Link>
       </div>
+
+      {/* Plan summary */}
+      <section className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#06333B] via-[#0B4E57] to-[#127A6E] p-5 text-white shadow-[0_24px_60px_-32px_rgba(6,51,59,0.9)]">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-white/10 blur-2xl"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-[#7BE3C4]/25 blur-3xl"
+        />
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/80">
+              <Sparkles className="h-3 w-3" /> Investment plan
+            </span>
+            <h1 className="mt-2 font-display text-[26px] leading-tight sm:text-3xl">
+              Grow your money
+            </h1>
+            <p className="mt-1 text-[11px] leading-relaxed text-white/70">
+              Choose a plan, set your amount, confirm.
+            </p>
+          </div>
+          <div className="shrink-0 rounded-2xl bg-white/10 px-3 py-2 text-right backdrop-blur">
+            <p className="text-[9px] uppercase tracking-wider text-white/60">Wallet</p>
+            <p className="mt-0.5 text-[15px] font-bold leading-none tabular-nums">
+              {formatUSD(balance)}
+            </p>
+            <p className="mt-1 text-[9px] tabular-nums text-white/60">{formatXAF(balance)}</p>
+          </div>
+        </div>
+        <div className="relative mt-4 flex items-center justify-between border-t border-white/15 pt-2.5 text-[10px] text-white/70">
+          <span className="inline-flex items-center gap-1">
+            <Clock className="h-3 w-3" /> About 2 minutes
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <ShieldCheck className="h-3 w-3" /> Secure activation
+          </span>
+        </div>
+      </section>
+
+      <StepRail labels={STEP_LABELS} step={step} onBack={setStep} />
 
       {/* Step 1 — choose a plan */}
       {step === 0 && (
-        <div className="space-y-3">
+        <motion.div
+          key="plans"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-3"
+        >
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">Choose a plan</h2>
+              <p className="text-[11px] text-muted-foreground">
+                Profit figures are per day at the plan minimum.
+              </p>
+            </div>
+            <span className="shrink-0 text-[11px] text-muted-foreground">
+              {plans.length} available
+            </span>
+          </div>
+
           {plans.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
+            <div className="rounded-3xl border border-dashed border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
               No investment plans are available right now.
             </div>
           )}
-          {plans.map((plan, idx) => {
-            const active = selected?.id === plan.id;
-            const popular = plan.name === POPULAR;
-            const baseAmount = Number(
-              plan.amount_type === "fixed" ? plan.fixed_amount : plan.min_amount,
-            );
-            const perDay = dailyProfitFor(plan, baseAmount);
-            return (
-              <motion.button
-                key={plan.id}
-                type="button"
-                onClick={() => choosePlan(plan)}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04 }}
-                className={cn(
-                  "relative w-full overflow-hidden rounded-2xl border p-4 text-left transition active:scale-[0.995]",
-                  active
-                    ? "border-primary bg-primary/5 ring-2 ring-primary/25"
-                    : "border-border bg-card hover:border-primary/40",
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-foreground">{plan.name}</h3>
-                      {popular && (
-                        <span className="rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-foreground">
-                          Popular
-                        </span>
-                      )}
-                    </div>
-                    {plan.description && (
-                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                        {plan.description}
-                      </p>
-                    )}
-                  </div>
-                  <span
-                    className={cn(
-                      "grid h-6 w-6 shrink-0 place-items-center rounded-full border transition",
-                      active
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border text-transparent",
-                    )}
-                  >
-                    <Check className="h-3.5 w-3.5" />
-                  </span>
-                </div>
 
-                <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="text-2xl font-bold text-success">{formatXAF(perDay)}</span>
-                  <span className="text-xs font-medium text-muted-foreground">/ day</span>
-                  <span className="ml-auto text-[11px] font-medium text-muted-foreground">
-                    {plan.profit_type === "percent"
-                      ? `${plan.daily_roi_percent}% ROI`
-                      : "fixed daily"}
-                  </span>
-                </div>
-
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  <MiniStat icon={Calendar} label="Duration" value={`${plan.duration_days}d`} />
-                  <MiniStat
-                    icon={TrendingUp}
-                    label="Total profit"
-                    value={formatXAF(perDay * Number(plan.duration_days))}
-                    tone="success"
-                  />
-                  <MiniStat icon={Zap} label="Payout" value={payoutLabel(plan.payout_frequency)} />
-                </div>
-
-                <div className="mt-3 flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2 text-xs">
-                  <span className="text-muted-foreground">
-                    {plan.amount_type === "fixed" ? "Fixed amount" : "Invest from"}
-                  </span>
-                  <span className="font-semibold text-foreground">
-                    {plan.amount_type === "fixed"
-                      ? formatXAF(plan.fixed_amount)
-                      : `${formatXAF(plan.min_amount)} – ${formatXAF(plan.max_amount)}`}
-                  </span>
-                </div>
-              </motion.button>
-            );
-          })}
-        </div>
+          {plans.map((plan, idx) => (
+            <PlanOption
+              key={plan.id}
+              plan={plan}
+              index={idx}
+              active={selected?.id === plan.id}
+              onSelect={() => choosePlan(plan)}
+            />
+          ))}
+        </motion.div>
       )}
 
       {/* Step 2 — set the amount */}
@@ -264,23 +199,27 @@ export function InvestmentWizard() {
           animate={{ opacity: 1, x: 0 }}
           className="space-y-4"
         >
-          <div className="rounded-3xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
+          <div className="rounded-3xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
+              <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Investing in
+                  Selected plan
                 </p>
-                <p className="text-lg font-bold text-foreground">{selected.name}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{selected.name}</p>
               </div>
-              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase text-primary">
-                {payoutLabel(selected.payout_frequency)}
-              </span>
+              <button
+                type="button"
+                onClick={() => setStep(0)}
+                className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-primary transition hover:bg-primary/10"
+              >
+                Change
+              </button>
             </div>
 
             {selected.amount_type === "fixed" ? (
               <div className="mt-4 rounded-2xl bg-secondary/50 p-4 text-center">
                 <p className="text-xs text-muted-foreground">This plan has a fixed amount</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">
+                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
                   {formatXAF(selected.fixed_amount)}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
@@ -293,23 +232,32 @@ export function InvestmentWizard() {
                   htmlFor="invest-amount"
                   className="mt-4 block text-xs font-medium text-muted-foreground"
                 >
-                  Amount to invest (XAF)
+                  How much do you want to invest?
                 </label>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <Input
-                    id="invest-amount"
-                    type="number"
-                    inputMode="numeric"
-                    step={500}
-                    min={selected.min_amount}
-                    max={selected.max_amount}
-                    value={amountInput || ""}
-                    onChange={(e) => setAmountInput(Number(e.target.value))}
-                    className="text-lg font-bold tabular-nums"
-                  />
-                  <span className="shrink-0 text-sm font-medium text-muted-foreground">XAF</span>
+                <div className="mt-2 rounded-2xl border border-border bg-secondary/40 px-4 py-3 transition focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15">
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="invest-amount"
+                      type="number"
+                      inputMode="numeric"
+                      step={500}
+                      min={selected.min_amount}
+                      max={selected.max_amount}
+                      value={amountInput || ""}
+                      onChange={(e) => setAmountInput(Number(e.target.value))}
+                      placeholder="0"
+                      className="w-full min-w-0 bg-transparent text-2xl font-bold tabular-nums text-foreground outline-none placeholder:text-muted-foreground/50"
+                    />
+                    <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      XAF
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-[11px] tabular-nums text-muted-foreground">
+                    ≈ {formatUSD(amount)}
+                  </p>
                 </div>
-                <div className="mt-4">
+
+                <div className="mt-3">
                   <Slider
                     value={[
                       Math.min(Math.max(amountInput, selected.min_amount), selected.max_amount),
@@ -324,6 +272,7 @@ export function InvestmentWizard() {
                     <span>Max {formatXAF(selected.max_amount)}</span>
                   </div>
                 </div>
+
                 <div className="mt-3 flex gap-2">
                   {(
                     [
@@ -341,12 +290,18 @@ export function InvestmentWizard() {
                       key={label}
                       type="button"
                       onClick={() => setAmountInput(value)}
-                      className="flex-1 rounded-full border border-border bg-secondary/40 px-2 py-1.5 text-[11px] font-medium text-foreground transition hover:border-primary/40 hover:text-primary"
+                      className={cn(
+                        "flex-1 rounded-full border px-2 py-1.5 text-[11px] font-medium transition",
+                        amountInput === value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-secondary/40 text-foreground hover:border-primary/40 hover:text-primary",
+                      )}
                     >
                       {label}
                     </button>
                   ))}
                 </div>
+
                 {outOfRange && (
                   <p className="mt-2 text-[11px] font-medium text-destructive">
                     Enter an amount between {formatXAF(selected.min_amount)} and{" "}
@@ -358,42 +313,58 @@ export function InvestmentWizard() {
           </div>
 
           {/* Live projection */}
-          <div className="rounded-3xl border border-primary/20 bg-primary/[0.04] p-5">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Projected return
-            </p>
-            <div className="mt-2 grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Daily profit
-                </p>
-                <DualMoney
-                  value={dailyProfit}
-                  primary="usd"
-                  primaryClassName="text-lg font-bold tabular-nums text-success"
-                  usdClassName="text-[10px] text-muted-foreground"
-                />
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B3B45] via-[#0E5C63] to-[#0F8C7A] p-4 text-white shadow-[0_20px_50px_-30px_rgba(11,59,69,0.85)]">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/10 blur-2xl"
+            />
+            <div className="relative">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-white/60">
+                Projected return
+              </p>
+              <div className="mt-2.5 grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[10px] text-white/60">Daily profit</p>
+                  <DualMoney
+                    value={dailyProfit}
+                    primary="usd"
+                    primaryClassName="text-lg font-bold tabular-nums text-white"
+                    usdClassName="text-[10px] text-white/60"
+                  />
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/60">
+                    Total profit · {selected.duration_days}d
+                  </p>
+                  <DualMoney
+                    value={totalProfit}
+                    primary="usd"
+                    primaryClassName="text-lg font-bold tabular-nums text-white"
+                    usdClassName="text-[10px] text-white/60"
+                  />
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Total profit
-                </p>
-                <DualMoney
-                  value={totalProfit}
-                  primary="usd"
-                  primaryClassName="text-lg font-bold tabular-nums text-success"
-                  usdClassName="text-[10px] text-muted-foreground"
-                />
+              <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-2.5 text-xs">
+                <span className="text-white/70">
+                  Total back after {selected.duration_days} days
+                </span>
+                <span className="font-bold tabular-nums text-white">{formatUSD(totalReturn)}</span>
               </div>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-primary/15 pt-3 text-sm">
-              <span className="text-muted-foreground">
-                Total back after {selected.duration_days} days
-              </span>
-              <span className="font-bold tabular-nums text-foreground">
-                {formatXAF(totalReturn)}
-              </span>
-            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+            <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+              <Wallet className="h-3.5 w-3.5" /> Wallet balance
+            </span>
+            <span
+              className={cn(
+                "text-xs font-semibold tabular-nums",
+                insufficient ? "text-warning" : "text-foreground",
+              )}
+            >
+              {formatXAF(balance)}
+            </span>
           </div>
 
           {insufficient && (
@@ -416,20 +387,27 @@ export function InvestmentWizard() {
           animate={{ opacity: 1, x: 0 }}
           className="space-y-4"
         >
-          <div className="rounded-3xl border border-border bg-card p-5">
-            <div className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <div className="overflow-hidden rounded-3xl border border-border bg-card">
+            <div className="flex items-center gap-3 bg-primary/[0.06] px-4 py-3.5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground">
                 <ShieldCheck className="h-5 w-5" />
               </span>
-              <div>
-                <p className="text-sm font-bold text-foreground">{selected.name}</p>
-                <p className="text-xs text-muted-foreground">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">{selected.name}</p>
+                <p className="text-[11px] text-muted-foreground">
                   Review the details before activating.
                 </p>
               </div>
+              <button
+                type="button"
+                onClick={() => setStep(0)}
+                className="ml-auto shrink-0 rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold text-primary shadow-sm transition hover:bg-primary/10"
+              >
+                Change
+              </button>
             </div>
 
-            <div className="mt-4 space-y-2 text-sm">
+            <div className="space-y-2.5 px-4 py-4 text-[13px]">
               <Row label="Amount invested" value={formatXAF(amount)} />
               <Row label="Daily profit" value={formatXAF(dailyProfit)} accent />
               <Row label="Duration" value={`${selected.duration_days} days`} />
@@ -439,24 +417,34 @@ export function InvestmentWizard() {
                 value={formatXAF(totalProfit)}
                 accent
               />
-              <div className="flex items-center justify-between border-t border-border pt-2">
-                <span className="text-muted-foreground">Total back</span>
-                <span className="font-bold tabular-nums text-foreground">
-                  {formatXAF(totalReturn)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Wallet balance</span>
-                <span
-                  className={cn(
-                    "font-bold tabular-nums",
-                    insufficient ? "text-warning" : "text-foreground",
-                  )}
-                >
-                  {formatXAF(balance)}
-                </span>
+              <div className="border-t border-dashed border-border pt-3">
+                <div className="flex items-end justify-between">
+                  <span className="text-xs text-muted-foreground">Total back</span>
+                  <div className="text-right">
+                    <p className="text-xl font-bold leading-none tabular-nums text-foreground">
+                      {formatUSD(totalReturn)}
+                    </p>
+                    <p className="mt-1 text-[10px] tabular-nums text-muted-foreground">
+                      ≈ {formatXAF(totalReturn)}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+            <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+              <Wallet className="h-3.5 w-3.5" /> Wallet balance
+            </span>
+            <span
+              className={cn(
+                "text-xs font-semibold tabular-nums",
+                insufficient ? "text-warning" : "text-foreground",
+              )}
+            >
+              {formatXAF(balance)}
+            </span>
           </div>
 
           {insufficient && (
@@ -477,11 +465,11 @@ export function InvestmentWizard() {
       )}
 
       {/* Navigation */}
-      <div className="flex gap-3 pt-1">
+      <div className="flex gap-2 pt-1">
         {step > 0 && (
           <Button
             variant="outline"
-            className="rounded-xl"
+            className="h-12 rounded-2xl px-4"
             onClick={() => setStep((s) => s - 1)}
             disabled={busy}
           >
@@ -490,7 +478,7 @@ export function InvestmentWizard() {
         )}
         {step === 0 && (
           <Button
-            className="flex-1 rounded-xl font-semibold"
+            className="h-12 flex-1 rounded-2xl text-sm font-semibold"
             disabled={!selected}
             onClick={() => setStep(1)}
           >
@@ -499,16 +487,16 @@ export function InvestmentWizard() {
         )}
         {step === 1 && (
           <Button
-            className="flex-1 rounded-xl font-semibold"
+            className="h-12 flex-1 rounded-2xl text-sm font-semibold"
             disabled={!selected || outOfRange || amount <= 0}
             onClick={() => setStep(2)}
           >
-            Review investment <ArrowRight className="ml-1 h-4 w-4" />
+            Review investment <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         )}
         {step === 2 && (
           <Button
-            className="flex-1 rounded-xl font-semibold"
+            className="h-12 flex-1 rounded-2xl text-sm font-semibold"
             onClick={confirm}
             disabled={busy || insufficient || outOfRange}
           >
@@ -531,39 +519,16 @@ export function InvestmentWizard() {
   );
 }
 
-function MiniStat({
-  icon: Icon,
-  label,
-  value,
-  tone,
-}: {
-  icon: typeof Calendar;
-  label: string;
-  value: string;
-  tone?: "success";
-}) {
-  return (
-    <div className="rounded-lg bg-secondary/60 px-2.5 py-2">
-      <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
-        <Icon className="h-3 w-3" /> {label}
-      </div>
-      <div
-        className={cn(
-          "mt-0.5 text-xs font-semibold capitalize",
-          tone === "success" ? "text-success" : "text-foreground",
-        )}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
-
 function Row({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-3">
       <span className="text-muted-foreground">{label}</span>
-      <span className={cn("font-bold tabular-nums", accent ? "text-success" : "text-foreground")}>
+      <span
+        className={cn(
+          "text-right font-semibold tabular-nums",
+          accent ? "text-success" : "text-foreground",
+        )}
+      >
         {value}
       </span>
     </div>
