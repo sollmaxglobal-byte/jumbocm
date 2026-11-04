@@ -50,6 +50,7 @@ import { Route as ApiPublicNowpaymentsWebhookRouteImport } from './routes/api/pu
 import { Route as ApiPublicProcessReceiptEmailsRouteImport } from './routes/api/public/process-receipt-emails'
 import { Route as ApiPublicWithdrawQueueRouteImport } from './routes/api/public/withdraw-queue'
 import { Route as ApiPublicWithdrawResultRouteImport } from './routes/api/public/withdraw-result'
+import { Route as DashboardUpgradeInvestmentIdRouteImport } from './routes/dashboard.upgrade.$investmentId'
 import { Route as InvestConfirmPlanIdRouteImport } from './routes/invest.confirm.$planId'
 import { Route as InvestSuccessIdRouteImport } from './routes/invest.success.$id'
 import { Route as DashboardReceiptKindIdRouteImport } from './routes/dashboard.receipt.$kind.$id'
@@ -261,6 +262,12 @@ const ApiPublicWithdrawResultRoute = ApiPublicWithdrawResultRouteImport.update({
   path: '/api/public/withdraw-result',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardUpgradeInvestmentIdRoute =
+  DashboardUpgradeInvestmentIdRouteImport.update({
+    id: '/upgrade/$investmentId',
+    path: '/upgrade/$investmentId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const InvestConfirmPlanIdRoute = InvestConfirmPlanIdRouteImport.update({
   id: '/invest/confirm/$planId',
   path: '/invest/confirm/$planId',
@@ -319,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
   '/api/public/withdraw-result': typeof ApiPublicWithdrawResultRoute
+  '/dashboard/upgrade/$investmentId': typeof DashboardUpgradeInvestmentIdRoute
   '/invest/confirm/$planId': typeof InvestConfirmPlanIdRoute
   '/invest/success/$id': typeof InvestSuccessIdRoute
   '/dashboard/receipt/$kind/$id': typeof DashboardReceiptKindIdRoute
@@ -363,6 +371,7 @@ export interface FileRoutesByTo {
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
   '/api/public/withdraw-result': typeof ApiPublicWithdrawResultRoute
+  '/dashboard/upgrade/$investmentId': typeof DashboardUpgradeInvestmentIdRoute
   '/invest/confirm/$planId': typeof InvestConfirmPlanIdRoute
   '/invest/success/$id': typeof InvestSuccessIdRoute
   '/dashboard/receipt/$kind/$id': typeof DashboardReceiptKindIdRoute
@@ -410,6 +419,7 @@ export interface FileRoutesById {
   '/api/public/process-receipt-emails': typeof ApiPublicProcessReceiptEmailsRoute
   '/api/public/withdraw-queue': typeof ApiPublicWithdrawQueueRoute
   '/api/public/withdraw-result': typeof ApiPublicWithdrawResultRoute
+  '/dashboard/upgrade/$investmentId': typeof DashboardUpgradeInvestmentIdRoute
   '/invest/confirm/$planId': typeof InvestConfirmPlanIdRoute
   '/invest/success/$id': typeof InvestSuccessIdRoute
   '/dashboard/receipt/$kind/$id': typeof DashboardReceiptKindIdRoute
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
     | '/api/public/withdraw-result'
+    | '/dashboard/upgrade/$investmentId'
     | '/invest/confirm/$planId'
     | '/invest/success/$id'
     | '/dashboard/receipt/$kind/$id'
@@ -502,6 +513,7 @@ export interface FileRouteTypes {
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
     | '/api/public/withdraw-result'
+    | '/dashboard/upgrade/$investmentId'
     | '/invest/confirm/$planId'
     | '/invest/success/$id'
     | '/dashboard/receipt/$kind/$id'
@@ -548,6 +560,7 @@ export interface FileRouteTypes {
     | '/api/public/process-receipt-emails'
     | '/api/public/withdraw-queue'
     | '/api/public/withdraw-result'
+    | '/dashboard/upgrade/$investmentId'
     | '/invest/confirm/$planId'
     | '/invest/success/$id'
     | '/dashboard/receipt/$kind/$id'
@@ -869,6 +882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWithdrawResultRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/upgrade/$investmentId': {
+      id: '/dashboard/upgrade/$investmentId'
+      path: '/upgrade/$investmentId'
+      fullPath: '/dashboard/upgrade/$investmentId'
+      preLoaderRoute: typeof DashboardUpgradeInvestmentIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/invest/confirm/$planId': {
       id: '/invest/confirm/$planId'
       path: '/invest/confirm/$planId'
@@ -932,6 +952,7 @@ interface DashboardRouteChildren {
   DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardWithdrawRoute: typeof DashboardWithdrawRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardUpgradeInvestmentIdRoute: typeof DashboardUpgradeInvestmentIdRoute
   DashboardReceiptKindIdRoute: typeof DashboardReceiptKindIdRoute
 }
 
@@ -944,6 +965,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardWalletRoute: DashboardWalletRoute,
   DashboardWithdrawRoute: DashboardWithdrawRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardUpgradeInvestmentIdRoute: DashboardUpgradeInvestmentIdRoute,
   DashboardReceiptKindIdRoute: DashboardReceiptKindIdRoute,
 }
 

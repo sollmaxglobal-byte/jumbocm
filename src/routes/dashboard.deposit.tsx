@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { ArrowLeft, Check, Clock3, Copy, FileImage, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,7 +13,15 @@ import { NumericKeypad } from "@/components/NumericKeypad";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export const Route = createFileRoute("/dashboard/deposit")({ component: DepositPage });
+export const Route = createFileRoute("/dashboard/deposit")({
+  // `upgrade` carries the pending plan upgrade this deposit is paying for, so the
+  // upgrade completes automatically once the payment is approved.
+  validateSearch: z.object({
+    amount: z.coerce.number().optional(),
+    upgrade: z.string().optional(),
+  }),
+  component: DepositPage,
+});
 
 type MethodId = string;
 type Method = {
@@ -83,7 +92,8 @@ function MethodLogo({ name }: { name: string }) {
 function DepositPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("");
+  const { amount: presetAmount, upgrade: upgradeId } = Route.useSearch();
+  const [amount, setAmount] = useState(presetAmount ? String(Math.round(presetAmount)) : "");
   const [method, setMethod] = useState<MethodId | null>(null);
   const [reference] = useState(makeReference);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -101,6 +111,21 @@ function DepositPage() {
   const checkCharge = useServerFn(checkKorapayDeposit);
   const startCrypto = useServerFn(startNowpaymentsDeposit);
   const [cryptoBusy, setCryptoBusy] = useState(false);
+
+  /** Ties this payment to the pending plan upgrade so approving it completes the upgrade. */
+  async function linkUpgrade(depositId?: string | null) {
+    if (!upgradeId) return;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).rpc("link_upgrade_deposit", {
+        _upgrade_id: upgradeId,
+        _deposit_id: depositId ?? null,
+        _reference: depositId ? null : reference,
+      });
+    } catch {
+      // The upgrade simply stays pending; the customer can retry from the upgrade page.
+    }
+  }
 
   const [activeMethods, setActiveMethods] = useState<Method[]>([]);
   const selectedMethod = activeMethods.find((m) => m.id === method);
@@ -262,6 +287,7 @@ function DepositPage() {
     try {
       const res = await startCharge({ data: { amount: amountNumber, phone } });
       setChargeId(res.depositId);
+      await linkUpgrade(res.depositId);
       if (res.status === "success") {
         navigate({ to: "/deposit-pending/$id", params: { id: res.depositId } });
       } else {
@@ -278,6 +304,7 @@ function DepositPage() {
     setCryptoBusy(true);
     try {
       const res = await startCrypto({ data: { amount: amountNumber } });
+      await linkUpgrade(res.depositId);
       window.location.href = res.invoiceUrl;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not start the crypto payment.");
@@ -311,6 +338,7 @@ function DepositPage() {
         .single();
       if (error) throw error;
       if (!createdDeposit) throw new Error("Deposit was created without an ID.");
+      await linkUpgrade(createdDeposit.id);
       toast.success("Proof uploaded successfully");
       navigate({ to: "/deposit-pending/$id", params: { id: createdDeposit.id } });
     } catch (error) {
@@ -359,6 +387,16 @@ function DepositPage() {
             <h1 className="text-[24px] font-extrabold leading-[1.1] tracking-tight">
               How much do you want to deposit?
             </h1>
+
+            {upgradeId && (
+              <div
+                className="rounded-2xl border px-3 py-2 text-[12px] leading-snug"
+                style={{ borderColor: GOLD, background: "rgba(246,200,90,0.08)", color: GOLD }}
+              >
+                Plan upgrade — pay {money(presetAmount ?? 0)} FCFA to complete it. Your investment
+                moves to the new plan automatically once this deposit is approved.
+              </div>
+            )}
 
             <div className="flex flex-col gap-2">
               <div
