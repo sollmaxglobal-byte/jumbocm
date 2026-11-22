@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   Save,
+  Headphones,
   MessageCircle,
   Mail,
   Share2,
@@ -34,6 +35,8 @@ type Settings = {
   tawk_property_id: string | null;
   tawk_widget_id: string | null;
   zendesk_widget_key: string | null;
+  support_whatsapp: string | null;
+  support_telegram: string | null;
   referral_percent: number | null;
   smtp_host: string | null;
   smtp_port: number | null;
@@ -156,6 +159,8 @@ function AdminSettings() {
         tawk_property_id: s.tawk_property_id,
         tawk_widget_id: s.tawk_widget_id,
         zendesk_widget_key: s.zendesk_widget_key,
+        support_whatsapp: s.support_whatsapp,
+        support_telegram: s.support_telegram,
         referral_percent: s.referral_percent ?? 5,
         smtp_host: s.smtp_host,
         smtp_port: s.smtp_port,
@@ -202,12 +207,14 @@ function AdminSettings() {
           nowpayments_enabled: _npEnabled,
           nowpayments_api_key: _npKey,
           nowpayments_ipn_secret: _npSecret,
+          support_whatsapp: _supportWhatsapp,
+          support_telegram: _supportTelegram,
           ...legacyPayload
         } = settingsPayload;
         ({ error } = await supabase.from("app_settings").update(legacyPayload).eq("id", 1));
         if (!error)
           toast.info(
-            "Settings saved; deposit limits and crypto settings will apply after the database migration is installed",
+            "Settings saved; deposit limits, crypto and support channels will apply after the database migration is installed",
           );
       }
       if (error) throw error;
@@ -375,13 +382,47 @@ function AdminSettings() {
             />
           </div>
           <div className="sm:col-span-2">
-            <Label>WhatsApp support link</Label>
+            <Label>Deposit page WhatsApp link</Label>
             <Input
               value={s.announcement_link ?? ""}
               onChange={(e) => set("announcement_link", e.target.value)}
               placeholder="https://wa.me/237..."
             />
             <p className="mt-1 text-xs text-muted-foreground">Used by the Contact Support on WhatsApp button on deposit processing pages.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
+        <h2 className="flex items-center gap-2 font-display text-lg text-primary">
+          <Headphones className="h-5 w-5" /> Support channels
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Shown on the Support page. WhatsApp opens a chat with your number; Telegram opens your
+          channel or group link.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label>WhatsApp number</Label>
+            <Input
+              value={s.support_whatsapp ?? ""}
+              onChange={(e) => set("support_whatsapp", e.target.value)}
+              placeholder="+237 6 70 00 00 00"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Any format — we turn it into a wa.me chat link.
+            </p>
+          </div>
+          <div>
+            <Label>Telegram link</Label>
+            <Input
+              value={s.support_telegram ?? ""}
+              onChange={(e) => set("support_telegram", e.target.value)}
+              placeholder="https://t.me/yourchannel"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Paste the full t.me link or just the username.
+            </p>
           </div>
         </div>
       </section>

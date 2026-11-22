@@ -63,6 +63,8 @@ export type Database = {
           ussd_pin: string | null
           ussd_webhook_url: string | null
           zendesk_widget_key: string | null
+          support_whatsapp: string | null
+          support_telegram: string | null
         }
         Insert: {
           nowpayments_enabled?: boolean
@@ -112,6 +114,8 @@ export type Database = {
           ussd_pin?: string | null
           ussd_webhook_url?: string | null
           zendesk_widget_key?: string | null
+          support_whatsapp?: string | null
+          support_telegram?: string | null
         }
         Update: {
           nowpayments_enabled?: boolean
@@ -161,6 +165,8 @@ export type Database = {
           ussd_pin?: string | null
           ussd_webhook_url?: string | null
           zendesk_widget_key?: string | null
+          support_whatsapp?: string | null
+          support_telegram?: string | null
         }
         Relationships: []
       }
@@ -885,6 +891,8 @@ export type Database = {
           tawk_widget_id: string | null
           tidio_public_key: string | null
           zendesk_widget_key: string | null
+          support_whatsapp: string | null
+          support_telegram: string | null
         }
         Insert: {
           nowpayments_enabled?: boolean | null
@@ -913,6 +921,8 @@ export type Database = {
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
           zendesk_widget_key?: string | null
+          support_whatsapp?: string | null
+          support_telegram?: string | null
         }
         Update: {
           nowpayments_enabled?: boolean | null
@@ -941,6 +951,8 @@ export type Database = {
           tawk_widget_id?: string | null
           tidio_public_key?: string | null
           zendesk_widget_key?: string | null
+          support_whatsapp?: string | null
+          support_telegram?: string | null
         }
         Relationships: []
       }
@@ -1038,6 +1050,8 @@ export type Database = {
           tidio_public_key: string | null
           updated_at: string
           zendesk_widget_key: string | null
+          support_whatsapp: string | null
+          support_telegram: string | null
         }[]
         SetofOptions: {
           from: "*"

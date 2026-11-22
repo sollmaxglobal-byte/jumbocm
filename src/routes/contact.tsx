@@ -1,50 +1,238 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Mail, MessageCircle, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  ArrowUpRight,
+  Clock,
+  Headphones,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Send,
+  ShieldCheck,
+} from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { supabase } from "@/integrations/supabase/client";
+import { telegramHref, whatsappHref } from "@/lib/support-links";
 import { useI18n } from "@/hooks/useI18n";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — JumboCM" },
-      { name: "description", content: "Reach the JumboCM team by phone, WhatsApp or email." },
+      { title: "Support — JumboCM" },
+      {
+        name: "description",
+        content: "Reach the JumboCM support team on WhatsApp or Telegram for fast, human help.",
+      },
     ],
   }),
-  component: ContactPage,
+  component: SupportPage,
 });
 
-function ContactPage() {
+function SupportPage() {
   const { t } = useI18n();
+  const [links, setLinks] = useState<{ whatsapp: string | null; telegram: string | null }>({
+    whatsapp: null,
+    telegram: null,
+  });
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const { data } = await supabase
+          .from("public_settings")
+          .select("support_whatsapp,support_telegram")
+          .eq("id", 1)
+          .maybeSingle();
+        if (!data) return;
+        setLinks({
+          whatsapp: data.support_whatsapp ?? null,
+          telegram: data.support_telegram ?? null,
+        });
+      } catch {
+        /* keep the channel cards in their unconfigured state */
+      }
+    })();
+  }, []);
+
+  const whatsapp = whatsappHref(links.whatsapp);
+  const telegram = telegramHref(links.telegram);
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <section className="bg-hero py-20 text-primary-foreground">
-        <div className="mx-auto max-w-4xl px-4">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            {t("Contact")}
+
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#06333B] via-[#0B4E57] to-[#127A6E] py-16 text-white md:py-24">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#7BE3C4]/20 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-6xl px-4">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/80">
+            <Headphones className="h-3 w-3" /> {t("Support center")}
+          </span>
+          <h1 className="mt-4 max-w-xl font-display text-4xl leading-[1.05] md:text-6xl">
+            {t("We're here to help.")}
+          </h1>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
+            {t(
+              "Talk to a real person from our Douala team. Fast answers on WhatsApp or Telegram — every day of the week.",
+            )}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {[
+              { icon: MessageCircle, label: t("Real human support") },
+              { icon: Clock, label: t("Replies in minutes") },
+              { icon: ShieldCheck, label: t("Mon–Sat · 8:00–20:00 WAT") },
+            ].map((chip) => (
+              <span
+                key={chip.label}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80"
+              >
+                <chip.icon className="h-3.5 w-3.5" /> {chip.label}
+              </span>
+            ))}
           </div>
-          <h1 className="mt-3 font-display text-5xl md:text-6xl">{t("We're here to help.")}</h1>
         </div>
       </section>
-      <section className="mx-auto max-w-4xl px-4 py-16">
-        <div className="grid gap-6 md:grid-cols-3">
+
+      {/* Channels */}
+      <section className="mx-auto -mt-10 max-w-6xl px-4 pb-12 md:-mt-14 md:pb-16">
+        <div className="grid gap-4 md:grid-cols-2 md:gap-6">
+          <ChannelCard
+            title={t("WhatsApp support")}
+            description={t(
+              "Chat one-to-one with our support team about deposits, withdrawals and your account.",
+            )}
+            cta={t("Chat on WhatsApp")}
+            href={whatsapp}
+            icon={MessageCircle}
+            tone="whatsapp"
+          />
+          <ChannelCard
+            title={t("Telegram support")}
+            description={t(
+              "Join our official Telegram channel for updates, announcements and quick help.",
+            )}
+            cta={t("Open Telegram")}
+            href={telegram}
+            icon={Send}
+            tone="telegram"
+          />
+        </div>
+      </section>
+
+      {/* Details */}
+      <section className="mx-auto max-w-6xl px-4 pb-16 md:pb-24">
+        <div className="grid gap-4 sm:grid-cols-3">
           {[
-            { i: Mail, t: t("Email"), d: "support@camvcc.com" },
-            { i: MessageCircle, t: "WhatsApp", d: "+237 6 70 00 00 00" },
-            { i: MapPin, t: t("Office"), d: t("Douala, Cameroon") },
-          ].map(({ i: Icon, t: label, d }) => (
-            <div key={label} className="rounded-2xl border border-border bg-card p-6">
-              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-gold">
-                <Icon className="h-5 w-5" />
-              </div>
-              <div className="font-display text-xl text-primary">{label}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{d}</div>
+            { icon: Mail, label: t("Email us"), value: "support@safegrowinvest.com" },
+            { icon: MapPin, label: t("Office"), value: t("Douala, Cameroon") },
+            { icon: Clock, label: t("Office hours"), value: t("Mon–Sat · 8:00–20:00 WAT") },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+            >
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                <item.icon className="h-4.5 w-4.5" />
+              </span>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {item.label}
+              </p>
+              <p className="mt-1 text-sm font-medium text-foreground">{item.value}</p>
             </div>
           ))}
         </div>
+
+        {whatsapp && (
+          <div className="mt-6 flex flex-col items-start gap-3 rounded-2xl border border-border bg-secondary/60 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-display text-lg text-primary">{t("Need a hand right away?")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t("Send us a message and our team will pick it up within minutes.")}
+              </p>
+            </div>
+            <a
+              href={whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+            >
+              {t("Chat on WhatsApp")} <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+        )}
       </section>
-      <SiteFooter />
     </div>
+  );
+}
+
+function ChannelCard({
+  title,
+  description,
+  cta,
+  href,
+  icon: Icon,
+  tone,
+}: {
+  title: string;
+  description: string;
+  cta: string;
+  href: string | null;
+  icon: typeof MessageCircle;
+  tone: "whatsapp" | "telegram";
+}) {
+  const { t } = useI18n();
+  const accent =
+    tone === "whatsapp"
+      ? "bg-[#25D366]/12 text-[#128C7E] ring-[#25D366]/25"
+      : "bg-[#229ED9]/12 text-[#1B7FAD] ring-[#229ED9]/25";
+  const button =
+    tone === "whatsapp"
+      ? "bg-[#128C7E] text-white hover:bg-[#0F7568]"
+      : "bg-[#1B7FAD] text-white hover:bg-[#166A91]";
+
+  const inner = (
+    <>
+      <div className="flex items-start justify-between gap-4">
+        <span
+          className={`grid h-12 w-12 place-items-center rounded-2xl ring-1 ring-inset ${accent}`}
+        >
+          <Icon className="h-6 w-6" />
+        </span>
+        {href && (
+          <ArrowUpRight className="h-5 w-5 text-muted-foreground transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+        )}
+      </div>
+      <h2 className="mt-5 font-display text-2xl text-primary">{title}</h2>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      {href ? (
+        <span
+          className={`mt-6 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${button}`}
+        >
+          {cta} <ArrowUpRight className="h-4 w-4" />
+        </span>
+      ) : (
+        <span className="mt-6 inline-flex items-center gap-2 rounded-xl border border-dashed border-border px-4 py-2.5 text-sm font-medium text-muted-foreground">
+          {t("Coming soon")}
+        </span>
+      )}
+    </>
+  );
+
+  const shell =
+    "group flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm transition md:p-7";
+
+  return href ? (
+    <a href={href} target="_blank" rel="noreferrer" className={`${shell} hover:shadow-elegant`}>
+      {inner}
+    </a>
+  ) : (
+    <div className={shell}>{inner}</div>
   );
 }
