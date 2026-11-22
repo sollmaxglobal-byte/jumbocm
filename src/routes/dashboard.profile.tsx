@@ -228,7 +228,7 @@ function ProfilePage() {
   }[profile?.kyc_status ?? "not_submitted"] ?? { label: "Not verified", className: "bg-white/5 text-white/50 ring-white/10" };
 
   return (
-    <div className="-mx-3 -my-4 min-h-screen bg-[#0A0B0D] pb-8 text-white sm:-mx-4 md:-my-6 md:pb-10">
+    <div className="-mx-3 -my-4 min-h-screen bg-[#0A0B0D] pb-28 text-white sm:-mx-4 md:-my-6 md:pb-10">
       <div className="mx-auto max-w-md md:max-w-2xl">
         {/* Top bar with section navigation */}
         <div className="sticky top-14 z-20 border-b border-white/5 bg-[#0A0B0D]/90 backdrop-blur-md">

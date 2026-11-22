@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { PushSetup } from "@/components/PushSetup";
+import { DashboardBottomNav } from "@/components/DashboardBottomNav";
 import { isStandalone } from "@/lib/push-client";
 
 export const Route = createFileRoute("/dashboard")({
@@ -115,29 +116,8 @@ function DashboardLayout() {
         </main>
       </div>
 
-      {/* Floating capsule nav (mobile) — hidden on pages that bring their own navigation */}
-      {!path.startsWith("/dashboard/deposit") && path !== "/dashboard/profile" && (
-        <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.9rem)] md:hidden">
-          <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#14112B] p-1.5 shadow-[0_16px_40px_-10px_rgba(20,17,43,0.55)]">
-            {NAV.map((item) => {
-              const active = isActive(item.to, item.exact);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to as never}
-                  aria-label={t(item.label)}
-                  className={`flex h-11 items-center justify-center gap-1.5 rounded-full px-3.5 transition active:scale-95 ${
-                    active ? "bg-[#C9F158] text-[#14112B]" : "text-white/60"
-                  }`}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {active && <span className="text-xs font-bold">{t(item.label)}</span>}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-      )}
+      {/* Shared app navigation — hidden during the deposit flow */}
+      {!path.startsWith("/dashboard/deposit") && <DashboardBottomNav className="md:hidden" />}
       <PushSetup />
     </div>
   );
