@@ -81,6 +81,15 @@ function ConfirmInvestment() {
   const totalProfit = plan ? dailyProfit * plan.duration_days : 0;
   const totalReturn = amount + totalProfit;
 
+  /** Wallet can't cover the amount: send the customer to deposit it instead. */
+  function activateOrDeposit() {
+    if (insufficient) {
+      navigate({ to: "/dashboard/deposit", search: { amount } });
+      return;
+    }
+    void confirm();
+  }
+
   async function confirm() {
     if (!plan) return;
     setBusy(true);
@@ -202,10 +211,7 @@ function ConfirmInvestment() {
           <div className="space-y-2.5 px-4 py-4 text-[13px]">
             <Row label={t("Amount")} value={formatXAF(amount)} />
             <Row label={t("Daily profit")} value={formatXAF(dailyProfit)} accent />
-            <Row
-              label={t("Duration")}
-              value={t("{days} days", { days: plan.duration_days })}
-            />
+            <Row label={t("Duration")} value={t("{days} days", { days: plan.duration_days })} />
             <Row label={t("Payout")} value={t(payoutLabel(plan.payout_frequency))} />
             <Row
               label={t("Total profit ({days} days)", { days: plan.duration_days })}
@@ -251,7 +257,7 @@ function ConfirmInvestment() {
               })}
             </p>
             <Button
-              onClick={() => navigate({ to: "/dashboard/deposit" })}
+              onClick={() => navigate({ to: "/dashboard/deposit", search: { amount } })}
               className="mt-3 w-full rounded-xl bg-warning text-white hover:bg-warning/90"
             >
               {t("Go to deposit")}
@@ -268,14 +274,16 @@ function ConfirmInvestment() {
             {t("Cancel")}
           </Button>
           <Button
-            onClick={confirm}
-            disabled={busy || insufficient || outOfRange}
+            onClick={activateOrDeposit}
+            disabled={busy || outOfRange}
             className="h-12 flex-1 rounded-2xl text-sm font-semibold"
           >
             {busy ? (
               <>
                 <Loader2 className="mr-1 h-4 w-4 animate-spin" /> {t("Processing…")}
               </>
+            ) : insufficient ? (
+              t("Deposit & invest")
             ) : (
               t("Confirm investment")
             )}
