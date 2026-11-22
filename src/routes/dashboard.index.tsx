@@ -10,7 +10,6 @@ import {
   Gift,
   Headphones,
   Home,
-  MoreHorizontal,
   PieChart,
   Settings,
   Star,
@@ -168,35 +167,24 @@ function DashboardHome() {
     >
       <div className="mx-auto max-w-md space-y-4 px-4 pb-4 pt-[calc(env(safe-area-inset-top)+0.9rem)]">
         {/* Header */}
-        <header className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <Link
-              to="/dashboard/profile"
-              aria-label="Profile"
-              className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#00FF88] to-[#0E9F6E] text-sm font-bold text-[#04120B] ring-2 ring-[#00FF88]/30"
-            >
-              {firstName.charAt(0).toUpperCase()}
-              <span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-[#0A0B0D]">
-                <Star className="h-3 w-3 fill-[#00FF88] text-[#00FF88]" />
-              </span>
-            </Link>
-            <div className="min-w-0">
-              <p className="truncate text-[11px] text-white/45">Welcome back,</p>
-              <p className="truncate text-sm font-semibold text-white">
-                {firstName}
-                {flag && <span className="ml-1.5">{flag}</span>}
-              </p>
-            </div>
+        <header className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm text-white/50">Welcome back,</p>
+            <p className="truncate text-xl font-semibold text-white">
+              {firstName}
+              {flag && <span className="ml-2">{flag}</span>}
+            </p>
           </div>
-          <div className="flex shrink-0 items-center gap-0.5">
-            <Link
-              to="/dashboard/profile"
-              aria-label="Settings"
-              className="grid h-9 w-9 place-items-center rounded-full text-white/70 transition hover:bg-white/5 hover:text-white"
-            >
-              <MoreHorizontal className="h-5 w-5" />
-            </Link>
-          </div>
+          <Link
+            to="/dashboard/profile"
+            aria-label="Profile"
+            className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#00FF88] to-[#0E9F6E] text-sm font-bold text-[#04120B] ring-2 ring-[#00FF88]/30"
+          >
+            {firstName.charAt(0).toUpperCase()}
+            <span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-[#0A0B0D]">
+              <Star className="h-3 w-3 fill-[#00FF88] text-[#00FF88]" />
+            </span>
+          </Link>
         </header>
 
         {/* Balance hero */}
