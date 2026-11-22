@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ArrowLeft, Check, Clock3, Copy, FileImage, Upload, X } from "lucide-react";
+import { ArrowLeft, Check, Clock3, FileImage, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
@@ -11,6 +11,7 @@ import { startNowpaymentsDeposit } from "@/lib/nowpayments.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { NumericKeypad } from "@/components/NumericKeypad";
+import { MethodPaymentScreen } from "@/components/deposit/MethodPaymentScreen";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -368,6 +369,21 @@ function DepositPage() {
       </div>
     );
 
+  // Manual mobile-money transfer: show the provider-branded send-money screen.
+  if (step === 3 && !instant && !crypto && selectedMethod)
+    return (
+      <MethodPaymentScreen
+        methodName={selectedMethod.name}
+        accountName={selectedMethod.accountName ?? selectedMethod.name}
+        number={selectedMethod.number}
+        amount={amountNumber}
+        timer={timer}
+        onBack={() => setStep(2)}
+        onPaid={() => setStep(4)}
+        onCopy={copy}
+      />
+    );
+
   return (
     <main
       className="fixed inset-0 z-30 mx-auto flex w-full max-w-md flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-4 text-white"
@@ -659,51 +675,6 @@ function DepositPage() {
           </motion.div>
         )}
 
-        {step === 3 && !instant && selectedMethod && (
-          <motion.div
-            key="payment"
-            initial={{ opacity: 0, x: 15 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -15 }}
-            className="flex flex-col gap-3 text-center"
-          >
-            <div>
-              <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
-                {t("Complete your payment")}
-              </h1>
-              <p className="mt-2 text-base font-semibold text-white/90">{t("Send exact amount")}</p>
-            </div>
-
-            <GoldRow
-              label={t("Amount to send")}
-              value={`${money(amount)} FCFA`}
-              onCopy={() => copy(String(amountNumber))}
-            />
-            <GoldRow
-              label={t("Send to number")}
-              value={selectedMethod.number}
-              light
-              onCopy={() => copy(selectedMethod.number)}
-            />
-            <GoldRow
-              label={t("Account name")}
-              value={selectedMethod.accountName ?? methodName(selectedMethod)}
-              hint={t("Confirm this name before you send")}
-              onCopy={() => copy(selectedMethod.accountName ?? "")}
-            />
-
-            <div className="mt-1 flex flex-col items-center gap-1">
-              <div className="flex items-center gap-2">
-                <Clock3 className="size-6" style={{ color: GOLD }} />
-                <span className="font-mono text-3xl font-bold" style={{ color: GOLD }}>
-                  {timer}
-                </span>
-              </div>
-              <p className="text-sm text-[#9a9aa2]">{t("Payment window expires in")}</p>
-            </div>
-          </motion.div>
-        )}
-
         {step === 4 && !submitted && (
           <motion.div
             key="proof"
@@ -888,49 +859,3 @@ function DepositPage() {
     </main>
   );
 }
-
-function GoldRow({
-  label,
-  value,
-  hint,
-  light,
-  onCopy,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  light?: boolean;
-  onCopy?: () => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <div
-      className="flex items-start gap-3 rounded-2xl border-2 px-4 py-3 text-left"
-      style={{ borderColor: GOLD, background: "#141418" }}
-    >
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold" style={{ color: GOLD }}>
-          {label}
-        </p>
-        <p
-          className="mt-0.5 break-words text-[22px] font-extrabold leading-tight"
-          style={{ color: light ? "#ffffff" : GOLD }}
-        >
-          {value}
-        </p>
-        {hint && <p className="mt-1 text-xs text-[#9a9aa2]">{hint}</p>}
-      </div>
-      {onCopy && (
-        <button
-          type="button"
-          onClick={onCopy}
-          aria-label={t("Copy {label}", { label })}
-          className="mt-1 shrink-0 rounded-md p-1.5 hover:bg-white/10"
-        >
-          <Copy className="size-5" style={{ color: GOLD }} />
-        </button>
-      )}
-    </div>
-  );
-}
-
