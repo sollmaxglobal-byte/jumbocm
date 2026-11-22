@@ -3,22 +3,18 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowDownLeft,
-  ArrowLeft,
+  ArrowUpCircle,
   ArrowUpRight,
-  BarChart3,
   ChevronRight,
   Copy,
   Gift,
   Headphones,
   Home,
   MoreHorizontal,
-  Pencil,
   PieChart,
-  Receipt,
-  Share2,
+  Settings,
   Star,
   TrendingUp,
-  User,
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -43,10 +39,46 @@ export const Route = createFileRoute("/dashboard/")({
 
 type Profile = {
   full_name: string | null;
+  phone: string | null;
   balance: number;
   referral_code: string | null;
   referral_earnings: number | null;
 };
+
+const DIAL_FLAGS: Record<string, string> = {
+  "237": "🇨🇲",
+  "225": "🇨🇮",
+  "221": "🇸🇳",
+  "241": "🇬🇦",
+  "242": "🇨🇬",
+  "243": "🇨🇩",
+  "235": "🇹🇩",
+  "236": "🇨🇫",
+  "240": "🇬🇶",
+  "229": "🇧🇯",
+  "228": "🇹🇬",
+  "226": "🇧🇫",
+  "223": "🇲🇱",
+  "227": "🇳🇪",
+  "234": "🇳🇬",
+  "233": "🇬🇭",
+  "254": "🇰🇪",
+  "27": "🇿🇦",
+  "33": "🇫🇷",
+  "44": "🇬🇧",
+  "49": "🇩🇪",
+  "1": "🇺🇸",
+};
+
+function countryFlag(phone?: string | null) {
+  const digits = (phone ?? "").replace(/\D/g, "");
+  const code = Object.keys(DIAL_FLAGS)
+    .sort((a, b) => b.length - a.length)
+    .find((c) => digits.startsWith(c));
+  if (code) return DIAL_FLAGS[code];
+  // Numbers saved without a dial code default to the app's home market.
+  return digits ? "🇨🇲" : "";
+}
 
 type ActiveInvestment = {
   id: string;
@@ -65,16 +97,15 @@ function DashboardHome() {
   const { t } = useI18n();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [investments, setInvestments] = useState<ActiveInvestment[]>([]);
-  const [referralCount, setReferralCount] = useState(0);
   const [totalWithdrawn, setTotalWithdrawn] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     void (async () => {
-      const [{ data: p }, { data: inv }, { count }, { data: wd }] = await Promise.all([
+      const [{ data: p }, { data: inv }, { data: wd }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("full_name,balance,referral_code,referral_earnings")
+          .select("full_name,phone,balance,referral_code,referral_earnings")
           .eq("id", user.id)
           .maybeSingle(),
         supabase
@@ -86,10 +117,6 @@ function DashboardHome() {
           .eq("status", "active")
           .order("end_date"),
         supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("referred_by", user.id),
-        supabase
           .from("withdrawals")
           .select("amount,status")
           .eq("user_id", user.id)
@@ -97,7 +124,6 @@ function DashboardHome() {
       ]);
       setProfile(p as Profile | null);
       setInvestments((inv as unknown as ActiveInvestment[]) ?? []);
-      setReferralCount(count ?? 0);
       setTotalWithdrawn(
         ((wd as { amount: number }[] | null) ?? []).reduce(
           (sum, item) => sum + Number(item.amount),
@@ -117,6 +143,7 @@ function DashboardHome() {
     [investments],
   );
   const firstName = (profile?.full_name ?? t("home.investor")).split(" ")[0];
+  const flag = countryFlag(profile?.phone);
   const growth = invested > 0 ? (profit / invested) * 100 : 0;
 
   const portfolioTotal = balance + profit + totalWithdrawn;
@@ -133,20 +160,6 @@ function DashboardHome() {
     toast.success("Balance copied");
   };
 
-  const shareApp = async () => {
-    const url = typeof window !== "undefined" ? window.location.origin : "";
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title: "JumboCM", url });
-        return;
-      } catch {
-        /* dismissed — fall through to copying */
-      }
-    }
-    await navigator.clipboard.writeText(url);
-    toast.success("Link copied");
-  };
-
   return (
     <motion.div
       className="min-h-screen bg-[#0A0B0D] pb-28 text-white"
@@ -157,14 +170,6 @@ function DashboardHome() {
         {/* Header */}
         <header className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => window.history.back()}
-              aria-label="Back"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-white/70 transition hover:bg-white/5 hover:text-white"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
             <Link
               to="/dashboard/profile"
               aria-label="Profile"
@@ -177,30 +182,13 @@ function DashboardHome() {
             </Link>
             <div className="min-w-0">
               <p className="truncate text-[11px] text-white/45">Welcome back,</p>
-              <p className="truncate text-sm font-semibold text-white">{firstName}</p>
+              <p className="truncate text-sm font-semibold text-white">
+                {firstName}
+                {flag && <span className="ml-1.5">{flag}</span>}
+              </p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-0.5">
-            <button
-              type="button"
-              onClick={shareApp}
-              aria-label="Share"
-              className="grid h-9 w-9 place-items-center rounded-full text-white/70 transition hover:bg-white/5 hover:text-white"
-            >
-              <Share2 className="h-[18px] w-[18px]" />
-            </button>
-            <Link
-              to="/dashboard/referrals"
-              aria-label="Referrals"
-              className="relative grid h-9 w-9 place-items-center rounded-full text-white/70 transition hover:bg-white/5 hover:text-white"
-            >
-              <Star className="h-[18px] w-[18px]" />
-              {referralCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#00FF88] px-1 text-[9px] font-bold text-[#04120B]">
-                  {referralCount}
-                </span>
-              )}
-            </Link>
             <Link
               to="/dashboard/profile"
               aria-label="Settings"
@@ -342,18 +330,19 @@ function DashboardHome() {
       <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
         <div className="pointer-events-auto grid w-full max-w-md grid-cols-5 items-end border-t border-white/5 bg-[#0B0C0E]/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] pt-2 backdrop-blur-md">
           <NavItem to="/dashboard" label="Home" icon={Home} active />
-          <NavItem to="/dashboard/invest" label="Analytics" icon={BarChart3} />
-          <div className="flex justify-center">
+          <NavItem to="/dashboard/invest" label="Invest" icon={TrendingUp} />
+          <div className="flex flex-col items-center gap-1">
             <Link
-              to="/dashboard/deposit"
-              aria-label="New"
+              to="/plans"
+              aria-label="Upgrade"
               className="-mt-6 grid h-14 w-14 place-items-center rounded-full bg-[#00FF88] text-[#04120B] shadow-[0_12px_30px_-6px_rgba(0,255,136,0.65)] ring-4 ring-[#0A0B0D] transition active:scale-95"
             >
-              <Pencil className="h-5 w-5" />
+              <ArrowUpCircle className="h-6 w-6" />
             </Link>
+            <span className="text-[10px] font-medium leading-none text-white/45">Upgrade</span>
           </div>
-          <NavItem to="/dashboard/wallet" label="Transactions" icon={Receipt} />
-          <NavItem to="/dashboard/profile" label="Profile" icon={User} />
+          <NavItem to="/dashboard/profile" label="Settings" icon={Settings} />
+          <NavItem to="/contact" label="Support" icon={Headphones} />
         </div>
       </nav>
     </motion.div>
