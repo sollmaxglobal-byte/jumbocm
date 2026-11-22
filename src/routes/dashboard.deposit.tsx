@@ -835,16 +835,16 @@ function DepositPage() {
           style={{ background: `${CARD}00` }}
         >
           <div className="mx-auto flex max-w-md gap-3">
-            {step > 1 && (
-              <Button
-                variant="outline"
-                onClick={() => setStep((step - 1) as 1 | 2 | 3)}
-                className="h-12 shrink-0 rounded-xl border-[#3c3c47] bg-transparent px-4 text-white hover:bg-white/5"
-                aria-label={t("Back")}
-              >
-                <ArrowLeft />
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={() =>
+                step > 1 ? setStep((step - 1) as 1 | 2 | 3) : navigate({ to: "/dashboard" })
+              }
+              className="h-12 shrink-0 rounded-xl border-[#3c3c47] bg-transparent px-5 text-base font-bold text-white hover:bg-white/5"
+            >
+              <ArrowLeft className="mr-1.5 size-4" />
+              {t("Back")}
+            </Button>
             <Button
               onClick={
                 step === 3 && instant

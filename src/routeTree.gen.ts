@@ -40,6 +40,7 @@ import { Route as DashboardInvestRouteImport } from './routes/dashboard.invest'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardReferRouteImport } from './routes/dashboard.refer'
 import { Route as DashboardReferralsRouteImport } from './routes/dashboard.referrals'
+import { Route as DashboardTransactionsRouteImport } from './routes/dashboard.transactions'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardWithdrawRouteImport } from './routes/dashboard.withdraw'
 import { Route as DepositPendingIdRouteImport } from './routes/deposit-pending.$id'
@@ -210,6 +211,11 @@ const DashboardReferralsRoute = DashboardReferralsRouteImport.update({
   path: '/referrals',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTransactionsRoute = DashboardTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardWalletRoute = DashboardWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/refer': typeof DashboardReferRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
+  '/dashboard/transactions': typeof DashboardTransactionsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/withdraw': typeof DashboardWithdrawRoute
   '/deposit-pending/$id': typeof DepositPendingIdRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/refer': typeof DashboardReferRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
+  '/dashboard/transactions': typeof DashboardTransactionsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/withdraw': typeof DashboardWithdrawRoute
   '/deposit-pending/$id': typeof DepositPendingIdRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/refer': typeof DashboardReferRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
+  '/dashboard/transactions': typeof DashboardTransactionsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/withdraw': typeof DashboardWithdrawRoute
   '/deposit-pending/$id': typeof DepositPendingIdRoute
@@ -456,6 +465,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/refer'
     | '/dashboard/referrals'
+    | '/dashboard/transactions'
     | '/dashboard/wallet'
     | '/dashboard/withdraw'
     | '/deposit-pending/$id'
@@ -501,6 +511,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/refer'
     | '/dashboard/referrals'
+    | '/dashboard/transactions'
     | '/dashboard/wallet'
     | '/dashboard/withdraw'
     | '/deposit-pending/$id'
@@ -548,6 +559,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/refer'
     | '/dashboard/referrals'
+    | '/dashboard/transactions'
     | '/dashboard/wallet'
     | '/dashboard/withdraw'
     | '/deposit-pending/$id'
@@ -812,6 +824,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReferralsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/transactions': {
+      id: '/dashboard/transactions'
+      path: '/transactions'
+      fullPath: '/dashboard/transactions'
+      preLoaderRoute: typeof DashboardTransactionsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/wallet': {
       id: '/dashboard/wallet'
       path: '/wallet'
@@ -949,6 +968,7 @@ interface DashboardRouteChildren {
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardReferRoute: typeof DashboardReferRoute
   DashboardReferralsRoute: typeof DashboardReferralsRoute
+  DashboardTransactionsRoute: typeof DashboardTransactionsRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardWithdrawRoute: typeof DashboardWithdrawRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -962,6 +982,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardReferRoute: DashboardReferRoute,
   DashboardReferralsRoute: DashboardReferralsRoute,
+  DashboardTransactionsRoute: DashboardTransactionsRoute,
   DashboardWalletRoute: DashboardWalletRoute,
   DashboardWithdrawRoute: DashboardWithdrawRoute,
   DashboardIndexRoute: DashboardIndexRoute,
