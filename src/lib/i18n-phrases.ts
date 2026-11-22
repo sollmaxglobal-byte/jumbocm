@@ -222,6 +222,13 @@ export const FR_PHRASE_TABLE: Record<string, string> = {
   "Account name": "Nom du compte",
   "Confirm this name before you send": "Vérifiez ce nom avant d'envoyer",
   "Payment window expires in": "La fenêtre de paiement expire dans",
+  "Payment instructions": "Instructions de paiement",
+  "Open your {method} menu and choose Send money.":
+    "Ouvrez le menu {method} et choisissez Envoyer de l'argent.",
+  "Enter the number above and send exactly {amount} FCFA.":
+    "Saisissez le numéro ci-dessus et envoyez exactement {amount} FCFA.",
+  "Keep the confirmation SMS, then tap “I have paid”.":
+    "Conservez le SMS de confirmation, puis appuyez sur « J'ai payé ».",
   "Send the exact amount — secure payment": "Envoyez le montant exact — paiement sécurisé",
   Recipient: "Destinataire",
   Verified: "Vérifié",
