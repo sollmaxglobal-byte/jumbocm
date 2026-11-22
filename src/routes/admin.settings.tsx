@@ -13,6 +13,7 @@ import {
   EyeOff,
   Copy,
   Download,
+  X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,66 @@ function CopyField({ label, value }: { label: string; value: string }) {
           <Copy className="h-4 w-4" />
         </Button>
       </div>
+    </div>
+  );
+}
+
+/** One entry per line, always showing at least one input row. */
+function splitRows(value: string | null): string[] {
+  const rows = (value ?? "").split("\n");
+  return rows.length ? rows : [""];
+}
+
+/** Repeatable list of support contacts saved as one entry per line. */
+function SupportRows({
+  label,
+  placeholder,
+  hint,
+  values,
+  onChange,
+}: {
+  label: string;
+  placeholder: string;
+  hint: string;
+  values: string[];
+  onChange: (next: string[]) => void;
+}) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <div className="space-y-2">
+        {values.map((value, index) => (
+          <div key={index} className="flex gap-2">
+            <Input
+              value={value}
+              placeholder={placeholder}
+              onChange={(e) =>
+                onChange(values.map((entry, i) => (i === index ? e.target.value : entry)))
+              }
+            />
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              aria-label={`Remove ${label}`}
+              disabled={values.length === 1}
+              onClick={() => onChange(values.filter((_, i) => i !== index))}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        className="mt-2"
+        onClick={() => onChange([...values, ""])}
+      >
+        + Add {label.toLowerCase()}
+      </Button>
+      <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
     </div>
   );
 }
@@ -398,32 +459,24 @@ function AdminSettings() {
           <Headphones className="h-5 w-5" /> Support channels
         </h2>
         <p className="text-sm text-muted-foreground">
-          Shown on the Support page. WhatsApp opens a chat with your number; Telegram opens your
-          channel or group link.
+          Shown on the Support page. Each WhatsApp number and each Telegram link becomes its own
+          button — add as many as you need.
         </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <Label>WhatsApp number</Label>
-            <Input
-              value={s.support_whatsapp ?? ""}
-              onChange={(e) => set("support_whatsapp", e.target.value)}
-              placeholder="+237 6 70 00 00 00"
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Any format — we turn it into a wa.me chat link.
-            </p>
-          </div>
-          <div>
-            <Label>Telegram link</Label>
-            <Input
-              value={s.support_telegram ?? ""}
-              onChange={(e) => set("support_telegram", e.target.value)}
-              placeholder="https://t.me/yourchannel"
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Paste the full t.me link or just the username.
-            </p>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SupportRows
+            label="WhatsApp number"
+            placeholder="+237 6 70 00 00 00"
+            hint="Any format — each number becomes its own wa.me chat button."
+            values={splitRows(s.support_whatsapp)}
+            onChange={(rows) => set("support_whatsapp", rows.join("\n"))}
+          />
+          <SupportRows
+            label="Telegram link"
+            placeholder="https://t.me/yourchannel"
+            hint="Full t.me link or username — each one becomes its own button."
+            values={splitRows(s.support_telegram)}
+            onChange={(rows) => set("support_telegram", rows.join("\n"))}
+          />
         </div>
       </section>
 
