@@ -5,7 +5,7 @@ export function LanguageToggle({
   variant = "default",
 }: {
   className?: string;
-  variant?: "default" | "terminal";
+  variant?: "default" | "auth";
 }) {
   const { lang, setLang } = useI18n();
   const next: Lang = lang === "en" ? "fr" : "en";
@@ -15,8 +15,8 @@ export function LanguageToggle({
       onClick={() => setLang(next)}
       aria-label={`Switch to ${next === "fr" ? "Français" : "English"}`}
       className={
-        variant === "terminal"
-          ? `term-tog term-mono ${className}`
+        variant === "auth"
+          ? `auth-lang ${className}`
           : `inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-border bg-card px-2.5 text-xs font-semibold uppercase tracking-wider text-foreground/80 transition hover:bg-muted ${className}`
       }
     >

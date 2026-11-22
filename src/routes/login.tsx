@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
-import { AuthTerminalShell, TerminalField, TICKET_IMAGE } from "@/components/AuthTerminal";
+import { AuthTerminalShell, TerminalField } from "@/components/AuthTerminal";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -50,9 +50,10 @@ function LoginPage() {
       if (error) throw error;
       toast.success(t("auth.welcomeToast"));
     } catch (err) {
-      const msg = err instanceof z.ZodError
-        ? err.issues[0]?.message ?? "Enter a valid email and password."
-        : (err as { message?: string }).message ?? "Unable to sign in. Please try again.";
+      const msg =
+        err instanceof z.ZodError
+          ? (err.issues[0]?.message ?? "Enter a valid email and password.")
+          : ((err as { message?: string }).message ?? "Unable to sign in. Please try again.");
       const normalized = msg.toLowerCase();
       const friendly = normalized.includes("invalid login credentials")
         ? "Email or password is incorrect. Check both fields and try again."
@@ -71,50 +72,46 @@ function LoginPage() {
 
   return (
     <AuthTerminalShell>
-      <span className="term-badge term-mono">Secure sign in</span>
-      <h1 className="term-title">Welcome back</h1>
-      <p className="term-sub">Sign in to manage your portfolio, deposits and payouts.</p>
+      <span className="auth-eyebrow">Secure sign in</span>
+      <h1 className="auth-title">{t("auth.welcomeBack")}</h1>
+      <p className="auth-sub">{t("auth.signInSub")}</p>
 
-      <form onSubmit={onSubmit} className="term-ticket">
-        <img src={TICKET_IMAGE} alt="" />
-        <div className="term-tin">
-          <TerminalField
-            rowClassName="term-r1"
-            id="email"
-            name="email"
-            type="email"
-            label={t("auth.email")}
-            required
-            autoComplete="email"
-            placeholder="you@example.com"
-          />
-          <TerminalField
-            rowClassName="term-r2"
-            id="password"
-            name="password"
-            type="password"
-            label={t("auth.password")}
-            required
-            autoComplete="current-password"
-            placeholder="••••••••"
-          />
-          <Link to="/forgot-password" className="term-fgt term-mono">
+      <form onSubmit={onSubmit} className="auth-form">
+        <TerminalField
+          id="email"
+          name="email"
+          type="email"
+          label={t("auth.email")}
+          required
+          autoComplete="email"
+          placeholder="you@example.com"
+        />
+        <TerminalField
+          id="password"
+          name="password"
+          type="password"
+          label={t("auth.password")}
+          required
+          autoComplete="current-password"
+          placeholder="••••••••"
+        />
+        <div className="auth-row">
+          <Link to="/forgot-password" className="auth-link">
             {t("auth.forgot")}
           </Link>
-          <button type="submit" disabled={busy} className="term-sbtn">
-            <span>{busy ? t("common.pleaseWait") : t("auth.signIn")}</span>
-            {busy ? (
-              <Loader2 className="h-[18px] w-[18px] animate-spin" />
-            ) : (
-              <ArrowRight className="h-[18px] w-[18px]" strokeWidth={3} />
-            )}
-          </button>
         </div>
+        <button type="submit" disabled={busy} className="auth-submit">
+          <span>{busy ? t("common.pleaseWait") : t("auth.signIn")}</span>
+          {busy ? (
+            <Loader2 className="h-[18px] w-[18px] animate-spin" />
+          ) : (
+            <ArrowRight className="h-[18px] w-[18px]" strokeWidth={3} />
+          )}
+        </button>
       </form>
 
-      <div className="term-alt">
-        {t("auth.noAccount")}{" "}
-        <Link to="/register">{t("auth.registerLink")}</Link>
+      <div className="auth-alt">
+        {t("auth.noAccount")} <Link to="/register">{t("auth.registerLink")}</Link>
       </div>
     </AuthTerminalShell>
   );

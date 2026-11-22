@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/hooks/useI18n";
-import { AuthTerminalShell, TerminalField, TICKET_IMAGE } from "@/components/AuthTerminal";
+import { AuthTerminalShell, TerminalField } from "@/components/AuthTerminal";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -53,41 +53,35 @@ function ForgotPasswordPage() {
 
   return (
     <AuthTerminalShell>
-      <span className="term-badge term-mono">Account recovery</span>
-      <h1 className="term-title">{t("auth.forgotTitle")}</h1>
-      <p className="term-sub">{t("auth.forgotSub")}</p>
+      <span className="auth-eyebrow">Account recovery</span>
+      <h1 className="auth-title">{t("auth.forgotTitle")}</h1>
+      <p className="auth-sub">{t("auth.forgotSub")}</p>
 
       {sent ? (
-        <div className="term-ticket">
-          <p className="term-note term-mono">{t("auth.resetSentBody")}</p>
-        </div>
+        <p className="auth-sent">{t("auth.resetSentBody")}</p>
       ) : (
-        <form onSubmit={onSubmit} className="term-ticket">
-          <img src={TICKET_IMAGE} alt="" />
-          <div className="term-tin">
-            <TerminalField
-              rowClassName="term-r1"
-              id="email"
-              name="email"
-              type="email"
-              label={t("auth.email")}
-              required
-              autoComplete="email"
-              placeholder="you@example.com"
-            />
-            <button type="submit" disabled={busy} className="term-sbtn">
-              <span>{busy ? t("auth.sending") : t("auth.sendReset")}</span>
-              {busy ? (
-                <Loader2 className="h-[18px] w-[18px] animate-spin" />
-              ) : (
-                <ArrowRight className="h-[18px] w-[18px]" strokeWidth={3} />
-              )}
-            </button>
-          </div>
+        <form onSubmit={onSubmit} className="auth-form">
+          <TerminalField
+            id="email"
+            name="email"
+            type="email"
+            label={t("auth.email")}
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+          />
+          <button type="submit" disabled={busy} className="auth-submit">
+            <span>{busy ? t("auth.sending") : t("auth.sendReset")}</span>
+            {busy ? (
+              <Loader2 className="h-[18px] w-[18px] animate-spin" />
+            ) : (
+              <ArrowRight className="h-[18px] w-[18px]" strokeWidth={3} />
+            )}
+          </button>
         </form>
       )}
 
-      <div className="term-alt">
+      <div className="auth-alt">
         <Link to="/login">
           <ArrowLeft className="mr-1 inline h-3 w-3 align-[-2px]" />
           {t("auth.backToSignIn")}
