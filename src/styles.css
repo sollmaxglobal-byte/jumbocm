@@ -841,3 +841,6 @@ html.app-standalone [contenteditable="true"] {
   background: rgba(0, 0, 0, 0.55);
   border-bottom: 1px solid #1d2618;
 }
+.term-note:last-child {
+  border-bottom: 0;
+}
