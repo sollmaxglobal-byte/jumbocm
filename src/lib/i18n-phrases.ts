@@ -534,4 +534,7 @@ export const FR_PHRASE_TABLE: Record<string, string> = {
   "Open link": "Ouvrir le lien",
   "Secure checkout · {step}/{total}": "Paiement sécurisé · {step}/{total}",
   "Loading markets…": "Chargement des marchés…",
+  "Recent activity": "Activité récente",
+  "No deposits or withdrawals yet.": "Aucun dépôt ni retrait pour le moment.",
+  Withdrawal: "Retrait",
 };
