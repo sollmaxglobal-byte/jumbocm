@@ -215,6 +215,8 @@ export const FR_PHRASE_TABLE: Record<string, string> = {
     "Vous serez redirigé vers le paiement sécurisé NOWPayments pour régler en BTC, ETH, USDT ou toute autre cryptomonnaie prise en charge. Votre portefeuille est crédité automatiquement dès que le réseau confirme le paiement.",
   "Complete your payment": "Finalisez votre paiement",
   "Send exact amount": "Envoyez le montant exact",
+  "Send the exact amount to validate the transaction":
+    "Envoyez le montant exact pour valider la transaction",
   "Amount to send": "Montant à envoyer",
   "Send to number": "Envoyer au numéro",
   "Account name": "Nom du compte",

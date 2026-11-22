@@ -3,10 +3,7 @@ import { useI18n } from "@/hooks/useI18n";
 import { formatXAF } from "@/lib/format";
 
 type MethodTheme = {
-  /** Header band background + its text/icon colour. */
-  header: string;
-  headerInk: string;
-  /** Primary brand colour for the amount, hints and field borders. */
+  /** Brand accent for the amount, hints and field borders. */
   accent: string;
   /** Readable ink that sits on white for the brand colour. */
   accentInk: string;
@@ -21,8 +18,6 @@ type MethodTheme = {
 };
 
 const MTN: MethodTheme = {
-  header: "#ffcb05",
-  headerInk: "#00305b",
   accent: "#ffcb05",
   accentInk: "#00305b",
   copyBg: "#00305b",
@@ -36,8 +31,6 @@ const MTN: MethodTheme = {
 };
 
 const ORANGE: MethodTheme = {
-  header: "#ff7900",
-  headerInk: "#ffffff",
   accent: "#ff7900",
   accentInk: "#ff7900",
   copyBg: "#ff7900",
@@ -51,8 +44,6 @@ const ORANGE: MethodTheme = {
 };
 
 const GENERIC: MethodTheme = {
-  header: "#f6c85a",
-  headerInk: "#101014",
   accent: "#f6c85a",
   accentInk: "#8a6d13",
   copyBg: "#101014",
@@ -106,58 +97,69 @@ export function MethodPaymentScreen({
   const amountOnly = amountLabel.replace(" FCFA", "");
 
   return (
-    <div
-      className="fixed inset-0 z-40 mx-auto flex h-dvh w-full max-w-md flex-col"
-      style={{ background: theme.header }}
-    >
-      {/* Provider header — the method the customer chose is the page title. */}
-      <header
-        className="flex shrink-0 items-center gap-2 px-4 pb-5 pt-[calc(env(safe-area-inset-top)+0.85rem)]"
-        style={{ color: theme.headerInk }}
-      >
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t("Back")}
-          className="-ml-1 flex size-9 items-center justify-center rounded-full transition-colors hover:bg-black/10"
-        >
-          <ArrowLeft className="size-5" />
-        </button>
-        <h1 className="min-w-0 flex-1 truncate text-center text-[17px] font-bold tracking-tight">
-          {methodName}
-        </h1>
-        <span className="flex size-9 items-center justify-center opacity-80" aria-hidden>
-          <HelpCircle className="size-5" />
-        </span>
+    <div className="fixed inset-0 z-40 mx-auto flex h-dvh w-full max-w-md flex-col bg-[#f5f5f5]">
+      {/* Provider header — the wallet the customer chose is the page title. */}
+      <header className="shrink-0 border-b border-[#ececec] bg-white">
+        <div className="flex items-center gap-2 px-3 pb-2.5 pt-[calc(env(safe-area-inset-top)+0.6rem)]">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={t("Back")}
+            className="flex size-10 shrink-0 items-center justify-center rounded-full text-[#333333] transition-colors hover:bg-black/5"
+          >
+            <ArrowLeft className="size-5" />
+          </button>
+          <h1
+            className="min-w-0 flex-1 truncate text-center text-[17px] font-bold tracking-tight"
+            style={{ color: theme.accentInk }}
+          >
+            {methodName}
+          </h1>
+          <span
+            className="flex size-10 shrink-0 items-center justify-center text-[#333333]"
+            aria-hidden
+          >
+            <HelpCircle className="size-5" />
+          </span>
+        </div>
       </header>
 
-      {/* White sheet */}
-      <div className="-mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-t-[28px] bg-white px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-6 text-[#1f1f1f]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-5 text-[#1f1f1f]">
         <div className="text-center">
+          <h2 className="text-[19px] font-bold leading-tight tracking-tight">
+            {t("Complete your payment")}
+          </h2>
+          <p className="mt-1 text-[13px] leading-snug text-[#6f6f6f]">
+            {t("Send the exact amount to validate the transaction")}
+          </p>
+
           <span
-            className="mx-auto flex size-14 items-center justify-center rounded-full"
+            className="mx-auto mt-4 flex size-14 items-center justify-center rounded-full"
             style={{ background: theme.tint, color: theme.accentInk }}
           >
             <Wallet className="size-7" strokeWidth={2.2} />
           </span>
           <div
-            className="mt-2 text-[30px] font-extrabold leading-tight tracking-tight tabular-nums"
+            className="mt-2 flex items-baseline justify-center gap-1.5"
             style={{ color: theme.accentInk }}
           >
-            {amountLabel}
+            <span className="text-[32px] font-extrabold leading-none tracking-tight tabular-nums">
+              {amountOnly}
+            </span>
+            <span className="text-[16px] font-bold">FCFA</span>
           </div>
-          <p className="mt-1 text-[15px] font-semibold text-[#2f2f2f]">{t("Amount to send")}</p>
+          <p className="mt-1.5 text-[14px] font-semibold text-[#2f2f2f]">{t("Amount to send")}</p>
         </div>
 
         {/* Recipient card */}
-        <div className="mt-5 rounded-2xl bg-white p-4 shadow-[0_10px_30px_rgba(16,24,40,0.12)] ring-1 ring-black/5">
+        <div className="mt-5 rounded-2xl bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.05),0_10px_28px_rgba(16,24,40,0.07)] ring-1 ring-black/[0.04]">
           <div className="flex items-center gap-3">
             <img
-              src="/avatar-african-man.svg"
+              src="/recipient-african-man.jpg"
               alt=""
               width={48}
               height={48}
-              className="size-12 shrink-0 rounded-full object-cover ring-1 ring-black/10"
+              className="size-12 shrink-0 rounded-full object-cover object-center ring-1 ring-black/10"
             />
             <div className="min-w-0">
               <div className="truncate text-[15px] font-extrabold uppercase tracking-wide text-[#333333]">
@@ -198,20 +200,19 @@ export function MethodPaymentScreen({
         </div>
 
         {/* Payment window */}
-        <div
-          className="mt-4 flex items-center gap-2 rounded-xl px-3 py-2.5"
-          style={{ background: theme.tint }}
-        >
-          <Clock3 className="size-5 shrink-0" style={{ color: theme.accentInk }} />
-          <span
-            className="font-mono text-[15px] font-extrabold tabular-nums"
-            style={{ color: theme.accentInk }}
-          >
-            {timer}
-          </span>
-          <span className="text-[12px] leading-tight text-[#5f5f5f]">
+        <div className="mt-4 rounded-2xl px-4 py-3 text-center" style={{ background: theme.tint }}>
+          <div className="flex items-center justify-center gap-2">
+            <Clock3 className="size-5 shrink-0" style={{ color: theme.accentInk }} />
+            <span
+              className="font-mono text-[24px] font-extrabold leading-none tabular-nums"
+              style={{ color: theme.accentInk }}
+            >
+              {timer}
+            </span>
+          </div>
+          <div className="mt-1.5 text-[12px] font-medium leading-tight text-[#5f5f5f]">
             {t("Payment window expires in")}
-          </span>
+          </div>
         </div>
 
         <div
