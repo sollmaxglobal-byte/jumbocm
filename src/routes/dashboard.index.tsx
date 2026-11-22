@@ -4,21 +4,19 @@ import { motion } from "framer-motion";
 import {
   ArrowDownLeft,
   ArrowLeft,
+  ArrowUpCircle,
   ArrowUpRight,
-  BarChart3,
   ChevronRight,
   Copy,
   Gift,
   Headphones,
   Home,
   MoreHorizontal,
-  Pencil,
   PieChart,
-  Receipt,
+  Settings,
   Share2,
   Star,
   TrendingUp,
-  User,
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -342,18 +340,19 @@ function DashboardHome() {
       <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
         <div className="pointer-events-auto grid w-full max-w-md grid-cols-5 items-end border-t border-white/5 bg-[#0B0C0E]/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] pt-2 backdrop-blur-md">
           <NavItem to="/dashboard" label="Home" icon={Home} active />
-          <NavItem to="/dashboard/invest" label="Analytics" icon={BarChart3} />
-          <div className="flex justify-center">
+          <NavItem to="/dashboard/invest" label="Invest" icon={TrendingUp} />
+          <div className="flex flex-col items-center gap-1">
             <Link
-              to="/dashboard/deposit"
-              aria-label="New"
+              to="/plans"
+              aria-label="Upgrade"
               className="-mt-6 grid h-14 w-14 place-items-center rounded-full bg-[#00FF88] text-[#04120B] shadow-[0_12px_30px_-6px_rgba(0,255,136,0.65)] ring-4 ring-[#0A0B0D] transition active:scale-95"
             >
-              <Pencil className="h-5 w-5" />
+              <ArrowUpCircle className="h-6 w-6" />
             </Link>
+            <span className="text-[10px] font-medium leading-none text-white/45">Upgrade</span>
           </div>
-          <NavItem to="/dashboard/wallet" label="Transactions" icon={Receipt} />
-          <NavItem to="/dashboard/profile" label="Profile" icon={User} />
+          <NavItem to="/dashboard/profile" label="Settings" icon={Settings} />
+          <NavItem to="/contact" label="Support" icon={Headphones} />
         </div>
       </nav>
     </motion.div>
