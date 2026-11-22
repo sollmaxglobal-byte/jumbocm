@@ -29,6 +29,8 @@ type MethodPaymentScreenProps = {
   amount: number;
   /** mm:ss countdown of the payment window. */
   timer: string;
+  /** Admin-configured instructions for this payment method, if any. */
+  instructions?: string;
   onBack: () => void;
   onPaid: () => void;
   onCopy: (value: string) => void;
@@ -45,6 +47,7 @@ export function MethodPaymentScreen({
   number,
   amount,
   timer,
+  instructions,
   onBack,
   onPaid,
   onCopy,
@@ -76,7 +79,23 @@ export function MethodPaymentScreen({
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-2">
-        <div className="text-center">
+        {/* Payment window — kept at the top so the countdown is always the first thing seen. */}
+        <div
+          className="rounded-2xl px-4 py-3 text-center text-black"
+          style={{ background: brand.accent }}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Clock3 className="size-5 shrink-0" strokeWidth={2.5} />
+            <span className="font-mono text-[24px] font-black leading-none tabular-nums">
+              {timer}
+            </span>
+          </div>
+          <div className="mt-1 text-[11px] font-semibold leading-tight">
+            {t("Payment window expires in")}
+          </div>
+        </div>
+
+        <div className="mt-4 text-center">
           <h1
             className="text-[23px] font-black uppercase leading-tight tracking-tight"
             style={{ color: brand.accent }}
@@ -155,20 +174,29 @@ export function MethodPaymentScreen({
           </button>
         </div>
 
-        {/* Payment window */}
+        {/* Payment instructions — how to send the money from this wallet. */}
         <div
-          className="mt-3 rounded-2xl px-4 py-3 text-center text-black"
-          style={{ background: brand.accent }}
+          className="mt-3 rounded-2xl border bg-black p-4"
+          style={{ borderColor: `${brand.accent}66` }}
         >
-          <div className="flex items-center justify-center gap-2">
-            <Clock3 className="size-5 shrink-0" strokeWidth={2.5} />
-            <span className="font-mono text-[24px] font-black leading-none tabular-nums">
-              {timer}
-            </span>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60">
+            {t("Payment instructions")}
           </div>
-          <div className="mt-1 text-[11px] font-semibold leading-tight">
-            {t("Payment window expires in")}
-          </div>
+          {instructions?.trim() ? (
+            <p className="mt-2 whitespace-pre-line text-[13px] leading-relaxed text-white/85">
+              {instructions}
+            </p>
+          ) : (
+            <ol className="mt-2 list-decimal space-y-1.5 pl-4 text-[13px] leading-relaxed text-white/85">
+              <li>{t("Open your {method} menu and choose Send money.", { method: methodName })}</li>
+              <li>
+                {t("Enter the number above and send exactly {amount} FCFA.", {
+                  amount: amountOnly,
+                })}
+              </li>
+              <li>{t("Keep the confirmation SMS, then tap “I have paid”.")}</li>
+            </ol>
+          )}
         </div>
 
         {/* Actions */}

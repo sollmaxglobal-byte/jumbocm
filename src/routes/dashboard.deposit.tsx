@@ -388,6 +388,7 @@ function DepositPage() {
         number={selectedMethod.number}
         amount={amountNumber}
         timer={timer}
+        instructions={selectedMethod.instructions}
         onBack={() => setStep(2)}
         onPaid={() => setStep(4)}
         onCopy={copy}
