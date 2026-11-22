@@ -1,11 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
   BadgeCheck,
   Bell,
+  ChevronLeft,
   ChevronRight,
   Copy,
   KeyRound,
@@ -23,9 +23,6 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PushToggle } from "@/components/PushToggle";
 
 export const Route = createFileRoute("/dashboard/profile")({
@@ -36,7 +33,7 @@ export const Route = createFileRoute("/dashboard/profile")({
       { property: "og:title", content: "Account & profile — JumboCM" },
       { property: "og:description", content: "Manage your JumboCM profile and account preferences." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "twitter:card", content: "summary" },
     ],
   }),
   component: ProfilePage,
@@ -57,6 +54,17 @@ const METHOD_LABEL: Record<PayoutAccount["method"], string> = {
   crypto: "Crypto wallet",
 };
 
+const SECTIONS = [
+  { id: "details", label: "Details" },
+  { id: "payouts", label: "Payouts" },
+  { id: "invite", label: "Invite" },
+  { id: "security", label: "Security" },
+  { id: "alerts", label: "Alerts" },
+];
+
+const INPUT_CLASS =
+  "h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#00FF88]/50";
+
 function initials(name?: string | null, email?: string) {
   return (name?.trim() || email || "J")
     .split(/\s+/)
@@ -66,11 +74,43 @@ function initials(name?: string | null, email?: string) {
     .toUpperCase();
 }
 
-function SectionTitle({ icon: Icon, children }: { icon: typeof UserRound; children: React.ReactNode }) {
+function Card({
+  id,
+  icon: Icon,
+  title,
+  action,
+  children,
+}: {
+  id: string;
+  icon: typeof UserRound;
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase text-muted-foreground">
-      <Icon className="h-3.5 w-3.5 text-primary" />
-      {children}
+    <section id={id} className="scroll-mt-40 overflow-hidden rounded-2xl border border-white/5 bg-[#0F1012]">
+      <div className="flex items-center justify-between gap-3 px-4 pt-4">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#00FF88]/10 text-[#00FF88]">
+            <Icon className="h-4 w-4" />
+          </span>
+          <h2 className="truncate text-sm font-semibold text-white">{title}</h2>
+        </div>
+        {action}
+      </div>
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
+function Row({ icon: Icon, label, value }: { icon: typeof Mail; label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3.5">
+      <Icon className="h-4 w-4 shrink-0 text-white/40" />
+      <div className="min-w-0">
+        <p className="text-[11px] text-white/40">{label}</p>
+        <p className="truncate text-sm font-medium text-white">{value}</p>
+      </div>
     </div>
   );
 }
@@ -181,108 +221,281 @@ function ProfilePage() {
   };
 
   const verification = {
-    not_submitted: { label: "Not verified", className: "bg-muted text-muted-foreground" },
-    pending: { label: "Review pending", className: "bg-warning/15 text-warning" },
-    verified: { label: "Verified", className: "bg-success/15 text-success" },
-    rejected: { label: "Needs attention", className: "bg-destructive/15 text-destructive" },
-  }[profile?.kyc_status ?? "not_submitted"] ?? { label: "Not verified", className: "bg-muted text-muted-foreground" };
+    not_submitted: { label: "Not verified", className: "bg-white/5 text-white/50 ring-white/10" },
+    pending: { label: "Review pending", className: "bg-[#F59E0B]/10 text-[#F59E0B] ring-[#F59E0B]/25" },
+    verified: { label: "Verified", className: "bg-[#00FF88]/10 text-[#00FF88] ring-[#00FF88]/25" },
+    rejected: { label: "Needs attention", className: "bg-red-500/10 text-red-400 ring-red-500/25" },
+  }[profile?.kyc_status ?? "not_submitted"] ?? { label: "Not verified", className: "bg-white/5 text-white/50 ring-white/10" };
 
   return (
-    <div className="profile-native -mx-3 -my-4 min-h-screen bg-background pb-32 sm:-mx-4 md:-my-6 md:pb-10">
-      <div className="mx-auto max-w-2xl">
-        <header className="border-b border-border bg-card px-4 pb-5 pt-6">
-          <p className="text-xs font-semibold uppercase text-muted-foreground">Account</p>
-          <h1 className="mt-1 text-2xl font-bold text-foreground">Profile & settings</h1>
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-5 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-primary text-xl font-bold text-primary-foreground shadow-gold">
-              {initials(profile?.full_name, user?.email)}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-lg font-bold text-foreground">{profile?.full_name || "JumboCM member"}</p>
-              <p className="truncate text-sm text-muted-foreground">{user?.email}</p>
-              <span className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold uppercase ${verification.className}`}>
-                <BadgeCheck className="h-3 w-3" /> {verification.label}
-              </span>
-            </div>
-            <ShieldCheck className="h-6 w-6 shrink-0 text-primary" />
-          </motion.div>
-        </header>
+    <div className="-mx-3 -my-4 min-h-screen bg-[#0A0B0D] pb-28 text-white sm:-mx-4 md:-my-6 md:pb-10">
+      <div className="mx-auto max-w-md md:max-w-2xl">
+        {/* Top bar with section navigation */}
+        <div className="sticky top-14 z-20 border-b border-white/5 bg-[#0A0B0D]/90 backdrop-blur-md">
+          <div className="flex items-center justify-between px-4 py-3">
+            <Link
+              to="/dashboard"
+              aria-label="Back to dashboard"
+              className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-white/70 transition hover:text-white"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Link>
+            <p className="text-sm font-semibold text-white">Profile &amp; settings</p>
+            <button
+              type="button"
+              aria-label="Sign out"
+              onClick={async () => {
+                await signOut();
+                navigate({ to: "/" });
+              }}
+              className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-white/70 transition hover:text-white"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+          <nav className="flex gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {SECTIONS.map((section) => (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-[#00FF88]/40 hover:text-white"
+              >
+                {section.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-        <div className="space-y-6 px-4 py-5">
-          <section>
-            <SectionTitle icon={UserRound}>Personal details</SectionTitle>
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border p-3.5">
-                <Mail className="h-5 w-5 text-primary" />
-                <div className="min-w-0"><p className="text-xs text-muted-foreground">Email address</p><p className="truncate text-sm font-semibold text-foreground">{user?.email ?? "—"}</p></div>
+        <div className="space-y-4 px-4 py-5">
+          {/* Identity */}
+          <section className="rounded-3xl bg-gradient-to-br from-[#00FF88]/45 via-white/5 to-[#3B82F6]/25 p-px">
+            <div className="relative overflow-hidden rounded-[23px] bg-[#0E1012] p-5">
+              <span className="pointer-events-none absolute -right-12 -top-14 h-40 w-40 rounded-full bg-[#00FF88]/10 blur-3xl" aria-hidden />
+              <div className="relative flex items-center gap-4">
+                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#00FF88] to-[#0E9F6E] text-xl font-bold text-[#04120B] shadow-[0_10px_30px_-10px_rgba(0,255,136,0.7)]">
+                  {initials(profile?.full_name, user?.email)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-lg font-semibold text-white">{profile?.full_name || "JumboCM member"}</p>
+                  <p className="truncate text-xs text-white/45">{user?.email}</p>
+                  <span className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${verification.className}`}>
+                    <BadgeCheck className="h-3 w-3" /> {verification.label}
+                  </span>
+                </div>
               </div>
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 p-3.5">
-                <Phone className="h-5 w-5 text-primary" />
-                <div className="min-w-0"><p className="text-xs text-muted-foreground">Phone number</p><p className="truncate text-sm font-semibold text-foreground">{profile?.phone ?? "Not added"}</p></div>
+              <div className="relative mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5">
+                  <p className="text-[10px] uppercase tracking-wide text-white/40">Payout methods</p>
+                  <p className="mt-0.5 text-sm font-semibold text-white tabular-nums">{accounts.length}</p>
+                </div>
+                <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5">
+                  <p className="text-[10px] uppercase tracking-wide text-white/40">Referral code</p>
+                  <p className="mt-0.5 truncate font-mono text-sm font-semibold text-[#00FF88]">{profile?.referral_code ?? "—"}</p>
+                </div>
               </div>
             </div>
           </section>
 
-          <section>
-            <SectionTitle icon={WalletCards}>Payout methods</SectionTitle>
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              {accounts.map((account, index) => (
-                <motion.div key={account.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-3.5 ${index < accounts.length - 1 ? "border-b border-border" : ""}`}>
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-secondary text-primary"><WalletCards className="h-5 w-5" /></div>
-                  <div className="min-w-0">
-                    <div className="flex min-w-0 items-center gap-2"><p className="truncate text-sm font-semibold">{account.account_name}</p>{account.is_default && <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase text-primary">Default</span>}</div>
-                    <p className="truncate text-xs text-muted-foreground">{METHOD_LABEL[account.method]} · {account.account_number}</p>
-                  </div>
-                  <div className="flex shrink-0">
-                    {!account.is_default && <Button size="icon" variant="ghost" aria-label="Make default" onClick={() => void makeDefault(account.id)}><Star className="h-4 w-4" /></Button>}
-                    <Button size="icon" variant="ghost" aria-label="Remove account" className="text-destructive" onClick={() => void removeAccount(account.id)}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </motion.div>
-              ))}
-              {!accounts.length && !showAccountForm && <p className="px-4 pt-4 text-sm text-muted-foreground">No payout method saved yet.</p>}
-              <AnimatePresence initial={false}>
-                {showAccountForm && (
-                  <motion.form initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} onSubmit={saveAccount} className="space-y-3 overflow-hidden border-t border-border p-4">
-                    <select name="payout_method" required className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground">
-                      <option value="mobile_money">Mobile money</option><option value="bank_transfer">Bank transfer</option><option value="crypto">Crypto wallet</option>
-                    </select>
-                    <Input name="payout_name" placeholder="Account name" required maxLength={120} className="h-11" />
-                    <Input name="payout_number" placeholder="Account or wallet number" required maxLength={120} className="h-11" />
-                    <div className="grid grid-cols-[auto_1fr] gap-2">
-                      <Button type="button" size="icon" variant="outline" aria-label="Cancel" onClick={() => setShowAccountForm(false)}><X /></Button>
-                      <Button type="submit" disabled={accountBusy}>{accountBusy ? "Saving…" : "Save payout method"}</Button>
+          {/* Personal details */}
+          <Card id="details" icon={UserRound} title="Personal details">
+            <div className="divide-y divide-white/5 border-t border-white/5">
+              <Row icon={Mail} label="Email address" value={user?.email ?? "—"} />
+              <Row icon={Phone} label="Phone number" value={profile?.phone ?? "Not added"} />
+            </div>
+          </Card>
+
+          {/* Payout methods */}
+          <Card
+            id="payouts"
+            icon={WalletCards}
+            title="Payout methods"
+            action={
+              !showAccountForm ? (
+                <button
+                  type="button"
+                  onClick={() => setShowAccountForm(true)}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#00FF88]/10 px-2.5 py-1 text-[11px] font-semibold text-[#00FF88]"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Add
+                </button>
+              ) : undefined
+            }
+          >
+            <div className="border-t border-white/5">
+              {accounts.map((account) => (
+                <div key={account.id} className="flex items-center gap-3 border-b border-white/5 px-4 py-3.5 last:border-b-0">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.04] text-[#00FF88]">
+                    <WalletCards className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <p className="truncate text-sm font-semibold text-white">{account.account_name}</p>
+                      {account.is_default && (
+                        <span className="shrink-0 rounded-full bg-[#00FF88]/10 px-2 py-0.5 text-[9px] font-bold uppercase text-[#00FF88]">Default</span>
+                      )}
                     </div>
-                  </motion.form>
-                )}
-              </AnimatePresence>
-              {!showAccountForm && <Button variant="ghost" className="h-12 w-full justify-between rounded-none border-t border-border px-4 text-primary" onClick={() => setShowAccountForm(true)}><span className="flex items-center gap-2"><Plus />{accounts.length ? "Add another account" : "Add payout account"}</span><ChevronRight /></Button>}
+                    <p className="truncate text-xs text-white/40">
+                      {METHOD_LABEL[account.method]} · {account.account_number}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center">
+                    {!account.is_default && (
+                      <button
+                        type="button"
+                        aria-label="Make default"
+                        onClick={() => void makeDefault(account.id)}
+                        className="grid h-9 w-9 place-items-center rounded-lg text-white/40 transition hover:bg-white/5 hover:text-[#00FF88]"
+                      >
+                        <Star className="h-4 w-4" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      aria-label="Remove account"
+                      onClick={() => void removeAccount(account.id)}
+                      className="grid h-9 w-9 place-items-center rounded-lg text-white/40 transition hover:bg-red-500/10 hover:text-red-400"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {!accounts.length && !showAccountForm && (
+                <p className="px-4 py-5 text-sm text-white/40">No payout method saved yet.</p>
+              )}
+              {showAccountForm && (
+                <form onSubmit={saveAccount} className="space-y-2.5 border-t border-white/5 p-4">
+                  <select name="payout_method" required className={INPUT_CLASS}>
+                    <option value="mobile_money" className="bg-[#0F1012]">Mobile money</option>
+                    <option value="bank_transfer" className="bg-[#0F1012]">Bank transfer</option>
+                    <option value="crypto" className="bg-[#0F1012]">Crypto wallet</option>
+                  </select>
+                  <input name="payout_name" placeholder="Account name" required maxLength={120} className={INPUT_CLASS} />
+                  <input name="payout_number" placeholder="Account or wallet number" required maxLength={120} className={INPUT_CLASS} />
+                  <div className="grid grid-cols-[auto_1fr] gap-2 pt-0.5">
+                    <button
+                      type="button"
+                      aria-label="Cancel"
+                      onClick={() => setShowAccountForm(false)}
+                      className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 text-white/60 transition hover:text-white"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={accountBusy}
+                      className="h-11 rounded-xl bg-[#00FF88] text-sm font-semibold text-[#04120B] transition active:scale-[0.99] disabled:opacity-60"
+                    >
+                      {accountBusy ? "Saving…" : "Save payout method"}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-          </section>
+          </Card>
 
-          <section>
-            <SectionTitle icon={Share2}>Invite & earn</SectionTitle>
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border bg-card p-4">
-              <div className="min-w-0"><p className="text-xs text-muted-foreground">Your referral code</p><p className="truncate font-mono text-base font-bold text-primary">{profile?.referral_code ?? "Not available"}</p></div>
-              <div className="flex gap-1"><Button size="icon" variant="outline" aria-label="Copy referral link" onClick={copyReferral}><Copy /></Button><Button size="icon" aria-label="Share referral link" onClick={() => void shareReferral()}><Share2 /></Button></div>
+          {/* Invite & earn */}
+          <Card id="invite" icon={Share2} title="Invite & earn">
+            <div className="border-t border-white/5 p-4">
+              <div className="rounded-xl border border-dashed border-[#00FF88]/25 bg-[#00FF88]/[0.04] px-3.5 py-3">
+                <p className="text-[10px] uppercase tracking-wide text-white/40">Your referral code</p>
+                <p className="mt-1 truncate font-mono text-base font-bold text-[#00FF88]">{profile?.referral_code ?? "Not available"}</p>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={copyReferral}
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-white/10 text-xs font-semibold text-white/80 transition hover:border-white/20 hover:text-white"
+                >
+                  <Copy className="h-3.5 w-3.5" /> Copy link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void shareReferral()}
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[#00FF88] text-xs font-semibold text-[#04120B] transition active:scale-[0.99]"
+                >
+                  <Share2 className="h-3.5 w-3.5" /> Share
+                </button>
+              </div>
             </div>
-          </section>
+          </Card>
 
-          <section>
-            <SectionTitle icon={ShieldCheck}>Security</SectionTitle>
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <Button variant="ghost" className="h-auto w-full justify-between rounded-none border-b border-border p-4" onClick={sendPinReset}><span className="flex items-center gap-3"><KeyRound className="text-primary" /><span className="text-left"><span className="block text-sm font-semibold">Transfer PIN</span><span className="block text-xs font-normal text-muted-foreground">Send a secure reset link</span></span></span><ChevronRight /></Button>
-              <Button variant="ghost" className="h-auto w-full justify-between rounded-none p-4" onClick={() => setShowPassword((value) => !value)}><span className="flex items-center gap-3"><ShieldCheck className="text-primary" /><span className="text-left"><span className="block text-sm font-semibold">Password</span><span className="block text-xs font-normal text-muted-foreground">Change your sign-in password</span></span></span><ChevronRight /></Button>
-              <AnimatePresence initial={false}>{showPassword && <motion.form initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} onSubmit={changePassword} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 overflow-hidden border-t border-border p-4"><Label htmlFor="new-password" className="sr-only">New password</Label><Input id="new-password" name="password" type="password" required minLength={8} maxLength={72} autoComplete="new-password" placeholder="New password" /><Button type="submit" disabled={passwordBusy}>{passwordBusy ? "Saving…" : "Update"}</Button></motion.form>}</AnimatePresence>
+          {/* Security */}
+          <Card id="security" icon={ShieldCheck} title="Security">
+            <div className="border-t border-white/5">
+              <button
+                type="button"
+                onClick={sendPinReset}
+                className="flex w-full items-center gap-3 border-b border-white/5 px-4 py-3.5 text-left transition hover:bg-white/[0.02]"
+              >
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.04] text-[#00FF88]">
+                  <KeyRound className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-white">Transfer PIN</span>
+                  <span className="block text-xs text-white/40">Send a secure reset link</span>
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0 text-white/30" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-white/[0.02]"
+              >
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.04] text-[#00FF88]">
+                  <ShieldCheck className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-white">Password</span>
+                  <span className="block text-xs text-white/40">Change your sign-in password</span>
+                </span>
+                <ChevronRight className={`h-4 w-4 shrink-0 text-white/30 transition ${showPassword ? "rotate-90" : ""}`} />
+              </button>
+              {showPassword && (
+                <form onSubmit={changePassword} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-t border-white/5 p-4">
+                  <label htmlFor="new-password" className="sr-only">New password</label>
+                  <input
+                    id="new-password"
+                    name="password"
+                    type="password"
+                    required
+                    minLength={8}
+                    maxLength={72}
+                    autoComplete="new-password"
+                    placeholder="New password"
+                    className={INPUT_CLASS}
+                  />
+                  <button
+                    type="submit"
+                    disabled={passwordBusy}
+                    className="h-11 rounded-xl bg-[#00FF88] px-4 text-sm font-semibold text-[#04120B] disabled:opacity-60"
+                  >
+                    {passwordBusy ? "Saving…" : "Update"}
+                  </button>
+                </form>
+              )}
             </div>
-          </section>
+          </Card>
 
-          <section>
-            <SectionTitle icon={Bell}>Notifications</SectionTitle>
-            <div className="overflow-hidden rounded-xl border border-border bg-card [&>div]:border-0 [&>div]:bg-transparent [&>div]:shadow-none"><PushToggle /></div>
-          </section>
+          {/* Notifications */}
+          <Card id="alerts" icon={Bell} title="Notifications">
+            <div className="border-t border-white/5 p-1 [&>div]:border-0 [&>div]:bg-transparent [&>div]:p-3.5 [&_span]:text-white [&_p]:text-white/40 [&_svg]:text-[#00FF88] [&_button]:bg-[#00FF88] [&_button]:text-[#04120B]">
+              <PushToggle />
+            </div>
+          </Card>
 
-          <Button variant="outline" className="h-12 w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={async () => { await signOut(); navigate({ to: "/" }); }}><LogOut /> Sign out</Button>
-          <p className="text-center text-[11px] text-muted-foreground">JumboCM · Secure account access</p>
+          <button
+            type="button"
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/" });
+            }}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-red-500/25 bg-red-500/[0.06] text-sm font-semibold text-red-400 transition hover:bg-red-500/10"
+          >
+            <LogOut className="h-4 w-4" /> Sign out
+          </button>
+          <p className="pb-2 text-center text-[11px] text-white/30">JumboCM · Secure account access</p>
         </div>
       </div>
     </div>
