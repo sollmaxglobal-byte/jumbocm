@@ -106,6 +106,9 @@ function DepositPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [remaining, setRemaining] = useState(900);
+  // Wall-clock end of the 15-minute payment window, so the countdown stays
+  // accurate instead of drifting with every re-created interval.
+  const [paymentDeadline, setPaymentDeadline] = useState(0);
   const [depositStatus, setDepositStatus] = useState("pending");
   const [payPhone, setPayPhone] = useState("");
   const [charging, setCharging] = useState(false);
@@ -203,10 +206,17 @@ function DepositPage() {
   }, [step, activeMethods, settings.korapay_enabled]);
 
   useEffect(() => {
-    if (step !== 3 || remaining <= 0) return;
-    const timer = window.setInterval(() => setRemaining((v) => Math.max(0, v - 1)), 1000);
+    if (step !== 3 || paymentDeadline) return;
+    setPaymentDeadline(Date.now() + 15 * 60 * 1000);
+  }, [step, paymentDeadline]);
+
+  useEffect(() => {
+    if (step !== 3 || !paymentDeadline) return;
+    const tick = () => setRemaining(Math.max(0, Math.round((paymentDeadline - Date.now()) / 1000)));
+    tick();
+    const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
-  }, [step, remaining]);
+  }, [step, paymentDeadline]);
 
   useEffect(() => {
     if (!submitted) return;
