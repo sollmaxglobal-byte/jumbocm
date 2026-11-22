@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ArrowUpCircle, Headphones, Home, Settings, TrendingUp } from "lucide-react";
+import { Headphones, Home, ReceiptText, Settings, TrendingUp } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
 
 function NavItem({
@@ -43,13 +43,15 @@ export function DashboardBottomNav({ className = "" }: { className?: string }) {
         />
         <div className="flex flex-col items-center gap-1">
           <Link
-            to="/plans"
-            aria-label={t("Upgrade")}
+            to="/dashboard/transactions"
+            aria-label={t("Transactions")}
             className="-mt-6 grid h-14 w-14 place-items-center rounded-full bg-[#00FF88] text-[#04120B] shadow-[0_12px_30px_-6px_rgba(0,255,136,0.65)] ring-4 ring-[#0A0B0D] transition active:scale-95"
           >
-            <ArrowUpCircle className="h-6 w-6" />
+            <ReceiptText className="h-6 w-6" />
           </Link>
-          <span className="text-[10px] font-medium leading-none text-white/45">{t("Upgrade")}</span>
+          <span className="text-[10px] font-medium leading-none text-white/45">
+            {t("Transactions")}
+          </span>
         </div>
         <NavItem
           to="/dashboard/profile"

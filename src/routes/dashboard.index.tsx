@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { DashboardBottomNav } from "@/components/DashboardBottomNav";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { formatUSD, formatXAF, XAF_PER_USD } from "@/lib/format";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -322,6 +323,8 @@ function DashboardHome() {
             </ul>
           </div>
         </section>
+
+        <RecentActivityCard />
       </div>
 
       <DashboardBottomNav />
