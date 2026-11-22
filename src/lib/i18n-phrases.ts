@@ -240,6 +240,9 @@ export const FR_PHRASE_TABLE: Record<string, string> = {
   "Submitting…": "Envoi…",
   "Submit proof": "Envoyer la preuve",
   Continue: "Continuer",
+  "Copy": "Copier",
+  "Make sure to send exactly {amount} FCFA from your {method} account.":
+    "Assurez-vous d'envoyer exactement {amount} FCFA depuis votre compte {method}.",
   "Copy {label}": "Copier {label}",
   Back: "Retour",
 
