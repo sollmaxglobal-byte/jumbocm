@@ -95,7 +95,6 @@ export function useTransactionHistory(
         date: d.created_at,
         status: d.status,
         label,
-        receipt: { kind: "deposit", id: d.id },
       });
     }
     for (const w of pendingWithdrawals) {
@@ -112,7 +111,6 @@ export function useTransactionHistory(
         date: w.created_at,
         status: w.status,
         label,
-        receipt: { kind: "withdrawal", id: w.id },
       });
     }
 
