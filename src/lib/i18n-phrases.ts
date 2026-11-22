@@ -72,6 +72,26 @@ export const FR_PHRASE_TABLE: Record<string, string> = {
   Email: "E-mail",
   Office: "Bureau",
   "Douala, Cameroon": "Douala, Cameroun",
+  "Support center": "Centre d'assistance",
+  "Talk to a real person from our Douala team. Fast answers on WhatsApp or Telegram — every day of the week.":
+    "Parlez à une vraie personne de notre équipe à Douala. Des réponses rapides sur WhatsApp ou Telegram, tous les jours de la semaine.",
+  "Real human support": "Un vrai soutien humain",
+  "Replies in minutes": "Réponses en quelques minutes",
+  "Mon–Sat · 8:00–20:00 WAT": "Lun–Sam · 8h00–20h00 WAT",
+  "WhatsApp support": "Assistance WhatsApp",
+  "Chat one-to-one with our support team about deposits, withdrawals and your account.":
+    "Discutez en direct avec notre équipe pour vos dépôts, retraits et votre compte.",
+  "Chat on WhatsApp": "Discuter sur WhatsApp",
+  "Telegram support": "Assistance Telegram",
+  "Join our official Telegram channel for updates, announcements and quick help.":
+    "Rejoignez notre canal Telegram officiel pour les annonces et une aide rapide.",
+  "Open Telegram": "Ouvrir Telegram",
+  "Coming soon": "Bientôt disponible",
+  "Email us": "Écrivez-nous",
+  "Office hours": "Horaires",
+  "Need a hand right away?": "Besoin d'aide tout de suite ?",
+  "Send us a message and our team will pick it up within minutes.":
+    "Envoyez-nous un message, notre équipe vous répond en quelques minutes.",
 
   // ── Auth pages ─────────────────────────────────────────────────
   "Secure sign in": "Connexion sécurisée",
