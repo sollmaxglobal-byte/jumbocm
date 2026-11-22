@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
+  BadgePercent,
   Check,
   ChevronRight,
   Copy,
   Gift,
   Share2,
-  Sparkles,
   TrendingUp,
   UserPlus,
   Users,
@@ -145,155 +145,196 @@ function ReferAndEarnPage() {
     : "";
 
   return (
-    <motion.div
-      className="-mx-3 -my-4 min-h-screen bg-background px-4 pb-32 pt-4 sm:-mx-4 md:-my-6 md:px-6 md:pb-10"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
-      <div className="mx-auto max-w-2xl space-y-4">
-        {/* Header */}
-        <header className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="shrink-0">
-            <Link to="/dashboard" aria-label={t("Back to dashboard")}>
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-lg font-semibold text-foreground">{t("Refer & Earn")}</h1>
-            <p className="text-xs text-muted-foreground">{t("Invite friends, earn rewards")}</p>
-          </div>
-        </header>
+    <motion.div className="space-y-4 pb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      {/* Header */}
+      <header className="flex items-center gap-3">
+        <Button asChild variant="ghost" size="icon" className="-ml-2 shrink-0 rounded-full">
+          <Link to="/dashboard" aria-label={t("Back to dashboard")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+        </Button>
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-semibold leading-tight text-foreground">
+            {t("Refer & Earn")}
+          </h1>
+          <p className="truncate text-xs text-muted-foreground">
+            {t("Invite friends, earn rewards")}
+          </p>
+        </div>
+      </header>
 
-        {/* Earnings hero */}
-        <section
-          className="relative overflow-hidden rounded-3xl p-5 text-primary-foreground shadow-sm"
-          style={{ background: "var(--gradient-hero)" }}
-        >
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full bg-[var(--gold)] opacity-30 blur-2xl"
-            animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <div className="pointer-events-none absolute -bottom-20 -left-12 h-48 w-48 rounded-full bg-white opacity-10 blur-2xl" />
+      {/* Earnings hero */}
+      <section
+        className="relative overflow-hidden rounded-3xl p-5 text-primary-foreground shadow-[var(--shadow-elegant)]"
+        style={{ background: "var(--gradient-hero)" }}
+      >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-white/10"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-24 -right-6 h-44 w-44 rounded-full border border-white/15"
+        />
+        <Gift
+          aria-hidden
+          className="pointer-events-none absolute -right-3 -top-2 h-24 w-24 text-white/10"
+        />
 
-          <div className="relative">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" /> {t("{percent}% commission", { percent })}
-            </span>
+        <div className="relative">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ring-1 ring-inset ring-white/25">
+            <BadgePercent className="h-3.5 w-3.5" />
+            {t("{percent}% commission", { percent })}
+          </span>
 
-            <p className="mt-4 text-xs font-medium text-primary-foreground/75">
-              {t("Total commission earned")}
-            </p>
-            <div className="mt-1.5">
-              <DualMoney
-                value={earned}
-                primary="usd"
-                primaryClassName="text-4xl font-bold leading-none tabular-nums"
-                usdClassName="text-sm font-medium text-primary-foreground/75"
-              />
-            </div>
-
-            <div className="mt-5 flex items-center gap-4 border-t border-white/15 pt-3 text-xs text-primary-foreground/85">
-              <span className="flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5" /> {referralCount}{" "}
-                {referralCount === 1 ? t("friend") : t("friends")}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <TrendingUp className="h-3.5 w-3.5" /> {t("{count} active", { count: activeCount })}
-              </span>
-              <span className="ml-auto flex items-center gap-1.5">
-                <Gift className="h-3.5 w-3.5" /> {t("Unlimited")}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* Invite link */}
-        <section className="rounded-3xl border border-border bg-card p-5">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Share2 className="h-3.5 w-3.5 text-primary" /> {t("Your invite link")}
-          </div>
-          <div className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 px-3.5 py-3">
-            <p className="break-all font-mono text-[13px] font-medium text-foreground">
-              {link || t("Your link will appear here once your account is ready.")}
-            </p>
+          <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.08em] text-primary-foreground/70">
+            {t("Total commission earned")}
+          </p>
+          <div className="mt-1.5">
+            <DualMoney
+              value={earned}
+              primary="usd"
+              primaryClassName="text-[clamp(28px,8vw,36px)] font-semibold leading-none tracking-tight tabular-nums"
+              usdClassName="text-xs font-medium text-primary-foreground/70 tabular-nums"
+            />
           </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-2.5">
-            <Button onClick={copy} disabled={!link} className="rounded-xl">
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? t("Copied") : t("Copy link")}
-            </Button>
-            <Button onClick={share} disabled={!link} variant="outline" className="rounded-xl">
-              <Share2 className="h-4 w-4" /> {t("Share")}
-            </Button>
-          </div>
-          {whatsapp && (
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2.5 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-sm font-semibold text-white transition active:scale-[0.99]"
-            >
-              <Share2 className="h-4 w-4" /> {t("Share on WhatsApp")}
-            </a>
-          )}
+          <dl className="mt-5 grid grid-cols-3 divide-x divide-white/15 border-t border-white/15 pt-3.5">
+            <Meta icon={Users} label={t("Friends")} value={String(referralCount)} />
+            <Meta icon={TrendingUp} label={t("Active")} value={String(activeCount)} />
+            <Meta icon={Gift} label={t("Reward")} value={t("Unlimited")} />
+          </dl>
+        </div>
+      </section>
+
+      {/* Invite link */}
+      <section className="rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-5">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            <Share2 className="h-3.5 w-3.5 text-primary" />
+            {t("Your invite link")}
+          </h2>
           {code && (
-            <p className="mt-3 text-center text-[11px] text-muted-foreground">
-              {t("Your referral code:")}{" "}
-              <span className="font-mono font-semibold text-foreground">{code}</span>
-            </p>
+            <span className="rounded-full bg-muted px-2.5 py-1 font-mono text-[11px] font-semibold text-foreground">
+              {code}
+            </span>
           )}
-        </section>
+        </div>
 
-        {/* Stats */}
-        <section className="grid grid-cols-3 gap-3">
-          <StatTile icon={Users} label={t("Invited")} value={String(referralCount)} />
-          <StatTile
-            icon={TrendingUp}
-            label={t("Active")}
-            value={String(activeCount)}
-            tone="success"
-          />
-          <StatTile icon={Gift} label={t("Rate")} value={`${percent}%`} />
-        </section>
+        <div className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 px-3.5 py-3">
+          <p className="line-clamp-2 break-all font-mono text-[12px] leading-relaxed text-foreground">
+            {link || t("Your link will appear here once your account is ready.")}
+          </p>
+        </div>
 
-        {/* How it works */}
-        <section className="rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-foreground">{t("How it works")}</h2>
-          <div className="mt-4 space-y-4">
-            {STEPS.map((step, i) => (
-              <div key={step.title} className="flex items-start gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                  <step.icon className="h-4 w-4" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {i + 1}. {t(step.title)}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{t(step.text)}</p>
-                </div>
+        <div className="mt-3 grid grid-cols-2 gap-2.5">
+          <Button
+            onClick={copy}
+            disabled={!link}
+            className={`h-11 rounded-xl text-sm font-semibold transition ${
+              copied ? "bg-success text-white hover:bg-success/90" : ""
+            }`}
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? t("Copied") : t("Copy link")}
+          </Button>
+          <Button
+            onClick={share}
+            disabled={!link}
+            variant="outline"
+            className="h-11 rounded-xl border-input text-sm font-semibold"
+          >
+            <Share2 className="h-4 w-4" /> {t("Share")}
+          </Button>
+        </div>
+
+        {whatsapp && (
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2.5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-sm font-semibold text-white transition active:scale-[0.99]"
+          >
+            <Share2 className="h-4 w-4" /> {t("Share on WhatsApp")}
+          </a>
+        )}
+
+        {code && (
+          <p className="mt-3 text-center text-[11px] text-muted-foreground">
+            {t("Your referral code:")}{" "}
+            <span className="font-mono font-semibold text-foreground">{code}</span>
+          </p>
+        )}
+      </section>
+
+      {/* Stats */}
+      <section className="grid grid-cols-3 gap-2.5">
+        <StatTile icon={Users} label={t("Invited")} value={String(referralCount)} />
+        <StatTile
+          icon={TrendingUp}
+          label={t("Active")}
+          value={String(activeCount)}
+          tone="success"
+        />
+        <StatTile icon={Gift} label={t("Rate")} value={`${percent}%`} />
+      </section>
+
+      {/* How it works */}
+      <section className="rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-5">
+        <h2 className="text-sm font-semibold text-foreground">{t("How it works")}</h2>
+        <ol className="mt-4 space-y-0">
+          {STEPS.map((step, i) => (
+            <li key={step.title} className="relative flex gap-3 pb-5 last:pb-0">
+              {i < STEPS.length - 1 && (
+                <span
+                  aria-hidden
+                  className="absolute left-[15px] top-9 h-[calc(100%-1.5rem)] w-px bg-border"
+                />
+              )}
+              <span className="relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-primary/15 bg-primary/10 text-primary">
+                <step.icon className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 pt-0.5">
+                <p className="text-sm font-semibold text-foreground">
+                  <span className="mr-1 tabular-nums text-muted-foreground">{i + 1}.</span>
+                  {t(step.title)}
+                </p>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  {t(step.text)}
+                </p>
               </div>
-            ))}
-          </div>
-        </section>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-        {/* Referral network */}
-        <section className="space-y-3">
-          <div className="flex items-end justify-between">
-            <h2 className="text-sm font-semibold text-foreground">{t("Your referral network")}</h2>
-            <Link
-              to="/dashboard/referrals"
-              className="flex items-center gap-0.5 text-xs font-medium text-primary"
-            >
-              {t("View all")} <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          <ReferralNetwork rows={rows.slice(0, 3)} loading={networkLoading} error={networkError} />
-        </section>
-      </div>
+      {/* Referral network */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-2 px-1">
+          <h2 className="text-sm font-semibold text-foreground">{t("Your referral network")}</h2>
+          <Link
+            to="/dashboard/referrals"
+            className="flex items-center gap-0.5 text-xs font-medium text-primary"
+          >
+            {t("View all")} <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <ReferralNetwork rows={rows.slice(0, 3)} loading={networkLoading} error={networkError} />
+      </section>
     </motion.div>
+  );
+}
+
+function Meta({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: string }) {
+  return (
+    <div className="px-3 first:pl-0 last:pr-0">
+      <dt className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.06em] text-primary-foreground/60">
+        <Icon className="h-3 w-3" /> {label}
+      </dt>
+      <dd className="mt-1 truncate text-sm font-semibold tabular-nums text-primary-foreground">
+        {value}
+      </dd>
+    </div>
   );
 }
 
@@ -309,16 +350,18 @@ function StatTile({
   tone?: "success";
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-3.5 text-center">
+    <div className="rounded-2xl border border-border bg-card px-2.5 py-3 text-center shadow-sm">
       <span
-        className={`mx-auto grid h-9 w-9 place-items-center rounded-full ${
+        className={`mx-auto grid h-8 w-8 place-items-center rounded-full ${
           tone === "success" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"
         }`}
       >
         <Icon className="h-4 w-4" />
       </span>
-      <p className="mt-2 text-lg font-bold tabular-nums text-foreground">{value}</p>
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-2 text-base font-semibold tabular-nums text-foreground">{value}</p>
+      <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+        {label}
+      </p>
     </div>
   );
 }
