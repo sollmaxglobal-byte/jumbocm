@@ -50,6 +50,16 @@ function DashboardLayout() {
 
   const isActive = (to: string, exact?: boolean) => (exact ? path === to : path.startsWith(to));
 
+  // The dashboard home renders its own dark app shell (header + bottom nav).
+  if (path === "/dashboard") {
+    return (
+      <div className="app-shell min-h-screen bg-[#0A0B0D]">
+        <Outlet />
+        <PushSetup />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`app-shell min-h-screen bg-background pb-24 md:pb-0 ${appMode ? "app-shell-standalone" : ""}`}
@@ -107,28 +117,26 @@ function DashboardLayout() {
 
       {/* Floating capsule nav (mobile) — hidden during the deposit flow */}
       {!path.startsWith("/dashboard/deposit") && (
-      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.9rem)] md:hidden">
-        <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#14112B] p-1.5 shadow-[0_16px_40px_-10px_rgba(20,17,43,0.55)]">
-          {NAV.map((item) => {
-            const active = isActive(item.to, item.exact);
-            return (
-              <Link
-                key={item.to}
-                to={item.to as never}
-                aria-label={t(item.label)}
-                className={`flex h-11 items-center justify-center gap-1.5 rounded-full px-3.5 transition active:scale-95 ${
-                  active ? "bg-[#C9F158] text-[#14112B]" : "text-white/60"
-                }`}
-              >
-                <item.icon className="h-5 w-5" />
-                {active && (
-                  <span className="text-xs font-bold">{t(item.label)}</span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+        <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.9rem)] md:hidden">
+          <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-[#14112B] p-1.5 shadow-[0_16px_40px_-10px_rgba(20,17,43,0.55)]">
+            {NAV.map((item) => {
+              const active = isActive(item.to, item.exact);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to as never}
+                  aria-label={t(item.label)}
+                  className={`flex h-11 items-center justify-center gap-1.5 rounded-full px-3.5 transition active:scale-95 ${
+                    active ? "bg-[#C9F158] text-[#14112B]" : "text-white/60"
+                  }`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {active && <span className="text-xs font-bold">{t(item.label)}</span>}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       )}
       <PushSetup />
     </div>
