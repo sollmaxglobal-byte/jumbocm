@@ -3,16 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowDownLeft,
-  ArrowUpCircle,
   ArrowUpRight,
   ChevronRight,
   Copy,
   Gift,
   Headphones,
-  Home,
-  MoreHorizontal,
   PieChart,
-  Settings,
   Star,
   TrendingUp,
   Wallet,
@@ -21,6 +17,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
+import { DashboardBottomNav } from "@/components/DashboardBottomNav";
 import { formatUSD, formatXAF, XAF_PER_USD } from "@/lib/format";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -168,35 +165,24 @@ function DashboardHome() {
     >
       <div className="mx-auto max-w-md space-y-4 px-4 pb-4 pt-[calc(env(safe-area-inset-top)+0.9rem)]">
         {/* Header */}
-        <header className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <Link
-              to="/dashboard/profile"
-              aria-label="Profile"
-              className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#00FF88] to-[#0E9F6E] text-sm font-bold text-[#04120B] ring-2 ring-[#00FF88]/30"
-            >
-              {firstName.charAt(0).toUpperCase()}
-              <span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-[#0A0B0D]">
-                <Star className="h-3 w-3 fill-[#00FF88] text-[#00FF88]" />
-              </span>
-            </Link>
-            <div className="min-w-0">
-              <p className="truncate text-[11px] text-white/45">Welcome back,</p>
-              <p className="truncate text-sm font-semibold text-white">
-                {firstName}
-                {flag && <span className="ml-1.5">{flag}</span>}
-              </p>
-            </div>
+        <header className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm text-white/50">Welcome back,</p>
+            <p className="truncate text-xl font-semibold text-white">
+              {firstName}
+              {flag && <span className="ml-2">{flag}</span>}
+            </p>
           </div>
-          <div className="flex shrink-0 items-center gap-0.5">
-            <Link
-              to="/dashboard/profile"
-              aria-label="Settings"
-              className="grid h-9 w-9 place-items-center rounded-full text-white/70 transition hover:bg-white/5 hover:text-white"
-            >
-              <MoreHorizontal className="h-5 w-5" />
-            </Link>
-          </div>
+          <Link
+            to="/dashboard/profile"
+            aria-label="Profile"
+            className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#00FF88] to-[#0E9F6E] text-sm font-bold text-[#04120B] ring-2 ring-[#00FF88]/30"
+          >
+            {firstName.charAt(0).toUpperCase()}
+            <span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-[#0A0B0D]">
+              <Star className="h-3 w-3 fill-[#00FF88] text-[#00FF88]" />
+            </span>
+          </Link>
         </header>
 
         {/* Balance hero */}
@@ -326,25 +312,7 @@ function DashboardHome() {
         </section>
       </div>
 
-      {/* Bottom navigation */}
-      <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
-        <div className="pointer-events-auto grid w-full max-w-md grid-cols-5 items-end border-t border-white/5 bg-[#0B0C0E]/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] pt-2 backdrop-blur-md">
-          <NavItem to="/dashboard" label="Home" icon={Home} active />
-          <NavItem to="/dashboard/invest" label="Invest" icon={TrendingUp} />
-          <div className="flex flex-col items-center gap-1">
-            <Link
-              to="/plans"
-              aria-label="Upgrade"
-              className="-mt-6 grid h-14 w-14 place-items-center rounded-full bg-[#00FF88] text-[#04120B] shadow-[0_12px_30px_-6px_rgba(0,255,136,0.65)] ring-4 ring-[#0A0B0D] transition active:scale-95"
-            >
-              <ArrowUpCircle className="h-6 w-6" />
-            </Link>
-            <span className="text-[10px] font-medium leading-none text-white/45">Upgrade</span>
-          </div>
-          <NavItem to="/dashboard/profile" label="Settings" icon={Settings} />
-          <NavItem to="/contact" label="Support" icon={Headphones} />
-        </div>
-      </nav>
+      <DashboardBottomNav />
     </motion.div>
   );
 }
@@ -437,30 +405,6 @@ function LegendRow({ color, label, value }: { color: string; label: string; valu
       </span>
       <span className="shrink-0 font-semibold text-white tabular-nums">{formatUSD(value)}</span>
     </li>
-  );
-}
-
-function NavItem({
-  to,
-  label,
-  icon: Icon,
-  active = false,
-}: {
-  to: string;
-  label: string;
-  icon: typeof Home;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      to={to as never}
-      className={`flex flex-col items-center gap-1 py-1 text-[10px] font-medium transition ${
-        active ? "text-[#00FF88]" : "text-white/45 hover:text-white/70"
-      }`}
-    >
-      <Icon className="h-5 w-5" />
-      <span className="leading-none">{label}</span>
-    </Link>
   );
 }
 
