@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Money } from "@/components/Money";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useI18n } from "@/hooks/useI18n";
 import { cn } from "@/lib/utils";
 
 type Plan = {
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/plans")({
 });
 
 function PlansPage() {
+  const { t } = useI18n();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -68,20 +70,21 @@ function PlansPage() {
         />
         <div className="relative mx-auto max-w-6xl px-4">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/80">
-            <Sparkles className="h-3 w-3" /> Investment plans
+            <Sparkles className="h-3 w-3" /> {t("Investment plans")}
           </span>
           <h1 className="mt-4 max-w-xl font-display text-4xl leading-[1.05] md:text-6xl">
-            Pick your pace.
+            {t("Pick your pace.")}
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
-            Three transparent tiers with flexible amounts and daily returns paid in XAF. Start with
-            what you have — scale when you're ready.
+            {t(
+              "Three transparent tiers with flexible amounts and daily returns paid in XAF. Start with what you have — scale when you're ready.",
+            )}
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             {[
-              { icon: Coins, label: "Daily returns" },
-              { icon: CalendarClock, label: "Fixed terms" },
-              { icon: ShieldCheck, label: "Principal back" },
+              { icon: Coins, label: t("Daily returns") },
+              { icon: CalendarClock, label: t("Fixed terms") },
+              { icon: ShieldCheck, label: t("Principal back") },
             ].map((chip) => (
               <span
                 key={chip.label}
@@ -113,7 +116,7 @@ function PlansPage() {
 
           {!loading && plans.length === 0 && (
             <p className="col-span-full rounded-3xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-              No plans are available right now. Please check back shortly.
+              {t("No plans are available right now. Please check back shortly.")}
             </p>
           )}
 
@@ -132,7 +135,7 @@ function PlansPage() {
               >
                 {featured && (
                   <span className="absolute right-5 top-5 rounded-full bg-[#C9F158] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[#14112B]">
-                    Most chosen
+                    {t("Most chosen")}
                   </span>
                 )}
 
@@ -162,7 +165,7 @@ function PlansPage() {
                         featured ? "text-white/70" : "text-muted-foreground",
                       )}
                     >
-                      / day
+                      {t("/ day")}
                     </span>
                   </div>
                   <p
@@ -171,7 +174,7 @@ function PlansPage() {
                       featured ? "text-white/60" : "text-muted-foreground",
                     )}
                   >
-                    for {p.duration_days} days
+                    {t("for {days} days", { days: p.duration_days })}
                   </p>
                 </div>
 
@@ -188,7 +191,7 @@ function PlansPage() {
                         featured ? "text-white/60" : "text-muted-foreground",
                       )}
                     >
-                      Total return
+                      {t("Total return")}
                     </p>
                     <p className="mt-0.5 text-sm font-bold tabular-nums">
                       ~{totalReturn.toFixed(0)}%
@@ -201,9 +204,11 @@ function PlansPage() {
                         featured ? "text-white/60" : "text-muted-foreground",
                       )}
                     >
-                      Term
+                      {t("Term")}
                     </p>
-                    <p className="mt-0.5 text-sm font-bold tabular-nums">{p.duration_days} days</p>
+                    <p className="mt-0.5 text-sm font-bold tabular-nums">
+                      {t("{days} days", { days: p.duration_days })}
+                    </p>
                   </div>
                 </div>
 
@@ -221,7 +226,7 @@ function PlansPage() {
                       )}
                     />
                     <span>
-                      Start from <Money value={p.min_amount} />
+                      {t("Start from")} <Money value={p.min_amount} />
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -232,7 +237,7 @@ function PlansPage() {
                       )}
                     />
                     <span>
-                      Up to <Money value={p.max_amount} />
+                      {t("Up to")} <Money value={p.max_amount} />
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -242,7 +247,7 @@ function PlansPage() {
                         featured ? "text-[#C9F158]" : "text-success",
                       )}
                     />
-                    <span>Principal returned at the end of term</span>
+                    <span>{t("Principal returned at the end of term")}</span>
                   </li>
                 </ul>
 
@@ -256,7 +261,7 @@ function PlansPage() {
                   )}
                 >
                   <Link to="/dashboard/invest">
-                    Invest now <ArrowRight className="ml-1 h-4 w-4" />
+                    {t("Invest now")} <ArrowRight className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -270,28 +275,28 @@ function PlansPage() {
         <div className="mx-auto max-w-6xl px-4">
           <div className="max-w-xl">
             <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
-              How it works
+              {t("How it works")}
             </span>
             <h2 className="mt-2 font-display text-3xl text-primary md:text-4xl">
-              Three steps to your first payout.
+              {t("Three steps to your first payout.")}
             </h2>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-3 md:gap-6">
             {[
               {
                 icon: Sparkles,
-                title: "Choose a plan",
-                copy: "Compare daily returns, terms and payout schedules side by side.",
+                title: t("Choose a plan"),
+                copy: t("Compare daily returns, terms and payout schedules side by side."),
               },
               {
                 icon: Wallet,
-                title: "Set your amount",
-                copy: "Fund from your wallet within the plan range and preview your return.",
+                title: t("Set your amount"),
+                copy: t("Fund from your wallet within the plan range and preview your return."),
               },
               {
                 icon: Coins,
-                title: "Earn daily",
-                copy: "Profit is credited automatically on the plan's payout schedule.",
+                title: t("Earn daily"),
+                copy: t("Profit is credited automatically on the plan's payout schedule."),
               },
             ].map((step, i) => (
               <div key={step.title} className="rounded-2xl border border-border bg-card p-5">
@@ -300,7 +305,7 @@ function PlansPage() {
                     <step.icon className="h-4 w-4" />
                   </span>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Step {i + 1}
+                    {t("Step {n}", { n: i + 1 })}
                   </span>
                 </div>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">{step.title}</h3>

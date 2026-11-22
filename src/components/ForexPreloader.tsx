@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useI18n } from "@/hooks/useI18n";
 
 /**
  * A Forex-trading themed pre-loader overlay shown on first app load.
@@ -9,6 +10,7 @@ import { useEffect, useState } from "react";
  * (both render null), avoiding SSR hydration mismatches.
  */
 export function ForexPreloader() {
+  const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [hidden, setHidden] = useState(false);
 
@@ -90,7 +92,7 @@ export function ForexPreloader() {
           Jumbo<span style={{ color: "#C9F158" }}>CM</span>
         </h1>
         <p className="mt-1.5 text-xs font-medium tracking-widest text-white/40 uppercase">
-          Loading markets…
+          {t("Loading markets…")}
         </p>
       </div>
 

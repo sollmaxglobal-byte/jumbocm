@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { DualMoney } from "@/components/DualMoney";
@@ -28,6 +29,7 @@ const STEP_LABELS = ["Choose plan", "Set amount", "Review"];
 /** Guided, three-step investment flow: pick a plan, set the amount, review and confirm. */
 export function InvestmentWizard() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [balance, setBalance] = useState(0);
@@ -80,7 +82,7 @@ export function InvestmentWizard() {
       const res = data as { investment_id: string };
       navigate({ to: "/invest/success/$id", params: { id: res.investment_id } });
     } catch (err) {
-      toast.error((err as Error).message ?? "Could not activate the plan");
+      toast.error((err as Error).message ?? t("Could not activate the plan"));
       setBusy(false);
     }
   }
@@ -88,7 +90,7 @@ export function InvestmentWizard() {
   if (loading) {
     return (
       <div className="grid h-dvh place-items-center text-sm text-muted-foreground">
-        Loading plans…
+        {t("Loading plans…")}
       </div>
     );
   }
@@ -101,13 +103,13 @@ export function InvestmentWizard() {
           to="/dashboard"
           className="inline-flex items-center gap-1 font-medium text-muted-foreground transition hover:text-primary"
         >
-          <ChevronLeft className="h-3.5 w-3.5" /> Dashboard
+          <ChevronLeft className="h-3.5 w-3.5" /> {t("Dashboard")}
         </Link>
         <Link
           to="/dashboard/wallet"
           className="inline-flex items-center gap-1 font-medium text-muted-foreground transition hover:text-primary"
         >
-          <Wallet className="h-3.5 w-3.5" /> Wallet
+          <Wallet className="h-3.5 w-3.5" /> {t("Wallet")}
         </Link>
       </div>
 
@@ -124,17 +126,17 @@ export function InvestmentWizard() {
         <div className="relative flex items-start justify-between gap-3">
           <div className="min-w-0">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/80">
-              <Sparkles className="h-3 w-3" /> Investment plan
+              <Sparkles className="h-3 w-3" /> {t("Investment plan")}
             </span>
             <h1 className="mt-2 font-display text-[26px] leading-tight sm:text-3xl">
-              Grow your money
+              {t("Grow your money")}
             </h1>
             <p className="mt-1 text-[11px] leading-relaxed text-white/70">
-              Choose a plan, set your amount, confirm.
+              {t("Choose a plan, set your amount, confirm.")}
             </p>
           </div>
           <div className="shrink-0 rounded-2xl bg-white/10 px-3 py-2 text-right backdrop-blur">
-            <p className="text-[9px] uppercase tracking-wider text-white/60">Wallet</p>
+            <p className="text-[9px] uppercase tracking-wider text-white/60">{t("Wallet")}</p>
             <p className="mt-0.5 text-[15px] font-bold leading-none tabular-nums">
               {formatUSD(balance)}
             </p>
@@ -143,15 +145,15 @@ export function InvestmentWizard() {
         </div>
         <div className="relative mt-4 flex items-center justify-between border-t border-white/15 pt-2.5 text-[10px] text-white/70">
           <span className="inline-flex items-center gap-1">
-            <Clock className="h-3 w-3" /> About 2 minutes
+            <Clock className="h-3 w-3" /> {t("About 2 minutes")}
           </span>
           <span className="inline-flex items-center gap-1">
-            <ShieldCheck className="h-3 w-3" /> Secure activation
+            <ShieldCheck className="h-3 w-3" /> {t("Secure activation")}
           </span>
         </div>
       </section>
 
-      <StepRail labels={STEP_LABELS} step={step} onBack={setStep} />
+      <StepRail labels={STEP_LABELS.map((label) => t(label))} step={step} onBack={setStep} />
 
       {/* Step 1 — choose a plan */}
       {step === 0 && (
@@ -163,19 +165,19 @@ export function InvestmentWizard() {
         >
           <div className="flex items-end justify-between">
             <div>
-              <h2 className="text-base font-semibold text-foreground">Choose a plan</h2>
+              <h2 className="text-base font-semibold text-foreground">{t("Choose a plan")}</h2>
               <p className="text-[11px] text-muted-foreground">
-                Profit figures are per day at the plan minimum.
+                {t("Profit figures are per day at the plan minimum.")}
               </p>
             </div>
             <span className="shrink-0 text-[11px] text-muted-foreground">
-              {plans.length} available
+              {t("{count} available", { count: plans.length })}
             </span>
           </div>
 
           {plans.length === 0 && (
             <div className="rounded-3xl border border-dashed border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
-              No investment plans are available right now.
+              {t("No investment plans are available right now.")}
             </div>
           )}
 
@@ -203,7 +205,7 @@ export function InvestmentWizard() {
             <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Selected plan
+                  {t("Selected plan")}
                 </p>
                 <p className="truncate text-sm font-semibold text-foreground">{selected.name}</p>
               </div>
@@ -212,13 +214,13 @@ export function InvestmentWizard() {
                 onClick={() => setStep(0)}
                 className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-primary transition hover:bg-primary/10"
               >
-                Change
+                {t("Change")}
               </button>
             </div>
 
             {selected.amount_type === "fixed" ? (
               <div className="mt-4 rounded-2xl bg-secondary/50 p-4 text-center">
-                <p className="text-xs text-muted-foreground">This plan has a fixed amount</p>
+                <p className="text-xs text-muted-foreground">{t("This plan has a fixed amount")}</p>
                 <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
                   {formatXAF(selected.fixed_amount)}
                 </p>
@@ -232,7 +234,7 @@ export function InvestmentWizard() {
                   htmlFor="invest-amount"
                   className="mt-4 block text-xs font-medium text-muted-foreground"
                 >
-                  How much do you want to invest?
+                  {t("How much do you want to invest?")}
                 </label>
                 <div className="mt-2 rounded-2xl border border-border bg-secondary/40 px-4 py-3 transition focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15">
                   <div className="flex items-center gap-2">
@@ -268,22 +270,22 @@ export function InvestmentWizard() {
                     onValueChange={([v]) => setAmountInput(v)}
                   />
                   <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
-                    <span>Min {formatXAF(selected.min_amount)}</span>
-                    <span>Max {formatXAF(selected.max_amount)}</span>
+                    <span>{t("Min {amount}", { amount: formatXAF(selected.min_amount) })}</span>
+                    <span>{t("Max {amount}", { amount: formatXAF(selected.max_amount) })}</span>
                   </div>
                 </div>
 
                 <div className="mt-3 flex gap-2">
                   {(
                     [
-                      ["Minimum", Number(selected.min_amount)],
+                      [t("Minimum"), Number(selected.min_amount)],
                       [
-                        "Halfway",
+                        t("Halfway"),
                         Math.round(
                           (Number(selected.min_amount) + Number(selected.max_amount)) / 2 / 500,
                         ) * 500,
                       ],
-                      ["Maximum", Number(selected.max_amount)],
+                      [t("Maximum"), Number(selected.max_amount)],
                     ] as const
                   ).map(([label, value]) => (
                     <button
@@ -304,8 +306,10 @@ export function InvestmentWizard() {
 
                 {outOfRange && (
                   <p className="mt-2 text-[11px] font-medium text-destructive">
-                    Enter an amount between {formatXAF(selected.min_amount)} and{" "}
-                    {formatXAF(selected.max_amount)}.
+                    {t("Enter an amount between {min} and {max}.", {
+                      min: formatXAF(selected.min_amount),
+                      max: formatXAF(selected.max_amount),
+                    })}
                   </p>
                 )}
               </>
@@ -320,11 +324,11 @@ export function InvestmentWizard() {
             />
             <div className="relative">
               <p className="text-[9px] uppercase tracking-[0.18em] text-white/60">
-                Projected return
+                {t("Projected return")}
               </p>
               <div className="mt-2.5 grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-[10px] text-white/60">Daily profit</p>
+                  <p className="text-[10px] text-white/60">{t("Daily profit")}</p>
                   <DualMoney
                     value={dailyProfit}
                     primary="usd"
@@ -334,7 +338,7 @@ export function InvestmentWizard() {
                 </div>
                 <div>
                   <p className="text-[10px] text-white/60">
-                    Total profit · {selected.duration_days}d
+                    {t("Total profit · {days}d", { days: selected.duration_days })}
                   </p>
                   <DualMoney
                     value={totalProfit}
@@ -346,7 +350,7 @@ export function InvestmentWizard() {
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-2.5 text-xs">
                 <span className="text-white/70">
-                  Total back after {selected.duration_days} days
+                  {t("Total back after {days} days", { days: selected.duration_days })}
                 </span>
                 <span className="font-bold tabular-nums text-white">{formatUSD(totalReturn)}</span>
               </div>
@@ -355,7 +359,7 @@ export function InvestmentWizard() {
 
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
             <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-              <Wallet className="h-3.5 w-3.5" /> Wallet balance
+              <Wallet className="h-3.5 w-3.5" /> {t("Wallet balance")}
             </span>
             <span
               className={cn(
@@ -371,8 +375,10 @@ export function InvestmentWizard() {
             <div className="flex items-start gap-2 rounded-2xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
               <Wallet className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
-                Your wallet has {formatXAF(balance)}. You can still review this investment and top
-                up on the next step.
+                {t(
+                  "Your wallet has {amount}. You can still review this investment and top up on the next step.",
+                  { amount: formatXAF(balance) },
+                )}
               </span>
             </div>
           )}
@@ -395,7 +401,7 @@ export function InvestmentWizard() {
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-foreground">{selected.name}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  Review the details before activating.
+                  {t("Review the details before activating.")}
                 </p>
               </div>
               <button
@@ -403,23 +409,26 @@ export function InvestmentWizard() {
                 onClick={() => setStep(0)}
                 className="ml-auto shrink-0 rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold text-primary shadow-sm transition hover:bg-primary/10"
               >
-                Change
+                {t("Change")}
               </button>
             </div>
 
             <div className="space-y-2.5 px-4 py-4 text-[13px]">
-              <Row label="Amount invested" value={formatXAF(amount)} />
-              <Row label="Daily profit" value={formatXAF(dailyProfit)} accent />
-              <Row label="Duration" value={`${selected.duration_days} days`} />
-              <Row label="Payout" value={payoutLabel(selected.payout_frequency)} />
+              <Row label={t("Amount invested")} value={formatXAF(amount)} />
+              <Row label={t("Daily profit")} value={formatXAF(dailyProfit)} accent />
               <Row
-                label={`Total profit (${selected.duration_days} days)`}
+                label={t("Duration")}
+                value={t("{days} days", { days: selected.duration_days })}
+              />
+              <Row label={t("Payout")} value={t(payoutLabel(selected.payout_frequency))} />
+              <Row
+                label={t("Total profit ({days} days)", { days: selected.duration_days })}
                 value={formatXAF(totalProfit)}
                 accent
               />
               <div className="border-t border-dashed border-border pt-3">
                 <div className="flex items-end justify-between">
-                  <span className="text-xs text-muted-foreground">Total back</span>
+                  <span className="text-xs text-muted-foreground">{t("Total back")}</span>
                   <div className="text-right">
                     <p className="text-xl font-bold leading-none tabular-nums text-foreground">
                       {formatUSD(totalReturn)}
@@ -435,7 +444,7 @@ export function InvestmentWizard() {
 
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
             <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-              <Wallet className="h-3.5 w-3.5" /> Wallet balance
+              <Wallet className="h-3.5 w-3.5" /> {t("Wallet balance")}
             </span>
             <span
               className={cn(
@@ -449,15 +458,17 @@ export function InvestmentWizard() {
 
           {insufficient && (
             <div className="rounded-2xl border border-warning/40 bg-warning/10 p-4 text-xs">
-              <p className="font-semibold text-warning">Insufficient wallet balance</p>
+              <p className="font-semibold text-warning">{t("Insufficient wallet balance")}</p>
               <p className="mt-1 text-muted-foreground">
-                You need {formatXAF(amount - balance)} more to activate this plan.
+                {t("You need {amount} more to activate this plan.", {
+                  amount: formatXAF(amount - balance),
+                })}
               </p>
               <Button
                 onClick={() => navigate({ to: "/dashboard/deposit" })}
                 className="mt-3 w-full rounded-xl bg-warning text-white hover:bg-warning/90"
               >
-                Top up wallet <ArrowRight className="ml-1 h-4 w-4" />
+                {t("Top up wallet")} <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
           )}
@@ -473,7 +484,7 @@ export function InvestmentWizard() {
             onClick={() => setStep((s) => s - 1)}
             disabled={busy}
           >
-            <ChevronLeft className="h-4 w-4" /> Back
+            <ChevronLeft className="h-4 w-4" /> {t("Back")}
           </Button>
         )}
         {step === 0 && (
@@ -482,7 +493,7 @@ export function InvestmentWizard() {
             disabled={!selected}
             onClick={() => setStep(1)}
           >
-            Continue <ArrowRight className="ml-1 h-4 w-4" />
+            {t("Continue")} <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         )}
         {step === 1 && (
@@ -491,7 +502,7 @@ export function InvestmentWizard() {
             disabled={!selected || outOfRange || amount <= 0}
             onClick={() => setStep(2)}
           >
-            Review investment <ChevronRight className="ml-1 h-4 w-4" />
+            {t("Review investment")} <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         )}
         {step === 2 && (
@@ -502,18 +513,19 @@ export function InvestmentWizard() {
           >
             {busy ? (
               <>
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Processing…
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" /> {t("Processing…")}
               </>
             ) : (
-              <>Confirm investment</>
+              <>{t("Confirm investment")}</>
             )}
           </Button>
         )}
       </div>
 
       <p className="px-2 text-center text-[10px] leading-relaxed text-muted-foreground">
-        Profit is paid according to each plan's payout schedule. Investments carry risk. Past
-        performance does not guarantee future returns.
+        {t(
+          "Profit is paid according to each plan's payout schedule. Investments carry risk. Past performance does not guarantee future returns.",
+        )}
       </p>
     </div>
   );

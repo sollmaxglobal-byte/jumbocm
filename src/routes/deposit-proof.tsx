@@ -115,7 +115,7 @@ function DepositProofPage() {
           to: user.email,
           template_key: "deposit_submitted",
           variables: {
-            name: user.user_metadata?.full_name ?? "Investor",
+            name: user.user_metadata?.full_name ?? t("Investor"),
             amount: String(amount),
             method: paymentMethod.label,
             transaction_id: txRef(data.id),
@@ -135,10 +135,10 @@ function DepositProofPage() {
       toast.success(t("deposit.submitted"));
       navigate({ to: "/deposit-pending/$id", params: { id: data.id } });
     } catch (error) {
-      const message = (error as Error).message || "Unable to submit deposit";
+      const message = (error as Error).message || t("Unable to submit deposit");
       toast.error(
         /fetch|network|load failed|timeout/i.test(message)
-          ? "Upload failed. Check your connection and try again."
+          ? t("Upload failed. Check your connection and try again.")
           : message,
       );
     } finally {
@@ -150,21 +150,21 @@ function DepositProofPage() {
     <div className="mx-auto flex h-dvh max-w-xl flex-col justify-center gap-4 overflow-hidden px-4 pb-24 pt-4">
       <header>
         <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-success">
-          <ShieldCheck className="h-4 w-4" /> Payment confirmed · Step 3 of 3
+          <ShieldCheck className="h-4 w-4" /> {t("Payment confirmed · Step 3 of 3")}
         </div>
-        <h1 className="font-display text-3xl text-primary">Upload payment proof</h1>
+        <h1 className="font-display text-3xl text-primary">{t("Upload payment proof")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Upload a clear screenshot or photo showing your completed transfer.
+          {t("Upload a clear screenshot or photo showing your completed transfer.")}
         </p>
       </header>
 
       <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
         <div>
           <div className="text-[10px] font-semibold uppercase text-muted-foreground">
-            Payment summary
+            {t("Payment summary")}
           </div>
           <div className="mt-1 text-sm font-medium text-foreground">
-            {paymentMethod?.label ?? "Loading…"}
+            {paymentMethod?.label ?? t("Loading…")}
           </div>
         </div>
         <div className="text-right text-lg font-bold uppercase tabular-nums text-primary">
@@ -177,7 +177,7 @@ function DepositProofPage() {
           <div className="space-y-3">
             <img
               src={preview}
-              alt="Selected payment proof"
+              alt={t("Selected payment proof")}
               className="mx-auto max-h-48 rounded-md object-contain"
             />
             <div className="flex items-center justify-center gap-2 text-sm font-medium text-success">
@@ -189,9 +189,9 @@ function DepositProofPage() {
             <span className="mb-3 grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary">
               <Upload className="h-7 w-7" />
             </span>
-            <div className="font-semibold text-foreground">Select payment proof</div>
+            <div className="font-semibold text-foreground">{t("Select payment proof")}</div>
             <div className="mt-1 text-xs text-muted-foreground">
-              JPG, PNG or a screenshot from your payment app
+              {t("JPG, PNG or a screenshot from your payment app")}
             </div>
           </div>
         )}
@@ -204,15 +204,15 @@ function DepositProofPage() {
       </label>
 
       <div className="rounded-lg bg-secondary p-3 text-xs leading-relaxed text-muted-foreground">
-        <FileImage className="mr-1 inline h-4 w-4 text-primary" /> Ensure the amount, receiver and
-        transaction reference are visible before submitting.
+        <FileImage className="mr-1 inline h-4 w-4 text-primary" />{" "}
+        {t("Ensure the amount, receiver and transaction reference are visible before submitting.")}
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 p-2 backdrop-blur md:static md:border-0 md:bg-transparent md:p-0">
         <div className="mx-auto flex max-w-xl gap-2">
           <Button asChild variant="outline" className="h-10 flex-1">
             <Link to="/deposit-payment" search={{ amount, method }}>
-              <ArrowLeft className="mr-1 h-4 w-4" /> Back
+              <ArrowLeft className="mr-1 h-4 w-4" /> {t("Back")}
             </Link>
           </Button>
           <Button

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { formatXAF, txRef } from "@/lib/format";
 import { toast } from "sonner";
 
@@ -53,6 +54,7 @@ type PaymentMethod = {
 
 /** Branded provider pill, matching the method the customer actually used. */
 function MethodBadge({ method }: { method: PaymentMethod | null }) {
+  const { t } = useI18n();
   const label = (method?.label ?? "").toLowerCase();
   if (label.includes("mtn"))
     return (
@@ -60,7 +62,7 @@ function MethodBadge({ method }: { method: PaymentMethod | null }) {
         <span className="flex items-center rounded-full bg-white px-1 py-px text-[9px] font-black italic text-[#00467f]">
           MTN
         </span>
-        <span className="text-xs font-bold text-black">Mobile Money</span>
+        <span className="text-xs font-bold text-black">{t("Mobile Money")}</span>
       </span>
     );
   if (label.includes("orange"))
@@ -69,27 +71,27 @@ function MethodBadge({ method }: { method: PaymentMethod | null }) {
         <span className="flex items-center rounded-full bg-white px-1 py-px text-[9px] font-black text-[#ff7900]">
           OM
         </span>
-        <span className="text-xs font-bold text-white">Orange Money</span>
+        <span className="text-xs font-bold text-white">{t("Orange Money")}</span>
       </span>
     );
   if (method?.type === "crypto")
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f7931a]/15 px-3 py-1 text-[#f7931a]">
         <Bitcoin className="h-3.5 w-3.5" />
-        <span className="text-xs font-bold">{method?.label ?? "Crypto"}</span>
+        <span className="text-xs font-bold">{method?.label ?? t("Crypto")}</span>
       </span>
     );
   if (method?.type === "bank_transfer")
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f6c85a]/15 px-3 py-1 text-[#f6c85a]">
         <Building2 className="h-3.5 w-3.5" />
-        <span className="text-xs font-bold">{method?.label ?? "Bank Transfer"}</span>
+        <span className="text-xs font-bold">{method?.label ?? t("Bank Transfer")}</span>
       </span>
     );
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f6c85a]/15 px-3 py-1 text-[#f6c85a]">
       <Smartphone className="h-3.5 w-3.5" />
-      <span className="text-xs font-bold">{method?.label ?? "Mobile Money"}</span>
+      <span className="text-xs font-bold">{method?.label ?? t("Mobile Money")}</span>
     </span>
   );
 }
@@ -173,12 +175,13 @@ function TimelineStep({
   label: string;
   sub: string;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex gap-2.5">
       <div
         className={`w-9 shrink-0 pt-0.5 text-[10px] font-semibold ${done || active ? "text-[#8f8f98]" : "text-[#5b5b63]"}`}
       >
-        Step {step}
+        {t("Step {n}", { n: step })}
       </div>
       <div className="flex flex-col items-center">
         <span
@@ -217,6 +220,7 @@ function TimelineStep({
 function PendingDepositPage() {
   const { id } = Route.useParams();
   const { user, loading } = useAuth();
+  const { t: tr } = useI18n();
   const navigate = useNavigate();
   const [deposit, setDeposit] = useState<Deposit | null>(null);
   const [method, setMethod] = useState<PaymentMethod | null>(null);
@@ -305,9 +309,9 @@ function PendingDepositPage() {
   const copyRef = async () => {
     try {
       await navigator.clipboard.writeText(reference);
-      toast.success("Reference copied");
+      toast.success(tr("Reference copied"));
     } catch {
-      toast.error("Could not copy");
+      toast.error(tr("Could not copy"));
     }
   };
 
@@ -342,17 +346,19 @@ function PendingDepositPage() {
           </div>
           <h1 className="mt-2 text-xl font-extrabold leading-tight tracking-tight text-[#f8f7f2]">
             {approved
-              ? "Deposit approved successfully!"
+              ? tr("Deposit approved successfully!")
               : rejected
-                ? "Deposit rejected"
-                : "Payment submitted successfully!"}
+                ? tr("Deposit rejected")
+                : tr("Payment submitted successfully!")}
           </h1>
           <p className="mt-1 text-xs text-[#8f8f98]">
             {approved
-              ? "Your deposit has been confirmed and credited to your wallet."
+              ? tr("Your deposit has been confirmed and credited to your wallet.")
               : rejected
-                ? "We couldn't verify this payment. Contact support if you believe this is a mistake."
-                : "Your deposit is being verified"}
+                ? tr(
+                    "We couldn't verify this payment. Contact support if you believe this is a mistake.",
+                  )
+                : tr("Your deposit is being verified")}
           </p>
         </div>
 
@@ -363,12 +369,12 @@ function PendingDepositPage() {
           </div>
           <div className="mt-1 flex items-center justify-center gap-1.5 text-xs text-[#8f8f98]">
             <span>
-              Reference · <span className="font-semibold text-[#a8a39a]">JCM-{reference.slice(0, 6)}</span>
+              {tr("Reference")} · <span className="font-semibold text-[#a8a39a]">JCM-{reference.slice(0, 6)}</span>
             </span>
             <button
               type="button"
               onClick={copyRef}
-              aria-label="Copy reference"
+              aria-label={tr("Copy reference")}
               className="text-[#8f8f98] transition-colors hover:text-[#f6c85a]"
             >
               <Copy className="h-3.5 w-3.5" />
@@ -381,26 +387,35 @@ function PendingDepositPage() {
 
         {/* Vertical timeline */}
         <div>
-          <TimelineStep step={1} done label="Uploaded" sub="Payment proof received · just now" />
+          <TimelineStep
+            step={1}
+            done
+            label={tr("Uploaded")}
+            sub={tr("Payment proof received · just now")}
+          />
           <TimelineStep
             step={2}
             done={approved}
             active={!approved && !rejected}
-            label={rejected ? "Verification failed" : "Verifying"}
+            label={rejected ? tr("Verification failed") : tr("Verifying")}
             sub={
               approved
-                ? "Payment confirmed by our team"
+                ? tr("Payment confirmed by our team")
                 : rejected
-                  ? "We couldn't match this payment"
-                  : "Verifying your payment now… our team is checking"
+                  ? tr("We couldn't match this payment")
+                  : tr("Verifying your payment now… our team is checking")
             }
           />
           <TimelineStep
             step={3}
             done={approved}
             last
-            label="Credited"
-            sub={approved ? "Funds added to your wallet" : "Funds will be credited to your wallet"}
+            label={tr("Credited")}
+            sub={
+              approved
+                ? tr("Funds added to your wallet")
+                : tr("Funds will be credited to your wallet")
+            }
           />
         </div>
 
@@ -409,8 +424,10 @@ function PendingDepositPage() {
           <div className="flex items-center gap-2.5">
             <Clock className="h-6 w-6 shrink-0 text-[#f6c85a]" strokeWidth={1.75} />
             <div className="min-w-0">
-              <div className="text-xs font-bold">Estimated time: 5–15 minutes</div>
-              <div className="text-[11px] text-[#a8a39a]">You&apos;ll receive a notification once credited</div>
+              <div className="text-xs font-bold">{tr("Estimated time: 5–15 minutes")}</div>
+              <div className="text-[11px] text-[#a8a39a]">
+                {tr("You'll receive a notification once credited")}
+              </div>
             </div>
           </div>
           {!approved && !rejected && (
@@ -425,7 +442,7 @@ function PendingDepositPage() {
                   />
                 ))}
               </span>
-              Checking your payment proof live — this page updates by itself
+              {tr("Checking your payment proof live — this page updates by itself")}
             </div>
           )}
         </div>
@@ -433,7 +450,7 @@ function PendingDepositPage() {
         {/* Progress */}
         <div>
           <div className="mb-1 flex justify-between text-xs font-semibold">
-            <span>Progress</span>
+            <span>{tr("Progress")}</span>
             <span className="text-[#f6c85a]">{approved ? 100 : displayPct}%</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-[#26262c]">
@@ -459,7 +476,7 @@ function PendingDepositPage() {
             to="/dashboard"
             className="flex h-11 items-center justify-center rounded-xl bg-[#eab532] text-sm font-bold text-[#101014] transition-colors hover:bg-[#f6c85a]"
           >
-            Back to Dashboard
+            {tr("Back to Dashboard")}
           </Link>
           {whatsappLink ? (
             <a
@@ -469,7 +486,7 @@ function PendingDepositPage() {
               className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d9b54a] bg-transparent text-xs font-bold text-[#f6c85a] transition-colors hover:bg-[#f6c85a]/10"
             >
               <MessageCircle className="h-4 w-4 shrink-0" />
-              WhatsApp Support
+              {tr("WhatsApp Support")}
             </a>
           ) : (
             <Link
@@ -478,7 +495,7 @@ function PendingDepositPage() {
               className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d9b54a] bg-transparent text-xs font-bold text-[#f6c85a] transition-colors hover:bg-[#f6c85a]/10"
             >
               <MessageCircle className="h-4 w-4 shrink-0" />
-              Contact Support
+              {tr("Contact Support")}
             </Link>
           )}
         </div>

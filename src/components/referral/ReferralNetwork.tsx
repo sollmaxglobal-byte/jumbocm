@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { UserPlus, Users } from "lucide-react";
 import { Money } from "@/components/Money";
 import { formatDate } from "@/lib/format";
+import { useI18n } from "@/hooks/useI18n";
 import type { Referral } from "@/hooks/useMyReferrals";
 
 function initials(name: string | null) {
@@ -19,6 +20,7 @@ export function ReferralNetwork({
   loading: boolean;
   error: string | null;
 }) {
+  const { t } = useI18n();
   if (loading) {
     return (
       <div className="space-y-3">
@@ -43,9 +45,9 @@ export function ReferralNetwork({
         <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
           <UserPlus className="h-6 w-6" />
         </span>
-        <p className="mt-3 text-sm font-semibold text-foreground">No referrals yet</p>
+        <p className="mt-3 text-sm font-semibold text-foreground">{t("No referrals yet")}</p>
         <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-          Share your invite link above — the friends who join will appear here.
+          {t("Share your invite link above — the friends who join will appear here.")}
         </p>
       </div>
     );
@@ -69,10 +71,12 @@ export function ReferralNetwork({
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-foreground">
-                  {r.full_name || "Member"}
+                  {r.full_name || t("Member")}
                 </p>
                 {r.joined_at && (
-                  <p className="text-xs text-muted-foreground">Joined {formatDate(r.joined_at)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("Joined {date}", { date: formatDate(r.joined_at) })}
+                  </p>
                 )}
               </div>
               <span
@@ -80,14 +84,14 @@ export function ReferralNetwork({
                   active ? "bg-success/15 text-success" : "bg-muted text-foreground/60"
                 }`}
               >
-                {active ? "Active" : "No plan"}
+                {active ? t("Active") : t("No plan")}
               </span>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-3 border-t border-border pt-3">
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Investment plan
+                  {t("Investment plan")}
                 </p>
                 <p className="truncate text-sm font-semibold text-foreground">
                   {r.plan_name ?? "—"}
@@ -95,7 +99,7 @@ export function ReferralNetwork({
               </div>
               <div className="text-right">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Invested
+                  {t("Invested")}
                 </p>
                 <p className="text-sm text-success">
                   {r.invested ? <Money value={Number(r.invested)} /> : "—"}
@@ -106,8 +110,8 @@ export function ReferralNetwork({
         );
       })}
       <p className="flex items-center justify-center gap-1.5 pt-1 text-[11px] text-muted-foreground">
-        <Users className="h-3.5 w-3.5" /> {rows.length}{" "}
-        {rows.length === 1 ? "person joined" : "people joined"} with your link
+        <Users className="h-3.5 w-3.5" />{" "}
+        {t("{count} joined with your link", { count: rows.length })}
       </p>
     </div>
   );

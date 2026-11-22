@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/hooks/useI18n";
 
 export const Route = createFileRoute("/reset-pin")({
   head: () => ({ meta: [{ title: "Reset transfer PIN — JumboCM" }] }),
@@ -24,6 +25,7 @@ const schema = z
   });
 
 function ResetPinPage() {
+  const { t } = useI18n();
   const nav = useNavigate();
   const [busy, setBusy] = useState(false);
 
@@ -38,13 +40,13 @@ function ResetPinPage() {
         _pin: value.pin,
       });
       if (error) throw error;
-      toast.success("Transfer PIN updated");
+      toast.success(t("Transfer PIN updated"));
       nav({ to: "/dashboard/profile" });
     } catch (error) {
       toast.error(
         error instanceof z.ZodError
-          ? error.issues[0].message
-          : "We could not update your PIN. The link may have expired.",
+          ? t(error.issues[0].message)
+          : t("We could not update your PIN. The link may have expired."),
       );
     } finally {
       setBusy(false);
@@ -55,11 +57,13 @@ function ResetPinPage() {
     <div className="grid min-h-screen place-items-center bg-background p-6">
       <div className="w-full max-w-sm">
         <img src="/jumbocm-logo.png" alt="JumboCM" className="mb-6 h-10 w-auto object-contain" />
-        <h1 className="font-display text-3xl text-primary">Reset transfer PIN</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Choose a new six-digit numeric PIN.</p>
+        <h1 className="font-display text-3xl text-primary">{t("Reset transfer PIN")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("Choose a new six-digit numeric PIN.")}
+        </p>
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>
-            <Label htmlFor="pin">New PIN</Label>
+            <Label htmlFor="pin">{t("New PIN")}</Label>
             <Input
               id="pin"
               name="pin"
@@ -73,7 +77,7 @@ function ResetPinPage() {
             />
           </div>
           <div>
-            <Label htmlFor="confirm">Confirm PIN</Label>
+            <Label htmlFor="confirm">{t("Confirm PIN")}</Label>
             <Input
               id="confirm"
               name="confirm"
@@ -91,7 +95,7 @@ function ResetPinPage() {
             disabled={busy}
             className="w-full bg-primary text-primary-foreground hover:opacity-90"
           >
-            {busy ? "Saving…" : "Update PIN"}
+            {busy ? t("Saving…") : t("Update PIN")}
           </Button>
         </form>
       </div>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useI18n } from "@/hooks/useI18n";
 
 /** Full-page shell used by the standalone deposit checkout steps (outside the dashboard). */
 export function CheckoutShell({
@@ -14,6 +15,7 @@ export function CheckoutShell({
   subtitle: string;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
       <header className="shrink-0 border-b border-border bg-card">
@@ -21,7 +23,7 @@ export function CheckoutShell({
           <img src="/jumbocm-logo.png" alt="JumboCM" className="h-9 w-auto object-contain" />
           <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Secure checkout · {step}/{total}
+              {t("Secure checkout · {step}/{total}", { step, total })}
             </div>
           </div>
         </div>

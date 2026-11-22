@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { DualMoney } from "@/components/DualMoney";
 import { ReferralNetwork } from "@/components/referral/ReferralNetwork";
 import { useMyReferrals } from "@/hooks/useMyReferrals";
+import { useI18n } from "@/hooks/useI18n";
 
 export const Route = createFileRoute("/dashboard/refer")({
   head: () => ({
@@ -60,6 +61,7 @@ const STEPS = [
 
 function ReferAndEarnPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const { rows, loading: networkLoading, error: networkError } = useMyReferrals();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [referralCount, setReferralCount] = useState(0);
@@ -117,7 +119,7 @@ function ReferAndEarnPage() {
       document.body.removeChild(field);
     }
     setCopied(true);
-    toast.success("Referral link copied");
+    toast.success(t("Referral link copied"));
     window.setTimeout(() => setCopied(false), 2000);
   };
 
@@ -126,8 +128,8 @@ function ReferAndEarnPage() {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: "Join JumboCM",
-          text: "Join me on JumboCM and start investing. Use my referral link:",
+          title: t("Join JumboCM"),
+          text: t("Join me on JumboCM and start investing. Use my referral link:"),
           url: link,
         });
         return;
@@ -139,7 +141,7 @@ function ReferAndEarnPage() {
   };
 
   const whatsapp = link
-    ? `https://wa.me/?text=${encodeURIComponent(`Join me on JumboCM and start investing: ${link}`)}`
+    ? `https://wa.me/?text=${encodeURIComponent(`${t("Join me on JumboCM and start investing")}: ${link}`)}`
     : "";
 
   return (
@@ -152,13 +154,13 @@ function ReferAndEarnPage() {
         {/* Header */}
         <header className="flex items-center gap-2">
           <Button asChild variant="ghost" size="icon" className="shrink-0">
-            <Link to="/dashboard" aria-label="Back to dashboard">
+            <Link to="/dashboard" aria-label={t("Back to dashboard")}>
               <ArrowLeft className="h-5 w-5" />
             </Link>
           </Button>
           <div>
-            <h1 className="text-lg font-semibold text-foreground">Refer &amp; Earn</h1>
-            <p className="text-xs text-muted-foreground">Invite friends, earn rewards</p>
+            <h1 className="text-lg font-semibold text-foreground">{t("Refer & Earn")}</h1>
+            <p className="text-xs text-muted-foreground">{t("Invite friends, earn rewards")}</p>
           </div>
         </header>
 
@@ -177,11 +179,11 @@ function ReferAndEarnPage() {
 
           <div className="relative">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" /> {percent}% commission
+              <Sparkles className="h-3.5 w-3.5" /> {t("{percent}% commission", { percent })}
             </span>
 
             <p className="mt-4 text-xs font-medium text-primary-foreground/75">
-              Total commission earned
+              {t("Total commission earned")}
             </p>
             <div className="mt-1.5">
               <DualMoney
@@ -195,13 +197,13 @@ function ReferAndEarnPage() {
             <div className="mt-5 flex items-center gap-4 border-t border-white/15 pt-3 text-xs text-primary-foreground/85">
               <span className="flex items-center gap-1.5">
                 <Users className="h-3.5 w-3.5" /> {referralCount}{" "}
-                {referralCount === 1 ? "friend" : "friends"}
+                {referralCount === 1 ? t("friend") : t("friends")}
               </span>
               <span className="flex items-center gap-1.5">
-                <TrendingUp className="h-3.5 w-3.5" /> {activeCount} active
+                <TrendingUp className="h-3.5 w-3.5" /> {t("{count} active", { count: activeCount })}
               </span>
               <span className="ml-auto flex items-center gap-1.5">
-                <Gift className="h-3.5 w-3.5" /> Unlimited
+                <Gift className="h-3.5 w-3.5" /> {t("Unlimited")}
               </span>
             </div>
           </div>
@@ -210,21 +212,21 @@ function ReferAndEarnPage() {
         {/* Invite link */}
         <section className="rounded-3xl border border-border bg-card p-5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Share2 className="h-3.5 w-3.5 text-primary" /> Your invite link
+            <Share2 className="h-3.5 w-3.5 text-primary" /> {t("Your invite link")}
           </div>
           <div className="mt-3 rounded-2xl border border-dashed border-border bg-muted/40 px-3.5 py-3">
             <p className="break-all font-mono text-[13px] font-medium text-foreground">
-              {link || "Your link will appear here once your account is ready."}
+              {link || t("Your link will appear here once your account is ready.")}
             </p>
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2.5">
             <Button onClick={copy} disabled={!link} className="rounded-xl">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Copied" : "Copy link"}
+              {copied ? t("Copied") : t("Copy link")}
             </Button>
             <Button onClick={share} disabled={!link} variant="outline" className="rounded-xl">
-              <Share2 className="h-4 w-4" /> Share
+              <Share2 className="h-4 w-4" /> {t("Share")}
             </Button>
           </div>
           {whatsapp && (
@@ -234,12 +236,12 @@ function ReferAndEarnPage() {
               rel="noopener noreferrer"
               className="mt-2.5 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-sm font-semibold text-white transition active:scale-[0.99]"
             >
-              <Share2 className="h-4 w-4" /> Share on WhatsApp
+              <Share2 className="h-4 w-4" /> {t("Share on WhatsApp")}
             </a>
           )}
           {code && (
             <p className="mt-3 text-center text-[11px] text-muted-foreground">
-              Your referral code:{" "}
+              {t("Your referral code:")}{" "}
               <span className="font-mono font-semibold text-foreground">{code}</span>
             </p>
           )}
@@ -247,14 +249,19 @@ function ReferAndEarnPage() {
 
         {/* Stats */}
         <section className="grid grid-cols-3 gap-3">
-          <StatTile icon={Users} label="Invited" value={String(referralCount)} />
-          <StatTile icon={TrendingUp} label="Active" value={String(activeCount)} tone="success" />
-          <StatTile icon={Gift} label="Rate" value={`${percent}%`} />
+          <StatTile icon={Users} label={t("Invited")} value={String(referralCount)} />
+          <StatTile
+            icon={TrendingUp}
+            label={t("Active")}
+            value={String(activeCount)}
+            tone="success"
+          />
+          <StatTile icon={Gift} label={t("Rate")} value={`${percent}%`} />
         </section>
 
         {/* How it works */}
         <section className="rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-foreground">How it works</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("How it works")}</h2>
           <div className="mt-4 space-y-4">
             {STEPS.map((step, i) => (
               <div key={step.title} className="flex items-start gap-3">
@@ -263,9 +270,9 @@ function ReferAndEarnPage() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    {i + 1}. {step.title}
+                    {i + 1}. {t(step.title)}
                   </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{step.text}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{t(step.text)}</p>
                 </div>
               </div>
             ))}
@@ -275,12 +282,12 @@ function ReferAndEarnPage() {
         {/* Referral network */}
         <section className="space-y-3">
           <div className="flex items-end justify-between">
-            <h2 className="text-sm font-semibold text-foreground">Your referral network</h2>
+            <h2 className="text-sm font-semibold text-foreground">{t("Your referral network")}</h2>
             <Link
               to="/dashboard/referrals"
               className="flex items-center gap-0.5 text-xs font-medium text-primary"
             >
-              View all <ChevronRight className="h-3.5 w-3.5" />
+              {t("View all")} <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
           <ReferralNetwork rows={rows.slice(0, 3)} loading={networkLoading} error={networkError} />

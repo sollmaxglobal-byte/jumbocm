@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Calendar, Check, Repeat, TrendingUp } from "lucide-react";
 import { formatUSD, formatXAF } from "@/lib/format";
+import { useI18n } from "@/hooks/useI18n";
 import { cn } from "@/lib/utils";
 import { dailyProfitFor, payoutLabel, type Plan } from "./planMath";
 
@@ -16,6 +17,7 @@ export function PlanOption({
   index: number;
   onSelect: () => void;
 }) {
+  const { t } = useI18n();
   const popular = plan.name === "Growth Plan";
   const baseAmount = Number(plan.amount_type === "fixed" ? plan.fixed_amount : plan.min_amount);
   const perDay = dailyProfitFor(plan, baseAmount);
@@ -41,7 +43,7 @@ export function PlanOption({
             <h3 className="text-[15px] font-semibold text-foreground">{plan.name}</h3>
             {popular && (
               <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent">
-                Popular
+                {t("Popular")}
               </span>
             )}
           </div>
@@ -69,7 +71,7 @@ export function PlanOption({
             <span className="text-[22px] font-bold leading-none tabular-nums text-success">
               {formatUSD(perDay)}
             </span>
-            <span className="text-[11px] font-medium text-muted-foreground">/ day</span>
+            <span className="text-[11px] font-medium text-muted-foreground">{t("/ day")}</span>
           </div>
           <p className="mt-1 text-[10px] tabular-nums text-muted-foreground">
             ≈ {formatXAF(perDay)}
@@ -77,20 +79,24 @@ export function PlanOption({
         </div>
         <span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-[10px] font-semibold text-secondary-foreground">
           {plan.profit_type === "percent"
-            ? `${plan.daily_roi_percent}% daily`
-            : "Fixed daily return"}
+            ? t("{percent}% daily", { percent: plan.daily_roi_percent })
+            : t("Fixed daily return")}
         </span>
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-1.5">
-        <Meta icon={Calendar} label="Term" value={`${plan.duration_days} days`} />
-        <Meta icon={TrendingUp} label="Profit" value={formatUSD(totalProfit)} accent />
-        <Meta icon={Repeat} label="Payout" value={payoutLabel(plan.payout_frequency)} />
+        <Meta
+          icon={Calendar}
+          label={t("Term")}
+          value={t("{days} days", { days: plan.duration_days })}
+        />
+        <Meta icon={TrendingUp} label={t("Profit")} value={formatUSD(totalProfit)} accent />
+        <Meta icon={Repeat} label={t("Payout")} value={t(payoutLabel(plan.payout_frequency))} />
       </div>
 
       <div className="mt-2.5 flex items-center justify-between gap-2 rounded-xl bg-secondary/50 px-3 py-2 text-[11px]">
         <span className="text-muted-foreground">
-          {plan.amount_type === "fixed" ? "Fixed stake" : "Invest between"}
+          {plan.amount_type === "fixed" ? t("Fixed stake") : t("Invest between")}
         </span>
         <span className="truncate font-semibold tabular-nums text-foreground">
           {plan.amount_type === "fixed"

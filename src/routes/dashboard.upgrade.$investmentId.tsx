@@ -5,6 +5,7 @@ import { ArrowRight, ChevronLeft, Loader2, ShieldCheck, Sparkles, TrendingUp } f
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { formatXAF } from "@/lib/format";
 import { PlanOption } from "@/components/invest/PlanOption";
@@ -65,6 +66,7 @@ function planTargetAmount(plan: Plan) {
 function UpgradePage() {
   const { investmentId } = Route.useParams();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [investment, setInvestment] = useState<Investment | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -142,18 +144,20 @@ function UpgradePage() {
       if (error) throw error;
       const res = data as BeginResult;
       if (res.status === "applied") {
-        toast.success(`Upgraded to ${selected.name}`);
+        toast.success(t("Upgraded to {plan}", { plan: selected.name }));
         navigate({ to: "/dashboard" });
         return;
       }
       const depositAmount = Number(res.deposit_amount ?? res.shortfall ?? 0);
-      toast.info(`Deposit ${formatXAF(depositAmount)} to finish your upgrade`);
+      toast.info(
+        t("Deposit {amount} to finish your upgrade", { amount: formatXAF(depositAmount) }),
+      );
       navigate({
         to: "/dashboard/deposit",
         search: { amount: depositAmount, upgrade: res.upgrade_id },
       });
     } catch (err) {
-      toast.error((err as Error).message ?? "Could not start the upgrade");
+      toast.error((err as Error).message ?? t("Could not start the upgrade"));
       setBusy(false);
     }
   }
@@ -169,7 +173,7 @@ function UpgradePage() {
       return;
     }
     setPendingId(null);
-    toast.success("Pending upgrade cancelled");
+    toast.success(t("Pending upgrade cancelled"));
   }
 
   if (loading || authLoading) {
@@ -183,12 +187,12 @@ function UpgradePage() {
   if (!investment) {
     return (
       <div className="mx-auto max-w-md rounded-3xl border border-border bg-card p-8 text-center">
-        <h1 className="text-lg font-semibold text-foreground">Investment not found</h1>
+        <h1 className="text-lg font-semibold text-foreground">{t("Investment not found")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          This investment is no longer active on your account.
+          {t("This investment is no longer active on your account.")}
         </p>
         <Button asChild className="mt-4 rounded-xl">
-          <Link to="/dashboard">Back to dashboard</Link>
+          <Link to="/dashboard">{t("Back to dashboard")}</Link>
         </Button>
       </div>
     );
@@ -204,7 +208,7 @@ function UpgradePage() {
         to="/dashboard"
         className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition hover:text-primary"
       >
-        <ChevronLeft className="h-3.5 w-3.5" /> Dashboard
+        <ChevronLeft className="h-3.5 w-3.5" /> {t("Dashboard")}
       </Link>
 
       {/* Current position */}
@@ -219,43 +223,46 @@ function UpgradePage() {
         />
         <div className="relative">
           <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/80">
-            <Sparkles className="h-3 w-3" /> Plan upgrade
+            <Sparkles className="h-3 w-3" /> {t("Plan upgrade")}
           </span>
           <h1 className="mt-2 font-display text-[26px] leading-tight sm:text-3xl">
-            Move up a tier
+            {t("Move up a tier")}
           </h1>
           <p className="mt-1 text-[11px] leading-relaxed text-white/70">
-            Your active investment switches to the plan you pick and restarts its term.
+            {t("Your active investment switches to the plan you pick and restarts its term.")}
           </p>
           <div className="mt-4 flex items-center justify-between border-t border-white/15 pt-3">
             <div>
-              <p className="text-[9px] uppercase tracking-wider text-white/60">Current plan</p>
+              <p className="text-[9px] uppercase tracking-wider text-white/60">
+                {t("Current plan")}
+              </p>
               <p className="mt-0.5 text-sm font-semibold">
-                {investment.plans?.name ?? "Investment plan"}
+                {investment.plans?.name ?? t("Investment plan")}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[9px] uppercase tracking-wider text-white/60">Invested</p>
+              <p className="text-[9px] uppercase tracking-wider text-white/60">{t("Invested")}</p>
               <p className="mt-0.5 text-sm font-bold tabular-nums">{formatXAF(currentAmount)}</p>
             </div>
           </div>
         </div>
       </section>
 
-      <StepRail labels={STEPS} step={step} onBack={setStep} />
+      <StepRail labels={STEPS.map((label) => t(label))} step={step} onBack={setStep} />
 
       {pendingId && (
         <div className="flex items-start justify-between gap-3 rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-amber-900">
           <p className="text-[11px] leading-relaxed">
-            An upgrade is waiting on its deposit. It completes automatically once that deposit is
-            approved.
+            {t(
+              "An upgrade is waiting on its deposit. It completes automatically once that deposit is approved.",
+            )}
           </p>
           <button
             type="button"
             onClick={cancelPending}
             className="shrink-0 rounded-full bg-amber-900/10 px-2.5 py-1 text-[10px] font-semibold"
           >
-            Cancel
+            {t("Cancel")}
           </button>
         </div>
       )}
@@ -269,15 +276,17 @@ function UpgradePage() {
           className="space-y-3"
         >
           <div>
-            <h2 className="text-base font-semibold text-foreground">Choose your new plan</h2>
+            <h2 className="text-base font-semibold text-foreground">{t("Choose your new plan")}</h2>
             <p className="text-[11px] text-muted-foreground">
-              Only plans above {formatXAF(currentAmount)} can be selected.
+              {t("Only plans above {amount} can be selected.", {
+                amount: formatXAF(currentAmount),
+              })}
             </p>
           </div>
 
           {higherPlans.length === 0 && (
             <div className="rounded-3xl border border-dashed border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
-              You are already on the highest available plan.
+              {t("You are already on the highest available plan.")}
             </div>
           )}
 
@@ -308,7 +317,7 @@ function UpgradePage() {
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  New plan
+                  {t("New plan")}
                 </p>
                 <p className="truncate text-sm font-semibold text-foreground">{selected.name}</p>
               </div>
@@ -317,7 +326,7 @@ function UpgradePage() {
                 onClick={() => setStep(0)}
                 className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-primary"
               >
-                Change
+                {t("Change")}
               </button>
             </div>
 
@@ -329,21 +338,23 @@ function UpgradePage() {
               <>
                 <dl className="mt-3 space-y-2 text-[12px]">
                   <Row
-                    label="Required for this plan"
+                    label={t("Required for this plan")}
                     value={formatXAF(quote.required_total)}
                     strong
                   />
                   <Row
-                    label="Your current investment"
+                    label={t("Your current investment")}
                     value={`− ${formatXAF(quote.eligible_principal)}`}
                   />
                   <Row
-                    label="Deposited wallet funds"
+                    label={t("Deposited wallet funds")}
                     value={`− ${formatXAF(quote.eligible_wallet)}`}
                   />
                   <div className="border-t border-border pt-2">
                     <Row
-                      label={quote.shortfall > 0 ? "Deposit needed" : "Covered by your deposits"}
+                      label={
+                        quote.shortfall > 0 ? t("Deposit needed") : t("Covered by your deposits")
+                      }
                       value={formatXAF(quote.shortfall)}
                       strong
                       accent={quote.shortfall > 0 ? "warn" : "ok"}
@@ -353,13 +364,16 @@ function UpgradePage() {
 
                 <div className="mt-3 flex items-center gap-2 rounded-2xl bg-secondary/60 px-3 py-2 text-[11px] text-muted-foreground">
                   <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-success" />
-                  Only deposited money counts — profits and referral bonuses are never used.
+                  {t("Only deposited money counts — profits and referral bonuses are never used.")}
                 </div>
 
                 <div className="mt-3 grid grid-cols-3 gap-1.5">
-                  <Mini label="Term" value={`${quote.duration_days} days`} />
-                  <Mini label="Daily" value={`${quote.daily_roi_percent}%`} />
-                  <Mini label="Payout" value={payoutLabel(selected.payout_frequency)} />
+                  <Mini
+                    label={t("Term")}
+                    value={t("{days} days", { days: quote.duration_days })}
+                  />
+                  <Mini label={t("Daily")} value={`${quote.daily_roi_percent}%`} />
+                  <Mini label={t("Payout")} value={t(payoutLabel(selected.payout_frequency))} />
                 </div>
               </>
             )}
@@ -372,8 +386,14 @@ function UpgradePage() {
               </span>
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 {quote && quote.shortfall > 0
-                  ? `You will be taken to the payment page for exactly ${formatXAF(quote.shortfall)}. As soon as that deposit is approved, your investment moves to ${selected.name} automatically.`
-                  : `Your deposited funds already cover the full ${formatXAF(quote?.required_total ?? 0)}, so the upgrade activates immediately.`}
+                  ? t(
+                      "You will be taken to the payment page for exactly {amount}. As soon as that deposit is approved, your investment moves to {plan} automatically.",
+                      { amount: formatXAF(quote.shortfall), plan: selected.name },
+                    )
+                  : t(
+                      "Your deposited funds already cover the full {amount}, so the upgrade activates immediately.",
+                      { amount: formatXAF(quote?.required_total ?? 0) },
+                    )}
               </p>
             </div>
 
@@ -387,8 +407,8 @@ function UpgradePage() {
               ) : (
                 <>
                   {quote && quote.shortfall > 0
-                    ? `Deposit ${formatXAF(quote.shortfall)} & upgrade`
-                    : "Confirm upgrade"}
+                    ? t("Deposit {amount} & upgrade", { amount: formatXAF(quote.shortfall) })
+                    : t("Confirm upgrade")}
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </>
               )}

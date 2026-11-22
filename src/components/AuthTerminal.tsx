@@ -139,6 +139,7 @@ type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 /** Labelled input; password fields get a show/hide toggle. */
 export function TerminalField({ label, error, type = "text", id, ...rest }: FieldProps) {
+  const { t } = useI18n();
   const [show, setShow] = useState(false);
   const isPw = type === "password";
   return (
@@ -150,7 +151,7 @@ export function TerminalField({ label, error, type = "text", id, ...rest }: Fiel
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            aria-label={show ? "Hide password" : "Show password"}
+            aria-label={show ? t("Hide password") : t("Show password")}
             className="auth-eye"
           >
             {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

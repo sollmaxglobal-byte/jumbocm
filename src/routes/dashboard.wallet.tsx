@@ -79,22 +79,22 @@ function WalletPage() {
   const rows = useMemo(() => {
     const out: TransactionRow[] = [];
 
-    for (const t of tx) {
-      if (t.type === "deposit" || t.type === "withdrawal") continue;
+    for (const item of tx) {
+      if (item.type === "deposit" || item.type === "withdrawal") continue;
       let kind: TransactionRow["kind"] = "profit";
-      let label = t.description ?? "";
-      if (t.type === "investment") {
+      let label = item.description ?? "";
+      if (item.type === "investment") {
         kind = "investment";
-        label = label || "Investment";
-      } else if (t.type === "profit" || t.type === "investment_return") {
+        label = label || t("Investment");
+      } else if (item.type === "profit" || item.type === "investment_return") {
         kind = "profit";
-        label = label || "Profit";
+        label = label || t("Profit");
       } else continue;
       out.push({
-        id: t.id,
+        id: item.id,
         kind,
-        amount: Number(t.amount),
-        date: t.created_at,
+        amount: Number(item.amount),
+        date: item.created_at,
         status: "approved",
         label,
       });
@@ -102,10 +102,10 @@ function WalletPage() {
     for (const d of pendingDeposits) {
       const label =
         d.status === "pending"
-          ? "Deposit submitted"
+          ? t("Deposit submitted")
           : d.status === "rejected"
-            ? "Deposit rejected"
-            : "Deposit approved";
+            ? t("Deposit rejected")
+            : t("Deposit approved");
       out.push({
         id: `pd-${d.id}`,
         kind: "deposit",
@@ -119,10 +119,10 @@ function WalletPage() {
     for (const w of pendingWithdrawals) {
       const label =
         w.status === "pending"
-          ? "Withdrawal requested"
+          ? t("Withdrawal requested")
           : w.status === "rejected"
-            ? "Withdrawal rejected"
-            : "Withdrawal paid";
+            ? t("Withdrawal rejected")
+            : t("Withdrawal paid");
       out.push({
         id: `pw-${w.id}`,
         kind: "withdrawal",
@@ -139,7 +139,7 @@ function WalletPage() {
     if (filter === "Withdrawals") return out.filter((r) => r.kind === "withdrawal");
     if (filter === "Profits") return out.filter((r) => r.kind === "profit");
     return out;
-  }, [tx, pendingDeposits, pendingWithdrawals, filter]);
+  }, [tx, pendingDeposits, pendingWithdrawals, filter, t]);
 
   const filterLabels: Record<TransactionFilter, string> = {
     All: t("wallet.filter.all"),
@@ -178,7 +178,7 @@ function WalletPage() {
           onClick={() => setSheetOpen(true)}
           className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-secondary px-3 py-2.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
         >
-          <Send className="h-4 w-4" /> Transfer
+          <Send className="h-4 w-4" /> {t("Transfer")}
         </button>
       </div>
 

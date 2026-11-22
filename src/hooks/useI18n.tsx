@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { FR_PHRASE_TABLE } from "@/lib/i18n-phrases";
 
 export type Lang = "en" | "fr";
 
@@ -530,8 +531,26 @@ const MERGED = {
 };
 
 type Key = keyof (typeof MERGED)["en"];
+type TVars = Record<string, string | number>;
 
-const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: Key) => string }>({
+/**
+ * Phrase dictionary keyed by the English source string. Pages call `t("English text")`
+ * and the French translation is looked up here; English falls back to the source text.
+ */
+const FR_PHRASES: Record<string, string> = FR_PHRASE_TABLE;
+
+function interpolate(text: string, vars?: TVars) {
+  if (!vars) return text;
+  return text.replace(/\{(\w+)\}/g, (match, name: string) =>
+    vars[name] !== undefined ? String(vars[name]) : match,
+  );
+}
+
+const Ctx = createContext<{
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: (k: Key | string, vars?: TVars) => string;
+}>({
   lang: "en",
   setLang: () => {},
   t: (k) => k,
@@ -584,8 +603,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     void persistLang(l);
   };
 
-  const t = (k: Key) =>
-    (MERGED[lang] as Record<string, string>)[k] ?? (MERGED.en as Record<string, string>)[k] ?? k;
+  const t = (k: Key | string, vars?: TVars) => {
+    const dict = MERGED[lang] as Record<string, string>;
+    const phrase = lang === "fr" ? FR_PHRASES[k] : undefined;
+    const value = dict[k] ?? phrase ?? (MERGED.en as Record<string, string>)[k] ?? k;
+    return interpolate(value, vars);
+  };
 
   return <Ctx.Provider value={{ lang, setLang, t }}>{children}</Ctx.Provider>;
 }

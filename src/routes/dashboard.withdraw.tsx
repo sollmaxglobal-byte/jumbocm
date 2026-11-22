@@ -145,8 +145,10 @@ function WithdrawPage() {
         account_name: String(fd.get("account_name") ?? ""),
         account_number: String(fd.get("account_number") ?? ""),
       });
-      if (v.amount < limits.min) throw new Error(`Minimum withdrawal is ${formatXAF(limits.min)}`);
-      if (v.amount > limits.max) throw new Error(`Maximum withdrawal is ${formatXAF(limits.max)}`);
+      if (v.amount < limits.min)
+        throw new Error(t("Minimum withdrawal is {amount}", { amount: formatXAF(limits.min) }));
+      if (v.amount > limits.max)
+        throw new Error(t("Maximum withdrawal is {amount}", { amount: formatXAF(limits.max) }));
       if (v.amount > balance) throw new Error(t("withdraw.errExceed"));
       const { data: canWithdraw, error: eligibilityError } = await supabase.rpc("can_withdraw", {
         _user_id: user.id,
@@ -154,7 +156,9 @@ function WithdrawPage() {
       if (eligibilityError) throw eligibilityError;
       if (!canWithdraw)
         throw new Error(
-          "Withdrawals are unavailable for this account. An active investment may be required.",
+          t(
+            "Withdrawals are unavailable for this account. An active investment may be required.",
+          ),
         );
       const { data: newId, error } = await supabase.rpc("create_withdrawal", {
         _amount: v.amount,
@@ -182,7 +186,7 @@ function WithdrawPage() {
       navigate({ to: "/dashboard/wallet", search: { filter: "Withdrawals" } as never });
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
-      toast.error(msg);
+      toast.error(t(msg));
     } finally {
       setBusy(false);
     }
@@ -229,12 +233,12 @@ function WithdrawPage() {
             }}
             className="shrink-0 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 active:scale-95"
           >
-            Max
+            {t("Max")}
           </button>
         </div>
         <div className="relative mt-5 flex items-center justify-between border-t border-white/15 pt-3 text-[11px] text-white/65">
-          <span>Minimum {formatXAF(limits.min)}</span>
-          <span>Maximum {formatXAF(limits.max)}</span>
+          <span>{t("Minimum {amount}", { amount: formatXAF(limits.min) })}</span>
+          <span>{t("Maximum {amount}", { amount: formatXAF(limits.max) })}</span>
         </div>
       </section>
 
@@ -244,10 +248,10 @@ function WithdrawPage() {
         </span>
         <div>
           <div className="text-sm font-semibold text-[#14213D] dark:text-foreground">
-            Estimated processing time: up to 10 minutes
+            {t("Estimated processing time: up to 10 minutes")}
           </div>
           <div className="text-xs text-muted-foreground">
-            Once approved, funds are sent to your account within 10 minutes maximum.
+            {t("Once approved, funds are sent to your account within 10 minutes maximum.")}
           </div>
         </div>
       </div>
@@ -261,7 +265,7 @@ function WithdrawPage() {
           <span className="grid h-8 w-8 place-items-center rounded-full bg-[#14213D] text-white">
             <ArrowUpRight className="h-4 w-4" />
           </span>
-          <h2 className="font-display text-lg text-primary">Withdrawal details</h2>
+          <h2 className="font-display text-lg text-primary">{t("Withdrawal details")}</h2>
         </div>
         <div className="grid gap-4 p-5 md:grid-cols-2">
           <div>
@@ -282,7 +286,10 @@ function WithdrawPage() {
               </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Minimum withdrawal: {formatXAF(limits.min)} — maximum {formatXAF(limits.max)}.
+              {t("Minimum withdrawal: {min} — maximum {max}.", {
+                min: formatXAF(limits.min),
+                max: formatXAF(limits.max),
+              })}
             </p>
           </div>
           <div>
@@ -310,7 +317,7 @@ function WithdrawPage() {
           </div>
           {accounts.length > 0 && (
             <div className="md:col-span-2">
-              <Label htmlFor="saved_account">Saved payout account</Label>
+              <Label htmlFor="saved_account">{t("Saved payout account")}</Label>
               <select
                 id="saved_account"
                 name="saved_account"
@@ -328,7 +335,7 @@ function WithdrawPage() {
                     account.account_number;
                 }}
               >
-                <option value="">Choose a saved account</option>
+                <option value="">{t("Choose a saved account")}</option>
                 {accounts.map((account) => (
                   <option key={account.id} value={account.id}>
                     {account.account_name} · {account.account_number}
@@ -368,10 +375,10 @@ function WithdrawPage() {
             <table className="w-full text-sm">
               <thead className="bg-secondary text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2 text-left">Date</th>
-                  <th className="px-4 py-2 text-left">Method</th>
-                  <th className="px-4 py-2 text-right">Amount</th>
-                  <th className="px-4 py-2 text-right">Status</th>
+                  <th className="px-4 py-2 text-left">{t("Date")}</th>
+                  <th className="px-4 py-2 text-left">{t("Method")}</th>
+                  <th className="px-4 py-2 text-right">{t("Amount")}</th>
+                  <th className="px-4 py-2 text-right">{t("Status")}</th>
                 </tr>
               </thead>
               <tbody>

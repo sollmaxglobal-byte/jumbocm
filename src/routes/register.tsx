@@ -70,7 +70,7 @@ function RegisterPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (pw !== confirm) {
-      toast.error("Passwords do not match");
+      toast.error(t("Passwords do not match"));
       return;
     }
     setBusy(true);
@@ -108,11 +108,11 @@ function RegisterPage() {
     }
   }
 
-  const mismatch = confirm.length > 0 && pw !== confirm ? "Passwords do not match" : null;
+  const mismatch = confirm.length > 0 && pw !== confirm ? t("Passwords do not match") : null;
 
   return (
     <AuthTerminalShell referralName={refName}>
-      <span className="auth-eyebrow">Open your account</span>
+      <span className="auth-eyebrow">{t("Open your account")}</span>
       <h1 className="auth-title">{t("auth.registerTitle")}</h1>
       <p className="auth-sub">{t("auth.signUpSub")}</p>
 
@@ -124,7 +124,7 @@ function RegisterPage() {
           required
           maxLength={80}
           autoComplete="name"
-          placeholder="Jane Doe"
+          placeholder={t("Jane Doe")}
         />
         <TerminalField
           id="phone"
@@ -153,7 +153,7 @@ function RegisterPage() {
             required
             minLength={6}
             autoComplete="new-password"
-            placeholder="Password"
+            placeholder={t("Password")}
             value={pw}
             onChange={(e) => setPw(e.target.value)}
           />
@@ -161,17 +161,17 @@ function RegisterPage() {
             id="confirm_password"
             name="confirm_password"
             type="password"
-            label="Confirm"
+            label={t("Confirm")}
             required
             autoComplete="new-password"
-            placeholder="Repeat"
+            placeholder={t("Repeat")}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             error={mismatch}
           />
         </div>
         <p className="auth-note">
-          By continuing you agree to the JumboCM terms and privacy policy.
+          {t("By continuing you agree to the JumboCM terms and privacy policy.")}
         </p>
         <button type="submit" disabled={busy || !!mismatch} className="auth-submit">
           <span>{busy ? t("common.pleaseWait") : t("auth.signUp")}</span>

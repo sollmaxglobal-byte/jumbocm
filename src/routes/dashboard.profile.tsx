@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { PushToggle } from "@/components/PushToggle";
 
 export const Route = createFileRoute("/dashboard/profile")({
@@ -117,6 +118,7 @@ function Row({ icon: Icon, label, value }: { icon: typeof Mail; label: string; v
 
 function ProfilePage() {
   const { user, signOut } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
@@ -163,14 +165,14 @@ function ProfilePage() {
     setAccounts((current) => [...current, data as PayoutAccount]);
     form.reset();
     setShowAccountForm(false);
-    toast.success("Payout account saved");
+    toast.success(t("Payout account saved"));
   }
 
   async function removeAccount(id: string) {
     const { error } = await supabase.from("payout_accounts").delete().eq("id", id);
     if (error) return toast.error(error.message);
     setAccounts((current) => current.filter((account) => account.id !== id));
-    toast.success("Payout account removed");
+    toast.success(t("Payout account removed"));
   }
 
   async function makeDefault(id: string) {
@@ -180,7 +182,7 @@ function ProfilePage() {
     const { error: defaultError } = await supabase.from("payout_accounts").update({ is_default: true }).eq("id", id);
     if (defaultError) return toast.error(defaultError.message);
     setAccounts((current) => current.map((account) => ({ ...account, is_default: account.id === id })).sort((a, b) => Number(b.is_default) - Number(a.is_default)));
-    toast.success("Default payout account updated");
+    toast.success(t("Default payout account updated"));
   }
 
   async function changePassword(event: React.FormEvent<HTMLFormElement>) {
@@ -193,30 +195,30 @@ function ProfilePage() {
       if (error) throw error;
       form.reset();
       setShowPassword(false);
-      toast.success("Password updated");
+      toast.success(t("Password updated"));
     } catch (error) {
-      toast.error(error instanceof z.ZodError ? error.issues[0].message : (error as Error).message);
+      toast.error(error instanceof z.ZodError ? t(error.issues[0].message) : (error as Error).message);
     } finally {
       setPasswordBusy(false);
     }
   }
 
   async function sendPinReset() {
-    if (!user?.email) return toast.error("No email address is associated with this account");
+    if (!user?.email) return toast.error(t("No email address is associated with this account"));
     const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: `${window.location.origin}/reset-pin?kind=transfer` });
-    if (error) return toast.error("We could not send the reset link. Please try again.");
-    toast.success("A transfer PIN reset link was sent to your email");
+    if (error) return toast.error(t("We could not send the reset link. Please try again."));
+    toast.success(t("A transfer PIN reset link was sent to your email"));
   }
 
   const referralLink = profile?.referral_code ? `${typeof window !== "undefined" ? window.location.origin : ""}/register?ref=${profile.referral_code}` : "";
   const copyReferral = () => {
     if (!referralLink) return;
     void navigator.clipboard.writeText(referralLink);
-    toast.success("Referral link copied");
+    toast.success(t("Referral link copied"));
   };
   const shareReferral = async () => {
     if (!referralLink) return;
-    if (navigator.share) await navigator.share({ title: "JumboCM", text: "Join me on JumboCM", url: referralLink }).catch(() => undefined);
+    if (navigator.share) await navigator.share({ title: "JumboCM", text: t("Join me on JumboCM"), url: referralLink }).catch(() => undefined);
     else copyReferral();
   };
 
@@ -235,15 +237,15 @@ function ProfilePage() {
           <div className="flex items-center justify-between px-4 py-3">
             <Link
               to="/dashboard"
-              aria-label="Back to dashboard"
+              aria-label={t("Back to dashboard")}
               className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-white/70 transition hover:text-white"
             >
               <ChevronLeft className="h-5 w-5" />
             </Link>
-            <p className="text-sm font-semibold text-white">Profile &amp; settings</p>
+            <p className="text-sm font-semibold text-white">{t("Profile & settings")}</p>
             <button
               type="button"
-              aria-label="Sign out"
+              aria-label={t("Sign out")}
               onClick={async () => {
                 await signOut();
                 navigate({ to: "/" });
@@ -261,7 +263,7 @@ function ProfilePage() {
                 onClick={() => document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-[#00FF88]/40 hover:text-white"
               >
-                {section.label}
+                {t(section.label)}
               </button>
             ))}
           </nav>
@@ -277,20 +279,20 @@ function ProfilePage() {
                   {initials(profile?.full_name, user?.email)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-lg font-semibold text-white">{profile?.full_name || "JumboCM member"}</p>
+                  <p className="truncate text-lg font-semibold text-white">{profile?.full_name || t("JumboCM member")}</p>
                   <p className="truncate text-xs text-white/45">{user?.email}</p>
                   <span className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${verification.className}`}>
-                    <BadgeCheck className="h-3 w-3" /> {verification.label}
+                    <BadgeCheck className="h-3 w-3" /> {t(verification.label)}
                   </span>
                 </div>
               </div>
               <div className="relative mt-4 grid grid-cols-2 gap-2">
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5">
-                  <p className="text-[10px] uppercase tracking-wide text-white/40">Payout methods</p>
+                  <p className="text-[10px] uppercase tracking-wide text-white/40">{t("Payout methods")}</p>
                   <p className="mt-0.5 text-sm font-semibold text-white tabular-nums">{accounts.length}</p>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5">
-                  <p className="text-[10px] uppercase tracking-wide text-white/40">Referral code</p>
+                  <p className="text-[10px] uppercase tracking-wide text-white/40">{t("Referral code")}</p>
                   <p className="mt-0.5 truncate font-mono text-sm font-semibold text-[#00FF88]">{profile?.referral_code ?? "—"}</p>
                 </div>
               </div>
@@ -298,10 +300,10 @@ function ProfilePage() {
           </section>
 
           {/* Personal details */}
-          <Card id="details" icon={UserRound} title="Personal details">
+          <Card id="details" icon={UserRound} title={t("Personal details")}>
             <div className="divide-y divide-white/5 border-t border-white/5">
-              <Row icon={Mail} label="Email address" value={user?.email ?? "—"} />
-              <Row icon={Phone} label="Phone number" value={profile?.phone ?? "Not added"} />
+              <Row icon={Mail} label={t("Email address")} value={user?.email ?? "—"} />
+              <Row icon={Phone} label={t("Phone number")} value={profile?.phone ?? t("Not added")} />
             </div>
           </Card>
 
@@ -309,7 +311,7 @@ function ProfilePage() {
           <Card
             id="payouts"
             icon={WalletCards}
-            title="Payout methods"
+            title={t("Payout methods")}
             action={
               !showAccountForm ? (
                 <button
@@ -317,7 +319,7 @@ function ProfilePage() {
                   onClick={() => setShowAccountForm(true)}
                   className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#00FF88]/10 px-2.5 py-1 text-[11px] font-semibold text-[#00FF88]"
                 >
-                  <Plus className="h-3.5 w-3.5" /> Add
+                  <Plus className="h-3.5 w-3.5" /> {t("Add")}
                 </button>
               ) : undefined
             }
@@ -332,18 +334,18 @@ function ProfilePage() {
                     <div className="flex min-w-0 items-center gap-2">
                       <p className="truncate text-sm font-semibold text-white">{account.account_name}</p>
                       {account.is_default && (
-                        <span className="shrink-0 rounded-full bg-[#00FF88]/10 px-2 py-0.5 text-[9px] font-bold uppercase text-[#00FF88]">Default</span>
+                        <span className="shrink-0 rounded-full bg-[#00FF88]/10 px-2 py-0.5 text-[9px] font-bold uppercase text-[#00FF88]">{t("Default")}</span>
                       )}
                     </div>
                     <p className="truncate text-xs text-white/40">
-                      {METHOD_LABEL[account.method]} · {account.account_number}
+                      {t(METHOD_LABEL[account.method])} · {account.account_number}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center">
                     {!account.is_default && (
                       <button
                         type="button"
-                        aria-label="Make default"
+                        aria-label={t("Make default")}
                         onClick={() => void makeDefault(account.id)}
                         className="grid h-9 w-9 place-items-center rounded-lg text-white/40 transition hover:bg-white/5 hover:text-[#00FF88]"
                       >
@@ -352,7 +354,7 @@ function ProfilePage() {
                     )}
                     <button
                       type="button"
-                      aria-label="Remove account"
+                      aria-label={t("Remove account")}
                       onClick={() => void removeAccount(account.id)}
                       className="grid h-9 w-9 place-items-center rounded-lg text-white/40 transition hover:bg-red-500/10 hover:text-red-400"
                     >
@@ -362,21 +364,21 @@ function ProfilePage() {
                 </div>
               ))}
               {!accounts.length && !showAccountForm && (
-                <p className="px-4 py-5 text-sm text-white/40">No payout method saved yet.</p>
+                <p className="px-4 py-5 text-sm text-white/40">{t("No payout method saved yet.")}</p>
               )}
               {showAccountForm && (
                 <form onSubmit={saveAccount} className="space-y-2.5 border-t border-white/5 p-4">
                   <select name="payout_method" required className={INPUT_CLASS}>
-                    <option value="mobile_money" className="bg-[#0F1012]">Mobile money</option>
-                    <option value="bank_transfer" className="bg-[#0F1012]">Bank transfer</option>
-                    <option value="crypto" className="bg-[#0F1012]">Crypto wallet</option>
+                    <option value="mobile_money" className="bg-[#0F1012]">{t("Mobile money")}</option>
+                    <option value="bank_transfer" className="bg-[#0F1012]">{t("Bank transfer")}</option>
+                    <option value="crypto" className="bg-[#0F1012]">{t("Crypto wallet")}</option>
                   </select>
-                  <input name="payout_name" placeholder="Account name" required maxLength={120} className={INPUT_CLASS} />
-                  <input name="payout_number" placeholder="Account or wallet number" required maxLength={120} className={INPUT_CLASS} />
+                  <input name="payout_name" placeholder={t("Account name")} required maxLength={120} className={INPUT_CLASS} />
+                  <input name="payout_number" placeholder={t("Account or wallet number")} required maxLength={120} className={INPUT_CLASS} />
                   <div className="grid grid-cols-[auto_1fr] gap-2 pt-0.5">
                     <button
                       type="button"
-                      aria-label="Cancel"
+                      aria-label={t("Cancel")}
                       onClick={() => setShowAccountForm(false)}
                       className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 text-white/60 transition hover:text-white"
                     >
@@ -387,7 +389,7 @@ function ProfilePage() {
                       disabled={accountBusy}
                       className="h-11 rounded-xl bg-[#00FF88] text-sm font-semibold text-[#04120B] transition active:scale-[0.99] disabled:opacity-60"
                     >
-                      {accountBusy ? "Saving…" : "Save payout method"}
+                      {accountBusy ? t("Saving…") : t("Save payout method")}
                     </button>
                   </div>
                 </form>
@@ -396,11 +398,11 @@ function ProfilePage() {
           </Card>
 
           {/* Invite & earn */}
-          <Card id="invite" icon={Share2} title="Invite & earn">
+          <Card id="invite" icon={Share2} title={t("Invite & earn")}>
             <div className="border-t border-white/5 p-4">
               <div className="rounded-xl border border-dashed border-[#00FF88]/25 bg-[#00FF88]/[0.04] px-3.5 py-3">
-                <p className="text-[10px] uppercase tracking-wide text-white/40">Your referral code</p>
-                <p className="mt-1 truncate font-mono text-base font-bold text-[#00FF88]">{profile?.referral_code ?? "Not available"}</p>
+                <p className="text-[10px] uppercase tracking-wide text-white/40">{t("Your referral code")}</p>
+                <p className="mt-1 truncate font-mono text-base font-bold text-[#00FF88]">{profile?.referral_code ?? t("Not available")}</p>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button
@@ -408,21 +410,21 @@ function ProfilePage() {
                   onClick={copyReferral}
                   className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-white/10 text-xs font-semibold text-white/80 transition hover:border-white/20 hover:text-white"
                 >
-                  <Copy className="h-3.5 w-3.5" /> Copy link
+                  <Copy className="h-3.5 w-3.5" /> {t("Copy link")}
                 </button>
                 <button
                   type="button"
                   onClick={() => void shareReferral()}
                   className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[#00FF88] text-xs font-semibold text-[#04120B] transition active:scale-[0.99]"
                 >
-                  <Share2 className="h-3.5 w-3.5" /> Share
+                  <Share2 className="h-3.5 w-3.5" /> {t("Share")}
                 </button>
               </div>
             </div>
           </Card>
 
           {/* Security */}
-          <Card id="security" icon={ShieldCheck} title="Security">
+          <Card id="security" icon={ShieldCheck} title={t("Security")}>
             <div className="border-t border-white/5">
               <button
                 type="button"
@@ -433,8 +435,8 @@ function ProfilePage() {
                   <KeyRound className="h-4 w-4" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-white">Transfer PIN</span>
-                  <span className="block text-xs text-white/40">Send a secure reset link</span>
+                  <span className="block text-sm font-semibold text-white">{t("Transfer PIN")}</span>
+                  <span className="block text-xs text-white/40">{t("Send a secure reset link")}</span>
                 </span>
                 <ChevronRight className="h-4 w-4 shrink-0 text-white/30" />
               </button>
@@ -447,14 +449,14 @@ function ProfilePage() {
                   <ShieldCheck className="h-4 w-4" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-white">Password</span>
-                  <span className="block text-xs text-white/40">Change your sign-in password</span>
+                  <span className="block text-sm font-semibold text-white">{t("Password")}</span>
+                  <span className="block text-xs text-white/40">{t("Change your sign-in password")}</span>
                 </span>
                 <ChevronRight className={`h-4 w-4 shrink-0 text-white/30 transition ${showPassword ? "rotate-90" : ""}`} />
               </button>
               {showPassword && (
                 <form onSubmit={changePassword} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-t border-white/5 p-4">
-                  <label htmlFor="new-password" className="sr-only">New password</label>
+                  <label htmlFor="new-password" className="sr-only">{t("New password")}</label>
                   <input
                     id="new-password"
                     name="password"
@@ -463,7 +465,7 @@ function ProfilePage() {
                     minLength={8}
                     maxLength={72}
                     autoComplete="new-password"
-                    placeholder="New password"
+                    placeholder={t("New password")}
                     className={INPUT_CLASS}
                   />
                   <button
@@ -471,7 +473,7 @@ function ProfilePage() {
                     disabled={passwordBusy}
                     className="h-11 rounded-xl bg-[#00FF88] px-4 text-sm font-semibold text-[#04120B] disabled:opacity-60"
                   >
-                    {passwordBusy ? "Saving…" : "Update"}
+                    {passwordBusy ? t("Saving…") : t("Update")}
                   </button>
                 </form>
               )}
@@ -479,7 +481,7 @@ function ProfilePage() {
           </Card>
 
           {/* Notifications */}
-          <Card id="alerts" icon={Bell} title="Notifications">
+          <Card id="alerts" icon={Bell} title={t("Notifications")}>
             <div className="border-t border-white/5 p-1 [&>div]:border-0 [&>div]:bg-transparent [&>div]:p-3.5 [&_span]:text-white [&_p]:text-white/40 [&_svg]:text-[#00FF88] [&_button]:bg-[#00FF88] [&_button]:text-[#04120B]">
               <PushToggle />
             </div>
@@ -493,9 +495,9 @@ function ProfilePage() {
             }}
             className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-red-500/25 bg-red-500/[0.06] text-sm font-semibold text-red-400 transition hover:bg-red-500/10"
           >
-            <LogOut className="h-4 w-4" /> Sign out
+            <LogOut className="h-4 w-4" /> {t("Sign out")}
           </button>
-          <p className="pb-2 text-center text-[11px] text-white/30">JumboCM · Secure account access</p>
+          <p className="pb-2 text-center text-[11px] text-white/30">{t("JumboCM · Secure account access")}</p>
         </div>
       </div>
     </div>

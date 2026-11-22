@@ -154,7 +154,7 @@ function DashboardHome() {
 
   const copyBalance = async () => {
     await navigator.clipboard.writeText(formatXAF(balance));
-    toast.success("Balance copied");
+    toast.success(t("Balance copied"));
   };
 
   return (
@@ -167,7 +167,7 @@ function DashboardHome() {
         {/* Header */}
         <header className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate text-sm text-white/50">Welcome back,</p>
+            <p className="truncate text-sm text-white/50">{t("Welcome back,")}</p>
             <p className="truncate text-xl font-semibold text-white">
               {firstName}
               {flag && <span className="ml-2">{flag}</span>}
@@ -175,7 +175,7 @@ function DashboardHome() {
           </div>
           <Link
             to="/dashboard/profile"
-            aria-label="Profile"
+            aria-label={t("Profile")}
             className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#00FF88] to-[#0E9F6E] text-sm font-bold text-[#04120B] ring-2 ring-[#00FF88]/30"
           >
             {firstName.charAt(0).toUpperCase()}
@@ -197,7 +197,9 @@ function DashboardHome() {
           />
           <div className="relative flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-medium text-white/50">Total Available Balance</p>
+              <p className="text-[11px] font-medium text-white/50">
+                {t("Total Available Balance")}
+              </p>
               <p className="mt-2 text-[clamp(24px,7vw,34px)] font-bold leading-none tracking-tight text-white tabular-nums">
                 {formatUSD(balance)}
               </p>
@@ -208,7 +210,7 @@ function DashboardHome() {
                 <button
                   type="button"
                   onClick={copyBalance}
-                  aria-label="Copy balance"
+                  aria-label={t("Copy balance")}
                   className="grid h-6 w-6 place-items-center rounded-full text-white/40 transition hover:bg-white/5 hover:text-white"
                 >
                   <Copy className="h-3.5 w-3.5" />
@@ -229,24 +231,34 @@ function DashboardHome() {
 
         {/* Quick actions */}
         <section className="grid grid-cols-4 gap-2.5">
-          <QuickAction to="/dashboard/deposit" label="Deposit" icon={ArrowDownLeft} tone="green" />
-          <QuickAction to="/dashboard/withdraw" label="Withdraw" icon={ArrowUpRight} tone="blue" />
-          <QuickAction to="/dashboard/refer" label="Refer & Earn" icon={Gift} tone="amber" />
-          <QuickAction to="/contact" label="Support" icon={Headphones} tone="purple" />
+          <QuickAction
+            to="/dashboard/deposit"
+            label={t("Deposit")}
+            icon={ArrowDownLeft}
+            tone="green"
+          />
+          <QuickAction
+            to="/dashboard/withdraw"
+            label={t("Withdraw")}
+            icon={ArrowUpRight}
+            tone="blue"
+          />
+          <QuickAction to="/dashboard/refer" label={t("Refer & Earn")} icon={Gift} tone="amber" />
+          <QuickAction to="/contact" label={t("Support")} icon={Headphones} tone="purple" />
         </section>
 
         {/* Money summary */}
         <section className="grid grid-cols-2 gap-3">
           <SummaryCard
             to="/dashboard/invest"
-            label="Total Profit"
+            label={t("Total Profit")}
             value={profit}
             tone="green"
             icon={TrendingUp}
           />
           <SummaryCard
             to="/dashboard/invest"
-            label="Active Portfolio"
+            label={t("Active Portfolio")}
             value={invested}
             tone="violet"
             icon={PieChart}
@@ -261,7 +273,7 @@ function DashboardHome() {
                 <Wallet className="h-4 w-4" />
               </span>
               <div className="min-w-0">
-                <p className="text-[10px] text-white/45">Total Withdrawn</p>
+                <p className="text-[10px] text-white/45">{t("Total Withdrawn")}</p>
                 <p className="text-sm font-semibold text-white tabular-nums">
                   {formatUSD(totalWithdrawn)}
                 </p>
@@ -271,7 +283,7 @@ function DashboardHome() {
               </div>
             </div>
             <div className="min-w-0 border-l border-white/10 pl-3">
-              <p className="text-[10px] text-white/45">Available to Withdraw</p>
+              <p className="text-[10px] text-white/45">{t("Available to Withdraw")}</p>
               <p className="text-sm font-semibold text-white tabular-nums">{formatUSD(balance)}</p>
               <p className="text-[10px] text-white/40 tabular-nums">≈ {formatXAF(balance)}</p>
             </div>
@@ -281,12 +293,12 @@ function DashboardHome() {
         {/* Portfolio overview */}
         <section className="rounded-2xl border border-white/5 bg-[#0F1012] p-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-white">Portfolio Overview</h2>
+            <h2 className="text-sm font-semibold text-white">{t("Portfolio Overview")}</h2>
             <Link
               to="/dashboard/wallet"
               className="flex items-center gap-0.5 text-[11px] font-medium text-[#00FF88]"
             >
-              View Details <ChevronRight className="h-3.5 w-3.5" />
+              {t("View Details")} <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
           <div className="mt-4 flex items-center gap-4">
@@ -298,15 +310,15 @@ function DashboardHome() {
                 <div className="text-center">
                   <p className="text-lg font-bold leading-none text-white">100%</p>
                   <p className="mt-1 text-[9px] uppercase tracking-[0.12em] text-white/45">
-                    Portfolio
+                    {t("Portfolio")}
                   </p>
                 </div>
               </div>
             </div>
             <ul className="min-w-0 flex-1 space-y-2.5">
-              <LegendRow color={GREEN} label="Available Balance" value={balance} />
-              <LegendRow color="#3B82F6" label="Total Profit" value={profit} />
-              <LegendRow color="#8B5CF6" label="Withdrawn" value={totalWithdrawn} />
+              <LegendRow color={GREEN} label={t("Available Balance")} value={balance} />
+              <LegendRow color="#3B82F6" label={t("Total Profit")} value={profit} />
+              <LegendRow color="#8B5CF6" label={t("Withdrawn")} value={totalWithdrawn} />
             </ul>
           </div>
         </section>
