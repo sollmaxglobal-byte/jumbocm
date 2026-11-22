@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ChevronLeft, Loader2, ShieldCheck, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { formatUSD, formatXAF } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ function ConfirmInvestment() {
   const { planId } = Route.useParams();
   const { amount: amountParam } = Route.useSearch();
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [balance, setBalance] = useState(0);
@@ -92,7 +94,7 @@ function ConfirmInvestment() {
       const res = data as { investment_id: string };
       navigate({ to: "/invest/success/$id", params: { id: res.investment_id } });
     } catch (err) {
-      toast.error((err as Error).message ?? "Could not activate the plan");
+      toast.error((err as Error).message ?? t("Could not activate the plan"));
       setBusy(false);
     }
   }
@@ -109,9 +111,9 @@ function ConfirmInvestment() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6 text-center">
         <div>
-          <h1 className="font-display text-2xl text-primary">Plan not found</h1>
+          <h1 className="font-display text-2xl text-primary">{t("Plan not found")}</h1>
           <Button className="mt-4" onClick={() => navigate({ to: "/dashboard/invest" })}>
-            Back to plans
+            {t("Back to plans")}
           </Button>
         </div>
       </div>
@@ -136,14 +138,16 @@ function ConfirmInvestment() {
             onClick={() => navigate({ to: "/dashboard/invest" })}
             className="inline-flex items-center gap-1 text-xs font-medium text-white/70 transition hover:text-white"
           >
-            <ChevronLeft className="h-3.5 w-3.5" /> Back to plans
+            <ChevronLeft className="h-3.5 w-3.5" /> {t("Back to plans")}
           </button>
           <p className="mt-4 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
-            Step 3 of 3 · Review
+            {t("Step 3 of 3 · Review")}
           </p>
-          <h1 className="mt-1.5 font-display text-[26px] leading-tight">Confirm your investment</h1>
+          <h1 className="mt-1.5 font-display text-[26px] leading-tight">
+            {t("Confirm your investment")}
+          </h1>
           <p className="mt-1 text-[11px] text-white/70">
-            Check the details below, then activate your plan.
+            {t("Check the details below, then activate your plan.")}
           </p>
         </div>
       </div>
@@ -165,7 +169,7 @@ function ConfirmInvestment() {
           {plan.amount_type !== "fixed" && (
             <div className="border-b border-border px-4 py-4">
               <label htmlFor="amount" className="block text-xs font-medium text-muted-foreground">
-                Amount to invest
+                {t("Amount to invest")}
               </label>
               <div className="mt-2 rounded-2xl border border-border bg-secondary/40 px-4 py-3 transition focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15">
                 <div className="flex items-center gap-2">
@@ -189,25 +193,28 @@ function ConfirmInvestment() {
                 </p>
               </div>
               <div className="mt-1.5 flex justify-between text-[10px] text-muted-foreground">
-                <span>Min {formatXAF(plan.min_amount)}</span>
-                <span>Max {formatXAF(plan.max_amount)}</span>
+                <span>{t("Min {amount}", { amount: formatXAF(plan.min_amount) })}</span>
+                <span>{t("Max {amount}", { amount: formatXAF(plan.max_amount) })}</span>
               </div>
             </div>
           )}
 
           <div className="space-y-2.5 px-4 py-4 text-[13px]">
-            <Row label="Amount" value={formatXAF(amount)} />
-            <Row label="Daily profit" value={formatXAF(dailyProfit)} accent />
-            <Row label="Duration" value={`${plan.duration_days} days`} />
-            <Row label="Payout" value={payoutLabel(plan.payout_frequency)} />
+            <Row label={t("Amount")} value={formatXAF(amount)} />
+            <Row label={t("Daily profit")} value={formatXAF(dailyProfit)} accent />
             <Row
-              label={`Total profit (${plan.duration_days} days)`}
+              label={t("Duration")}
+              value={t("{days} days", { days: plan.duration_days })}
+            />
+            <Row label={t("Payout")} value={t(payoutLabel(plan.payout_frequency))} />
+            <Row
+              label={t("Total profit ({days} days)", { days: plan.duration_days })}
               value={formatXAF(totalProfit)}
               accent
             />
             <div className="border-t border-dashed border-border pt-3">
               <div className="flex items-end justify-between">
-                <span className="text-xs text-muted-foreground">Total back</span>
+                <span className="text-xs text-muted-foreground">{t("Total back")}</span>
                 <div className="text-right">
                   <p className="text-xl font-bold leading-none tabular-nums text-foreground">
                     {formatUSD(totalReturn)}
@@ -222,7 +229,7 @@ function ConfirmInvestment() {
 
           <div className="flex items-center justify-between border-t border-border px-4 py-3">
             <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-              <Wallet className="h-3.5 w-3.5" /> Wallet balance
+              <Wallet className="h-3.5 w-3.5" /> {t("Wallet balance")}
             </span>
             <span
               className={cn(
@@ -237,15 +244,17 @@ function ConfirmInvestment() {
 
         {insufficient && (
           <div className="mt-3 rounded-2xl border border-warning/40 bg-warning/10 p-4 text-xs">
-            <p className="font-semibold text-warning">Insufficient wallet balance</p>
+            <p className="font-semibold text-warning">{t("Insufficient wallet balance")}</p>
             <p className="mt-1 text-muted-foreground">
-              You need {formatXAF(amount - balance)} more to activate this plan.
+              {t("You need {amount} more to activate this plan.", {
+                amount: formatXAF(amount - balance),
+              })}
             </p>
             <Button
               onClick={() => navigate({ to: "/dashboard/deposit" })}
               className="mt-3 w-full rounded-xl bg-warning text-white hover:bg-warning/90"
             >
-              Go to deposit
+              {t("Go to deposit")}
             </Button>
           </div>
         )}
@@ -256,7 +265,7 @@ function ConfirmInvestment() {
             className="h-12 rounded-2xl px-4"
             onClick={() => navigate({ to: "/dashboard/invest" })}
           >
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             onClick={confirm}
@@ -265,10 +274,10 @@ function ConfirmInvestment() {
           >
             {busy ? (
               <>
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Processing…
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" /> {t("Processing…")}
               </>
             ) : (
-              "Confirm investment"
+              t("Confirm investment")
             )}
           </Button>
         </div>

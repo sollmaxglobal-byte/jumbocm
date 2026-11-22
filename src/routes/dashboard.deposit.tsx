@@ -9,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { checkKorapayDeposit, startKorapayDeposit } from "@/lib/korapay.functions";
 import { startNowpaymentsDeposit } from "@/lib/nowpayments.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { NumericKeypad } from "@/components/NumericKeypad";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,6 +92,7 @@ function MethodLogo({ name }: { name: string }) {
 
 function DepositPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { amount: presetAmount, upgrade: upgradeId } = Route.useSearch();
   const [amount, setAmount] = useState(presetAmount ? String(Math.round(presetAmount)) : "");
@@ -138,7 +140,10 @@ function DepositPage() {
   const maxAmount = Number(settings.deposit_max_amount ?? fallbackSettings.deposit_max_amount);
   const amountError =
     amount && (amountNumber < minAmount || amountNumber > maxAmount)
-      ? `Enter an amount between ${money(minAmount)} and ${money(maxAmount)} FCFA.`
+      ? t("Enter an amount between {min} and {max} FCFA.", {
+          min: money(minAmount),
+          max: money(maxAmount),
+        })
       : "";
 
   useEffect(() => {
@@ -227,7 +232,7 @@ function DepositPage() {
           window.clearInterval(poll);
           setCharging(false);
           setChargeId(null);
-          toast.error("The payment was not completed. Please try again.");
+          toast.error(t("The payment was not completed. Please try again."));
         }
       } catch {
         /* keep polling */
@@ -238,7 +243,7 @@ function DepositPage() {
 
   async function copy(value: string) {
     await navigator.clipboard.writeText(value);
-    toast.success("Copied to clipboard");
+    toast.success(t("Copied to clipboard"));
   }
 
   // The amount is typed on the on-screen keypad only, so the device keyboard never opens.
@@ -262,13 +267,13 @@ function DepositPage() {
   function next() {
     if (step === 1) {
       if (!amount || amountNumber < minAmount || amountNumber > maxAmount) {
-        toast.error(amountError || "Enter a valid amount.");
+        toast.error(amountError || t("Enter a valid amount."));
         return;
       }
       setStep(2);
     } else if (step === 2) {
       if (!method) {
-        toast.error("Choose an active payment method.");
+        toast.error(t("Choose an active payment method."));
         return;
       }
       setStep(3);
@@ -279,7 +284,7 @@ function DepositPage() {
     if (charging) return;
     const phone = payPhone.replace(/\D/g, "");
     if (phone.replace(/^237/, "").length !== 9) {
-      toast.error("Enter your 9-digit mobile money number.");
+      toast.error(t("Enter your 9-digit mobile money number."));
       return;
     }
     setCharging(true);
@@ -291,10 +296,12 @@ function DepositPage() {
       if (res.status === "success") {
         navigate({ to: "/deposit-pending/$id", params: { id: res.depositId } });
       } else {
-        toast.success("Approve the payment prompt on your phone.");
+        toast.success(t("Approve the payment prompt on your phone."));
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not start the payment.");
+      toast.error(
+        error instanceof Error ? error.message : t("Could not start the payment."),
+      );
       setCharging(false);
     }
   }
@@ -307,14 +314,16 @@ function DepositPage() {
       await linkUpgrade(res.depositId);
       window.location.href = res.invoiceUrl;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not start the crypto payment.");
+      toast.error(
+        error instanceof Error ? error.message : t("Could not start the crypto payment."),
+      );
       setCryptoBusy(false);
     }
   }
 
   async function submitProof() {
     if (!user || !uploadedFile || !selectedMethod) {
-      toast.error("Upload your payment proof to continue.");
+      toast.error(t("Upload your payment proof to continue."));
       return;
     }
     setSubmitting(true);
@@ -339,10 +348,12 @@ function DepositPage() {
       if (error) throw error;
       if (!createdDeposit) throw new Error("Deposit was created without an ID.");
       await linkUpgrade(createdDeposit.id);
-      toast.success("Proof uploaded successfully");
+      toast.success(t("Proof uploaded successfully"));
       navigate({ to: "/deposit-pending/$id", params: { id: createdDeposit.id } });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not submit your deposit.");
+      toast.error(
+        error instanceof Error ? error.message : t("Could not submit your deposit."),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -353,7 +364,7 @@ function DepositPage() {
   if (loading)
     return (
       <div className="grid h-dvh place-items-center text-sm text-[#a9a9b0]" style={{ background: INK }}>
-        Loading deposit options…
+        {t("Loading deposit options…")}
       </div>
     );
 
@@ -385,7 +396,7 @@ function DepositPage() {
             className="flex flex-col gap-4"
           >
             <h1 className="text-[24px] font-extrabold leading-[1.1] tracking-tight">
-              How much do you want to deposit?
+              {t("How much do you want to deposit?")}
             </h1>
 
             {upgradeId && (
@@ -393,8 +404,10 @@ function DepositPage() {
                 className="rounded-2xl border px-3 py-2 text-[12px] leading-snug"
                 style={{ borderColor: GOLD, background: "rgba(246,200,90,0.08)", color: GOLD }}
               >
-                Plan upgrade — pay {money(presetAmount ?? 0)} FCFA to complete it. Your investment
-                moves to the new plan automatically once this deposit is approved.
+                {t(
+                  "Plan upgrade — pay {amount} FCFA to complete it. Your investment moves to the new plan automatically once this deposit is approved.",
+                  { amount: money(presetAmount ?? 0) },
+                )}
               </div>
             )}
 
@@ -407,7 +420,7 @@ function DepositPage() {
                 <span
                   role="textbox"
                   aria-readonly="true"
-                  aria-label="Amount in FCFA"
+                  aria-label={t("Amount in FCFA")}
                   className="min-w-0 flex-1 truncate text-[28px] font-extrabold tracking-tight"
                   style={{ color: amount ? GOLD : "rgba(246,200,90,0.4)" }}
                 >
@@ -418,7 +431,7 @@ function DepositPage() {
                 </span>
               </div>
               <p className="text-center text-sm text-[#9a9aa2]">
-                Min {money(minAmount)} • Max {money(maxAmount)}
+                {t("Min {min} • Max {max}", { min: money(minAmount), max: money(maxAmount) })}
               </p>
               {amountError && <p className="text-center text-sm text-destructive">{amountError}</p>}
             </div>
@@ -457,7 +470,7 @@ function DepositPage() {
             className="flex flex-col gap-4"
           >
             <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
-              Select payment method
+              {t("Select payment method")}
             </h1>
 
             {instantEnabled && (
@@ -482,13 +495,13 @@ function DepositPage() {
                     className="truncate text-lg font-bold"
                     style={{ color: instant ? "#141418" : "#ffffff" }}
                   >
-                    Pay instantly
+                    {t("Pay instantly")}
                   </span>
                   <span
                     className="truncate text-sm"
                     style={{ color: instant ? "rgba(20,20,24,0.7)" : "#9a9aa2" }}
                   >
-                    MTN / Orange prompt • credited automatically
+                    {t("MTN / Orange prompt • credited automatically")}
                   </span>
                 </span>
                 {instant && (
@@ -518,13 +531,13 @@ function DepositPage() {
                     className="truncate text-lg font-bold"
                     style={{ color: crypto ? "#141418" : "#ffffff" }}
                   >
-                    Pay with crypto
+                    {t("Pay with crypto")}
                   </span>
                   <span
                     className="truncate text-sm"
                     style={{ color: crypto ? "rgba(20,20,24,0.7)" : "#9a9aa2" }}
                   >
-                    BTC, ETH, USDT & more • credited automatically
+                    {t("BTC, ETH, USDT & more • credited automatically")}
                   </span>
                 </span>
                 {crypto && (
@@ -539,7 +552,7 @@ function DepositPage() {
               <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#3c3c47] p-8 text-center">
                 <Clock3 className="size-8 text-[#9a9aa2]" />
                 <p className="text-sm text-[#9a9aa2]">
-                  There are no active deposit methods right now.
+                  {t("There are no active deposit methods right now.")}
                 </p>
               </div>
             ) : (
@@ -561,7 +574,7 @@ function DepositPage() {
                           {item.name}
                         </span>
                         <span className="truncate text-sm text-[#141418]/70">
-                          Mobile Money • Instant
+                          {t("Mobile Money • Instant")}
                         </span>
                       </span>
                       {active && (
@@ -586,7 +599,7 @@ function DepositPage() {
             className="flex flex-col gap-4 text-center"
           >
             <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
-              {chargeId ? "Check your phone" : "Pay instantly"}
+              {chargeId ? t("Check your phone") : t("Pay instantly")}
             </h1>
             <p className="text-base font-semibold" style={{ color: GOLD }}>
               {money(amount)} FCFA
@@ -596,14 +609,16 @@ function DepositPage() {
               <div className="flex flex-col items-center gap-3">
                 <Clock3 className="size-10 animate-pulse" style={{ color: GOLD }} />
                 <p className="text-sm text-[#c8c8d0]">
-                  Enter your mobile money PIN on the prompt sent to {payPhone}. Your wallet is
-                  credited automatically once the payment goes through.
+                  {t(
+                    "Enter your mobile money PIN on the prompt sent to {phone}. Your wallet is credited automatically once the payment goes through.",
+                    { phone: payPhone },
+                  )}
                 </p>
               </div>
             ) : (
               <div className="flex flex-col gap-2 text-left">
                 <label htmlFor="pay-phone" className="text-sm font-semibold" style={{ color: GOLD }}>
-                  Mobile money number
+                  {t("Mobile money number")}
                 </label>
                 <Input
                   id="pay-phone"
@@ -615,7 +630,7 @@ function DepositPage() {
                   style={{ borderColor: GOLD }}
                 />
                 <p className="text-xs text-[#9a9aa2]">
-                  You will receive a payment prompt on this number. No screenshot needed.
+                  {t("You will receive a payment prompt on this number. No screenshot needed.")}
                 </p>
               </div>
             )}
@@ -630,14 +645,16 @@ function DepositPage() {
             exit={{ opacity: 0, x: -15 }}
             className="flex flex-col items-center gap-4 text-center"
           >
-            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">Pay with crypto</h1>
+            <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
+              {t("Pay with crypto")}
+            </h1>
             <p className="text-base font-semibold" style={{ color: GOLD }}>
               {money(amount)} FCFA
             </p>
             <p className="text-sm text-[#c8c8d0]">
-              You will be redirected to the secure NOWPayments checkout to pay in BTC, ETH, USDT or
-              any supported coin. Your wallet is credited automatically once the network confirms
-              the payment.
+              {t(
+                "You will be redirected to the secure NOWPayments checkout to pay in BTC, ETH, USDT or any supported coin. Your wallet is credited automatically once the network confirms the payment.",
+              )}
             </p>
           </motion.div>
         )}
@@ -652,26 +669,26 @@ function DepositPage() {
           >
             <div>
               <h1 className="text-[26px] font-extrabold leading-[1.1] tracking-tight">
-                Complete your payment
+                {t("Complete your payment")}
               </h1>
-              <p className="mt-2 text-base font-semibold text-white/90">Send exact amount</p>
+              <p className="mt-2 text-base font-semibold text-white/90">{t("Send exact amount")}</p>
             </div>
 
             <GoldRow
-              label="Amount to send"
+              label={t("Amount to send")}
               value={`${money(amount)} FCFA`}
               onCopy={() => copy(String(amountNumber))}
             />
             <GoldRow
-              label="Send to number"
+              label={t("Send to number")}
               value={selectedMethod.number}
               light
               onCopy={() => copy(selectedMethod.number)}
             />
             <GoldRow
-              label="Account name"
+              label={t("Account name")}
               value={selectedMethod.accountName ?? methodName(selectedMethod)}
-              hint="Confirm this name before you send"
+              hint={t("Confirm this name before you send")}
               onCopy={() => copy(selectedMethod.accountName ?? "")}
             />
 
@@ -682,7 +699,7 @@ function DepositPage() {
                   {timer}
                 </span>
               </div>
-              <p className="text-sm text-[#9a9aa2]">Payment window expires in</p>
+              <p className="text-sm text-[#9a9aa2]">{t("Payment window expires in")}</p>
             </div>
           </motion.div>
         )}
@@ -702,7 +719,7 @@ function DepositPage() {
             >
               <Upload className="size-9" style={{ color: GOLD }} />
               <span className="text-2xl font-bold" style={{ color: GOLD }}>
-                Tap to upload
+                {t("Tap to upload")}
               </span>
               <Input
                 id="proof"
@@ -712,12 +729,12 @@ function DepositPage() {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file && file.size > 5 * 1024 * 1024)
-                    toast.error("File must be smaller than 5MB.");
+                    toast.error(t("File must be smaller than 5MB."));
                   else setUploadedFile(file ?? null);
                 }}
               />
             </label>
-            <p className="text-base font-semibold">Upload payment screenshot or receipt</p>
+            <p className="text-base font-semibold">{t("Upload payment screenshot or receipt")}</p>
             {uploadedFile && (
               <div className="flex items-center gap-3 rounded-xl border border-[#3c3c47] p-3 text-left">
                 <FileImage className="size-5" style={{ color: GOLD }} />
@@ -726,14 +743,17 @@ function DepositPage() {
                   size="icon"
                   variant="ghost"
                   onClick={() => setUploadedFile(null)}
-                  aria-label="Remove proof"
+                  aria-label={t("Remove proof")}
                 >
                   <X />
                 </Button>
               </div>
             )}
             <p className="text-sm text-[#9a9aa2]">
-              Depositing {money(amount)} FCFA via {methodName(selectedMethod)}
+              {t("Depositing {amount} FCFA via {method}", {
+                amount: money(amount),
+                method: methodName(selectedMethod),
+              })}
             </p>
           </motion.div>
         )}
@@ -753,16 +773,16 @@ function DepositPage() {
                 <Check className="size-6 text-[#141418]" />
               </span>
               <span className="text-2xl font-extrabold" style={{ color: GOLD }}>
-                Payment submitted!
+                {t("Payment submitted!")}
               </span>
             </div>
 
             <div className="flex w-full items-center justify-between gap-1">
               {(
                 [
-                  ["Uploaded", true],
-                  ["Verifying", true],
-                  ["Credited", depositStatus === "approved"],
+                  [t("Uploaded"), true],
+                  [t("Verifying"), true],
+                  [t("Credited"), depositStatus === "approved"],
                 ] as const
               ).map(([label, done], i) => (
                 <div key={label} className="flex flex-1 flex-col items-center gap-2">
@@ -789,8 +809,10 @@ function DepositPage() {
             </div>
 
             <div>
-              <p className="text-base font-semibold">Estimated time: 5–15 minutes</p>
-              <p className="mt-2 text-sm text-[#9a9aa2]">We’ll notify you once credited</p>
+              <p className="text-base font-semibold">{t("Estimated time: 5–15 minutes")}</p>
+              <p className="mt-2 text-sm text-[#9a9aa2]">
+                {t("We’ll notify you once credited")}
+              </p>
             </div>
 
             <div className="flex w-full flex-col gap-3">
@@ -799,7 +821,7 @@ function DepositPage() {
                 className="h-12 w-full rounded-xl text-base font-bold"
                 style={{ background: GOLD, color: "#141418" }}
               >
-                Back to dashboard
+                {t("Back to dashboard")}
               </Button>
             </div>
           </motion.div>
@@ -818,7 +840,7 @@ function DepositPage() {
                 variant="outline"
                 onClick={() => setStep((step - 1) as 1 | 2 | 3)}
                 className="h-12 shrink-0 rounded-xl border-[#3c3c47] bg-transparent px-4 text-white hover:bg-white/5"
-                aria-label="Back"
+                aria-label={t("Back")}
               >
                 <ArrowLeft />
               </Button>
@@ -844,21 +866,21 @@ function DepositPage() {
             >
               {step === 3 && instant
                 ? chargeId
-                  ? "Waiting for your approval…"
+                  ? t("Waiting for your approval…")
                   : charging
-                    ? "Starting…"
-                    : "Pay now"
+                    ? t("Starting…")
+                    : t("Pay now")
                 : step === 3 && crypto
                   ? cryptoBusy
-                    ? "Redirecting…"
-                    : "Pay with crypto"
+                    ? t("Redirecting…")
+                    : t("Pay with crypto")
                   : step === 3
-                    ? "I have paid"
+                    ? t("I have paid")
                     : step === 4
                       ? submitting
-                        ? "Submitting…"
-                        : "Submit proof"
-                      : "Continue"}
+                        ? t("Submitting…")
+                        : t("Submit proof")
+                      : t("Continue")}
             </Button>
           </div>
         </div>
@@ -880,6 +902,7 @@ function GoldRow({
   light?: boolean;
   onCopy?: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div
       className="flex items-start gap-3 rounded-2xl border-2 px-4 py-3 text-left"
@@ -901,7 +924,7 @@ function GoldRow({
         <button
           type="button"
           onClick={onCopy}
-          aria-label={`Copy ${label}`}
+          aria-label={t("Copy {label}", { label })}
           className="mt-1 shrink-0 rounded-md p-1.5 hover:bg-white/10"
         >
           <Copy className="size-5" style={{ color: GOLD }} />

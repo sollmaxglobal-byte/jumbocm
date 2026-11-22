@@ -3,6 +3,7 @@ import { Megaphone, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/hooks/useI18n";
 
 type Announcement = {
   announcement_enabled: boolean | null;
@@ -19,6 +20,7 @@ type Announcement = {
  * (saving a new message) shows it again to everyone.
  */
 export function AnnouncementPopup() {
+  const { t } = useI18n();
   const [a, setA] = useState<Announcement | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -78,7 +80,7 @@ export function AnnouncementPopup() {
           >
             <button
               onClick={dismiss}
-              aria-label="Close"
+              aria-label={t("Close")}
               className="absolute right-3 top-3 rounded-full p-1.5 text-muted-foreground transition hover:bg-secondary"
             >
               <X className="h-4 w-4" />
@@ -87,7 +89,7 @@ export function AnnouncementPopup() {
               <Megaphone className="h-5 w-5" />
             </div>
             <h2 className="mt-3 font-display text-xl text-primary">
-              {a.announcement_title || "Announcement"}
+              {a.announcement_title || t("Announcement")}
             </h2>
             <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
               {a.announcement_message}
@@ -101,11 +103,11 @@ export function AnnouncementPopup() {
                   onClick={dismiss}
                   className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
                 >
-                  {a.announcement_link_label || "Open link"}
+                  {a.announcement_link_label || t("Open link")}
                 </a>
               ) : null}
               <Button variant="ghost" size="sm" onClick={dismiss}>
-                Close
+                {t("Close")}
               </Button>
             </div>
           </motion.div>

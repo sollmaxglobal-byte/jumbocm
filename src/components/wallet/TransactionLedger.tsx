@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/format";
 import { Money } from "@/components/Money";
+import { useI18n } from "@/hooks/useI18n";
 
 export type TransactionRow = {
   id: string;
@@ -101,6 +102,7 @@ export function TransactionLedger({
 }
 
 function LedgerRow({ row }: { row: TransactionRow }) {
+  const { t } = useI18n();
   const kind = KIND_STYLE[row.kind];
   const Icon = kind.icon;
   const status = STATUS_STYLE[row.status];
@@ -123,7 +125,7 @@ function LedgerRow({ row }: { row: TransactionRow }) {
               <span className="text-border" aria-hidden>
                 ·
               </span>
-              <span className={status.className}>{status.label}</span>
+              <span className={status.className}>{t(status.label)}</span>
             </>
           )}
         </span>
@@ -139,7 +141,7 @@ function LedgerRow({ row }: { row: TransactionRow }) {
           <Money value={Math.abs(row.amount)} />
         </span>
         <span className="mt-0.5 text-[10.5px] font-medium text-muted-foreground">
-          {row.receipt ? "Receipt" : income ? "Credit" : "Debit"}
+          {row.receipt ? t("Receipt") : income ? t("Credit") : t("Debit")}
         </span>
       </span>
 

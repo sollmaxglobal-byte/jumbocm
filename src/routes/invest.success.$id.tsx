@@ -4,6 +4,7 @@ import { CalendarClock, CheckCircle2, Copy, Loader2, Sparkles, TrendingUp } from
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { formatUSD, formatXAF, txRef } from "@/lib/format";
 
@@ -33,6 +34,7 @@ type Details = {
 function InvestSuccess() {
   const { id } = Route.useParams();
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const [d, setD] = useState<Details | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -59,7 +61,7 @@ function InvestSuccess() {
           duration_days: inv.duration_days,
           start_date: inv.start_date,
           end_date: inv.end_date,
-          plan_name: plan?.name ?? "Investment plan",
+          plan_name: plan?.name ?? t("Investment plan"),
           tx_id: tx?.id ?? null,
         });
       }
@@ -94,13 +96,13 @@ function InvestSuccess() {
             <CheckCircle2 className="h-9 w-9 text-[#C9F158]" />
           </div>
           <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/80">
-            <Sparkles className="h-3 w-3" /> Plan active
+            <Sparkles className="h-3 w-3" /> {t("Plan active")}
           </span>
           <h1 className="mt-2 font-display text-[26px] leading-tight">
-            Investment purchased successfully
+            {t("Investment purchased successfully")}
           </h1>
           <p className="mt-1.5 text-[11px] leading-relaxed text-white/70">
-            Your plan is now active and profit will be credited automatically.
+            {t("Your plan is now active and profit will be credited automatically.")}
           </p>
         </div>
       </div>
@@ -112,7 +114,7 @@ function InvestSuccess() {
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-2xl border border-border bg-card px-4 py-3">
                 <p className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
-                  <TrendingUp className="h-3 w-3" /> Invested
+                  <TrendingUp className="h-3 w-3" /> {t("Invested")}
                 </p>
                 <p className="mt-1 text-lg font-bold leading-none tabular-nums text-foreground">
                   {formatUSD(d.amount)}
@@ -123,7 +125,7 @@ function InvestSuccess() {
               </div>
               <div className="rounded-2xl border border-border bg-card px-4 py-3">
                 <p className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
-                  <CalendarClock className="h-3 w-3" /> Matures
+                  <CalendarClock className="h-3 w-3" /> {t("Matures")}
                 </p>
                 <p className="mt-1 text-lg font-bold leading-none tabular-nums text-foreground">
                   {d.duration_days}d
@@ -137,17 +139,17 @@ function InvestSuccess() {
             {/* Receipt */}
             <div className="mt-3 overflow-hidden rounded-3xl border border-border bg-card">
               <div className="space-y-2.5 px-4 py-4 text-[13px]">
-                <Row label="Plan" value={d.plan_name} />
-                <Row label="Duration" value={`${d.duration_days} days`} />
-                <Row label="Start" value={new Date(d.start_date).toLocaleString()} />
-                <Row label="Maturity" value={new Date(d.end_date).toLocaleString()} />
+                <Row label={t("Plan")} value={d.plan_name} />
+                <Row label={t("Duration")} value={t("{days} days", { days: d.duration_days })} />
+                <Row label={t("Start")} value={new Date(d.start_date).toLocaleString()} />
+                <Row label={t("Maturity")} value={new Date(d.end_date).toLocaleString()} />
                 <div className="flex items-center justify-between gap-3 border-t border-dashed border-border pt-3">
-                  <span className="text-muted-foreground">Transaction ID</span>
+                  <span className="text-muted-foreground">{t("Transaction ID")}</span>
                   <button
                     className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold uppercase tabular-nums text-primary transition hover:bg-primary/15"
                     onClick={() => {
                       navigator.clipboard.writeText(ref);
-                      toast.success("Transaction ID copied");
+                      toast.success(t("Transaction ID copied"));
                     }}
                   >
                     #{ref} <Copy className="h-3 w-3" />
@@ -160,14 +162,14 @@ function InvestSuccess() {
 
         <div className="mt-4 space-y-2">
           <Button asChild className="h-12 w-full rounded-2xl text-sm font-semibold">
-            <Link to="/dashboard">Go to dashboard</Link>
+            <Link to="/dashboard">{t("Go to dashboard")}</Link>
           </Button>
           <Button
             asChild
             variant="outline"
             className="h-12 w-full rounded-2xl text-sm font-semibold"
           >
-            <Link to="/dashboard/invest">View more plans</Link>
+            <Link to="/dashboard/invest">{t("View more plans")}</Link>
           </Button>
         </div>
       </div>

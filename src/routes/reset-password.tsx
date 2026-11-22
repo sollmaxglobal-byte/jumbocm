@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/hooks/useI18n";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -52,6 +53,7 @@ async function establishRecoverySession(): Promise<boolean> {
 }
 
 function ResetPasswordPage() {
+  const { t } = useI18n();
   const nav = useNavigate();
   const [busy, setBusy] = useState(false);
   const [linkState, setLinkState] = useState<LinkState>("checking");
@@ -83,11 +85,11 @@ function ResetPasswordPage() {
       });
       const { error } = await supabase.auth.updateUser({ password: v.password });
       if (error) throw error;
-      toast.success("Password updated");
+      toast.success(t("Password updated"));
       nav({ to: "/dashboard" });
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
-      toast.error(msg);
+      toast.error(t(msg));
     } finally {
       setBusy(false);
     }
@@ -99,19 +101,19 @@ function ResetPasswordPage() {
         <div className="mb-6 flex items-center">
           <img src="/jumbocm-logo.png" alt="JumboCM" className="h-10 w-auto object-contain" />
         </div>
-        <h1 className="font-display text-3xl text-primary">Set a new password</h1>
+        <h1 className="font-display text-3xl text-primary">{t("Set a new password")}</h1>
 
         {linkState === "checking" && (
           <p className="mt-4 text-sm text-muted-foreground" role="status">
-            Verifying your reset link…
+            {t("Verifying your reset link…")}
           </p>
         )}
 
         {linkState === "invalid" && (
           <div className="mt-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm">
-            <p>This reset link is invalid or has expired.</p>
+            <p>{t("This reset link is invalid or has expired.")}</p>
             <Link to="/forgot-password" className="mt-2 inline-block font-semibold text-primary">
-              Request a new link
+              {t("Request a new link")}
             </Link>
           </div>
         )}
@@ -119,11 +121,11 @@ function ResetPasswordPage() {
         {linkState === "ready" && (
           <>
             <p className="mt-1 text-sm text-muted-foreground">
-              Choose a strong password you haven&apos;t used before.
+              {t("Choose a strong password you haven't used before.")}
             </p>
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               <div>
-                <Label htmlFor="password">New password</Label>
+                <Label htmlFor="password">{t("New password")}</Label>
                 <Input
                   id="password"
                   name="password"
@@ -134,7 +136,7 @@ function ResetPasswordPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="confirm">Confirm password</Label>
+                <Label htmlFor="confirm">{t("Confirm password")}</Label>
                 <Input
                   id="confirm"
                   name="confirm"
@@ -149,7 +151,7 @@ function ResetPasswordPage() {
                 disabled={busy}
                 className="w-full bg-primary text-primary-foreground hover:opacity-90"
               >
-                {busy ? "Saving…" : "Update password"}
+                {busy ? t("Saving…") : t("Update password")}
               </Button>
             </form>
           </>

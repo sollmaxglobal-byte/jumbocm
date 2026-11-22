@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { formatXAF } from "@/lib/format";
+import { useI18n } from "@/hooks/useI18n";
 
 export function TransferSheet({
   open,
@@ -32,6 +33,7 @@ export function TransferSheet({
   userId: string | undefined;
   onTransferSuccess: (amount: number) => void;
 }) {
+  const { t } = useI18n();
   const [transferBusy, setTransferBusy] = useState(false);
   const [pinBusy, setPinBusy] = useState(false);
   const [transferDraft, setTransferDraft] = useState<{
@@ -62,7 +64,7 @@ export function TransferSheet({
     setPinBusy(false);
     if (error) return toast.error(error.message);
     e.currentTarget.reset();
-    toast.success("Transfer PIN saved");
+    toast.success(t("Transfer PIN saved"));
   }
 
   async function confirmTransfer() {
@@ -79,7 +81,7 @@ export function TransferSheet({
     onTransferSuccess(transferDraft.amount);
     setTransferDraft(null);
     setConfirmPin("");
-    toast.success("Transfer sent securely");
+    toast.success(t("Transfer sent securely"));
   }
 
   return (
@@ -92,20 +94,20 @@ export function TransferSheet({
           {/* Drag handle */}
           <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-muted" />
           <SheetHeader className="px-0 text-center">
-            <SheetTitle className="text-base">Transfer</SheetTitle>
+            <SheetTitle className="text-base">{t("Transfer")}</SheetTitle>
           </SheetHeader>
 
           <Tabs defaultValue="send" className="mt-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="send">Send</TabsTrigger>
-              <TabsTrigger value="pin">Set PIN</TabsTrigger>
+              <TabsTrigger value="send">{t("Send")}</TabsTrigger>
+              <TabsTrigger value="pin">{t("Set PIN")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="send" className="mt-4 space-y-3">
               <form onSubmit={sendTransfer} className="space-y-3">
                 <div>
                   <Label htmlFor="recipient_email" className="text-xs">
-                    Recipient email
+                    {t("Recipient email")}
                   </Label>
                   <Input
                     id="recipient_email"
@@ -118,7 +120,7 @@ export function TransferSheet({
                 </div>
                 <div>
                   <Label htmlFor="transfer_amount" className="text-xs">
-                    Amount
+                    {t("Amount")}
                   </Label>
                   <Input
                     id="transfer_amount"
@@ -132,12 +134,12 @@ export function TransferSheet({
                 </div>
                 <Input
                   name="transfer_note"
-                  placeholder="Note (optional)"
+                  placeholder={t("Note (optional)")}
                   maxLength={160}
                 />
                 <Button type="submit" disabled={transferBusy} className="w-full">
                   <Send className="mr-2 h-4 w-4" />
-                  {transferBusy ? "Sending…" : "Send transfer"}
+                  {transferBusy ? t("Sending…") : t("Send transfer")}
                 </Button>
               </form>
             </TabsContent>
@@ -146,10 +148,10 @@ export function TransferSheet({
               <form onSubmit={submitPin} className="space-y-3">
                 <div>
                   <Label htmlFor="new_pin" className="text-xs">
-                    Transfer PIN
+                    {t("Transfer PIN")}
                   </Label>
                   <p className="mb-2 text-xs text-muted-foreground">
-                    Choose a 4–6 digit PIN and keep it private.
+                    {t("Choose a 4–6 digit PIN and keep it private.")}
                   </p>
                   <Input
                     id="new_pin"
@@ -159,13 +161,13 @@ export function TransferSheet({
                     pattern="[0-9]{4,6}"
                     minLength={4}
                     maxLength={6}
-                    placeholder="4–6 digits"
+                    placeholder={t("4–6 digits")}
                     required
                   />
                 </div>
                 <Button type="submit" disabled={pinBusy} className="w-full">
                   <KeyRound className="mr-2 h-4 w-4" />
-                  {pinBusy ? "Saving…" : "Save PIN"}
+                  {pinBusy ? t("Saving…") : t("Save PIN")}
                 </Button>
               </form>
             </TabsContent>
@@ -185,11 +187,12 @@ export function TransferSheet({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm transfer</DialogTitle>
+            <DialogTitle>{t("Confirm transfer")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Enter your transfer PIN to send{" "}
-            {transferDraft ? formatXAF(transferDraft.amount) : ""}.
+            {t("Enter your transfer PIN to send {amount}.", {
+              amount: transferDraft ? formatXAF(transferDraft.amount) : "",
+            })}
           </p>
           <Input
             value={confirmPin}
@@ -199,8 +202,8 @@ export function TransferSheet({
             type="password"
             inputMode="numeric"
             autoComplete="off"
-            placeholder="4–6 digit PIN"
-            aria-label="Transfer PIN"
+            placeholder={t("4–6 digit PIN")}
+            aria-label={t("Transfer PIN")}
           />
           <DialogFooter>
             <Button
@@ -211,14 +214,14 @@ export function TransferSheet({
                 setConfirmPin("");
               }}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button
               type="button"
               disabled={transferBusy || confirmPin.length < 4}
               onClick={confirmTransfer}
             >
-              {transferBusy ? "Sending…" : "Confirm transfer"}
+              {transferBusy ? t("Sending…") : t("Confirm transfer")}
             </Button>
           </DialogFooter>
         </DialogContent>

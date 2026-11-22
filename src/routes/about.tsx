@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { useI18n } from "@/hooks/useI18n";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -17,30 +18,34 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const { t } = useI18n();
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <section className="bg-hero py-20 text-primary-foreground">
         <div className="mx-auto max-w-4xl px-4">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            About JumboCM
+            {t("About JumboCM")}
           </div>
           <h1 className="mt-3 font-display text-5xl md:text-6xl">
-            A new chapter for Cameroonian capital.
+            {t("A new chapter for Cameroonian capital.")}
           </h1>
         </div>
       </section>
       <section className="mx-auto max-w-3xl px-4 py-16 text-lg leading-relaxed text-foreground/80">
         <p>
-          JumboCM was founded with a simple belief — that everyday Cameroonians deserve access to
-          real investment opportunities, paid in their own currency, on rails they already trust.
+          {t(
+            "JumboCM was founded with a simple belief — that everyday Cameroonians deserve access to real investment opportunities, paid in their own currency, on rails they already trust.",
+          )}
         </p>
         <p className="mt-6">
-          We combine the speed of Mobile Money with the discipline of institutional finance. Every
-          deposit is reviewed by a member of our team. Every payout is logged. Every plan is
-          designed around flexibility — you choose the amount, you choose the duration.
+          {t(
+            "We combine the speed of Mobile Money with the discipline of institutional finance. Every deposit is reviewed by a member of our team. Every payout is logged. Every plan is designed around flexibility — you choose the amount, you choose the duration.",
+          )}
         </p>
-        <p className="mt-6">Headquartered in Douala, we serve investors across Central Africa.</p>
+        <p className="mt-6">
+          {t("Headquartered in Douala, we serve investors across Central Africa.")}
+        </p>
       </section>
       <SiteFooter />
     </div>

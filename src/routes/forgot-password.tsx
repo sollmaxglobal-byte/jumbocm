@@ -53,7 +53,7 @@ function ForgotPasswordPage() {
 
   return (
     <AuthTerminalShell>
-      <span className="auth-eyebrow">Account recovery</span>
+      <span className="auth-eyebrow">{t("Account recovery")}</span>
       <h1 className="auth-title">{t("auth.forgotTitle")}</h1>
       <p className="auth-sub">{t("auth.forgotSub")}</p>
 
